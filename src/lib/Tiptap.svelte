@@ -31,6 +31,10 @@
 	});
 
     function translate(json: JSONContent): string {
+
+        if(!json.content![0].content) {
+            return ""
+        }
         
         const content = json.content![0].content!
 
@@ -46,7 +50,7 @@
                 obfuscated: trueMarkOrUndefined(c, "obfuscated"),
                 text: c.text,
                 color: c.marks?.at(0)?.attrs?.color || "white",
-                font: c.marks?.at(0)?.attrs?.font
+                font: c.marks?.at(0)?.attrs?.font || undefined
             })
         })
 

@@ -4,6 +4,6 @@
 	
 </script>
 
-<main class="font-lexend">
+<main class="font-lexend p-4">
 	<Tiptap />
 </main>

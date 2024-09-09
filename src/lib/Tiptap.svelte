@@ -6,6 +6,7 @@
     import Color from "@tiptap/extension-color"
     import TextStyle from "@tiptap/extension-text-style"
 	import { colorMap, Fonts, Obfuscation, type MinecraftText } from "./text";
+	import { dev } from "$app/environment";
 
 	let element: HTMLElement;
 	let editor: Editor;
@@ -76,36 +77,43 @@
 {#if editor}
 	<button
 		on:click={() => editor.chain().focus().toggleBold().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("bold")}>
 		Bold
 	</button>
 	<button
 		on:click={() => editor.chain().focus().toggleItalic().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("italic")}>
 		Italic
 	</button>
 	<button
 		on:click={() => editor.chain().focus().toggleStrike().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("strikethrough")}>
 		Strikethrough
 	</button>
     <button
 		on:click={() => editor.chain().focus().toggleUnderline().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Underline
 	</button>
     <button
 		on:click={() => editor.chain().focus().toggleObfuscated().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Obfuscate
 	</button>
     <button
 		on:click={() => editor.chain().focus().setFont(fontName).run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Font
 	</button>
     <button
 		on:click={() => editor.chain().focus().unsetFont().run()}
+        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Remove Font
 	</button>
@@ -119,15 +127,25 @@
             <div class="size-4" style="background-color: {color.value};"></div>
         </button>
     {/each}
-    <input type="color" bind:value={color} on:contextmenu={e => e.preventDefault()} on:mousedown={customColorHandler}>
-    <input type="text" bind:value={fontName} placeholder="Enter font name">
+
+    <br>
+
+    <label for="color">Custom Color:</label>
+    <input type="color" name="color" bind:value={color} on:contextmenu={e => e.preventDefault()} on:mousedown={customColorHandler} class="size-6 bg-transparent border-0">
+    
+    <br>
+
+    <label for="font">Custom Font:</label>
+    <input type="text" name="font" bind:value={fontName} placeholder="Enter font name">
 {/if}
 
-<div class="font-minecraft" bind:this={element} />
+<div class="font-minecraft p-3 bg-zinc-800 w-1/2" bind:this={element} />
 
 <div>
-    Debug<br>
-    <code>{editor ? JSON.stringify(editor.getJSON()) : "Loading..."}</code>
+    {#if dev}        
+        Debug<br>
+        <code>{editor ? JSON.stringify(editor.getJSON()) : "Loading..."}</code>
+    {/if}
     <br>Final<br>
     <code>{editor ? translate(editor.getJSON()) : "Loading..."}</code>
 </div>

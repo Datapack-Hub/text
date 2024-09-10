@@ -8,6 +8,13 @@
 	import { colorMap, Fonts, Obfuscation, type MinecraftText } from "./text";
 	import { dev } from "$app/environment";
 
+    import IconBold from '~icons/tabler/bold'
+    import IconItalic from '~icons/tabler/italic'
+    import IconStrikethrough from '~icons/tabler/strikethrough'
+    import IconUnderline from '~icons/tabler/underline'
+    import IconObfuscate from '~icons/tabler/password'
+    import IconSquare from '~icons/tabler/square-filled'
+
 	let element: HTMLElement;
 	let editor: Editor;
     let color = "";
@@ -34,7 +41,7 @@
     function translate(json: JSONContent): string {
 
         if(!json.content![0].content) {
-            return ""
+            return "waiting for output..."
         }
         
         const content = json.content![0].content!
@@ -77,58 +84,60 @@
 {#if editor}
 	<button
 		on:click={() => editor.chain().focus().toggleBold().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
-		class:active={editor.isActive("bold")}>
-		Bold
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive("bold") ? "bg-zinc-800" : ""}">
+		<IconBold />
 	</button>
 	<button
 		on:click={() => editor.chain().focus().toggleItalic().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("italic")}>
-		Italic
+		<IconItalic />
 	</button>
 	<button
 		on:click={() => editor.chain().focus().toggleStrike().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("strikethrough")}>
-		Strikethrough
+		<IconStrikethrough />
 	</button>
     <button
 		on:click={() => editor.chain().focus().toggleUnderline().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
-		Underline
+		<IconUnderline />
 	</button>
     <button
 		on:click={() => editor.chain().focus().toggleObfuscated().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
-		Obfuscate
+		<IconObfuscate />
 	</button>
     <button
 		on:click={() => editor.chain().focus().setFont(fontName).run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Font
 	</button>
     <button
 		on:click={() => editor.chain().focus().unsetFont().run()}
-        class="px-2 py-1 bg-orange-600 rounded-md font-medium"
+        class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 		class:active={editor.isActive("underline")}>
 		Remove Font
 	</button>
+
+    <button class="px-2" />
 
     {#each colorMap as color}
         <button
             on:click={() => editor.chain().focus().setColor(color.value).run()}
             title={color.name}
-            class="ml-2"
-            class:active={editor.isActive("underline")}>
-            <div class="size-4" style="background-color: {color.value};"></div>
+            class="p-1 text-lg hover:bg-zinc-800"
+            class:active={editor.isActive("underline")}
+            style="color: {color.value};">
+            <IconSquare />
         </button>
     {/each}
 
-    <br>
+    <!-- <br>
 
     <label for="color">Custom Color:</label>
     <input type="color" name="color" bind:value={color} on:contextmenu={e => e.preventDefault()} on:mousedown={customColorHandler} class="size-6 bg-transparent border-0">
@@ -136,16 +145,15 @@
     <br>
 
     <label for="font">Custom Font:</label>
-    <input type="text" name="font" bind:value={fontName} placeholder="Enter font name">
+    <input type="text" name="font" bind:value={fontName} placeholder="Enter font name"> -->
 {/if}
 
-<div class="font-minecraft p-3 bg-zinc-800 w-1/2" bind:this={element} />
+<div class="font-minecraft bg-zinc-800 w-1/2 p-2 rounded-md mt-2 mb-4" bind:this={element} />
 
 <div>
-    {#if dev}        
+    {#if !dev}        
         Debug<br>
         <code>{editor ? JSON.stringify(editor.getJSON()) : "Loading..."}</code>
     {/if}
-    <br>Final<br>
-    <code>{editor ? translate(editor.getJSON()) : "Loading..."}</code>
+    <code class="inline-block p-3 bg-zinc-950 mt-2 w-1/2 rounded-md">{editor ? translate(editor.getJSON()) : "Loading..."}</code>
 </div>

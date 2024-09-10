@@ -137,23 +137,24 @@
         </button>
     {/each}
 
-    <!-- <br>
+    <br>
 
     <label for="color">Custom Color:</label>
-    <input type="color" name="color" bind:value={color} on:contextmenu={e => e.preventDefault()} on:mousedown={customColorHandler} class="size-6 bg-transparent border-0">
+    <input type="color" id="color" bind:value={color} on:contextmenu={e => e.preventDefault()} on:mousedown={customColorHandler} class="size-6 bg-transparent border-0">
     
     <br>
 
     <label for="font">Custom Font:</label>
-    <input type="text" name="font" bind:value={fontName} placeholder="Enter font name"> -->
+    <input class="bg-zinc-800 p-2 rounded-md" type="text" id="font" bind:value={fontName} placeholder="Enter font name">
 {/if}
 
 <div class="font-minecraft bg-zinc-800 w-1/2 p-2 rounded-md mt-2 mb-4" bind:this={element} />
 
 <div>
-    {#if !dev}        
+    {#if dev}        
         Debug<br>
         <code>{editor ? JSON.stringify(editor.getJSON()) : "Loading..."}</code>
+        <br>
     {/if}
     <code class="inline-block p-3 bg-zinc-950 mt-2 w-1/2 rounded-md">{editor ? translate(editor.getJSON()) : "Loading..."}</code>
 </div>

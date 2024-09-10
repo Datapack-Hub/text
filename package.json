@@ -36,7 +36,6 @@
 	"dependencies": {
 		"@formkit/auto-animate": "^0.8.2",
 		"@sveltejs/adapter-auto": "^3.2.4",
-		"@sveltejs/adapter-cloudflare": "^4.7.2",
 		"@tiptap/core": "^2.6.6",
 		"@tiptap/pm": "^2.6.6",
 		"@tiptap/starter-kit": "^2.6.6",

@@ -19,6 +19,18 @@ export const colorMap = [
 	{ name: "black", value: "#000000" },
 ];
 
+export type MinecraftTextWithNoEvents = Pick<
+	MinecraftText,
+	| "text"
+	| "color"
+	| "font"
+	| "bold"
+	| "italic"
+	| "underlined"
+	| "strikethrough"
+	| "obfuscated"
+>;
+
 // Create a type that replicates the Minecraft JSON text format
 export type MinecraftText = {
 	// Text OR translation
@@ -37,9 +49,20 @@ export type MinecraftText = {
 	};
 	hoverEvent?: {
 		action: string;
-		value: string;
+		contents: MinecraftTextWithNoEvents;
 	};
 };
+
+interface ClickEventAttributes {
+	action: string | null;
+	value: string | null;
+}
+
+interface HoverEventAttributes {
+	action: string | null;
+	value: object;
+}
+
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
@@ -60,6 +83,10 @@ declare module "@tiptap/core" {
 			setObfuscated: () => ReturnType;
 			toggleObfuscated: () => ReturnType;
 			unsetObfuscated: () => ReturnType;
+			setClickEvent: (attributes: ClickEventAttributes) => ReturnType;
+			unsetClickEvent: () => ReturnType;
+			setHoverEvent: (attributes: HoverEventAttributes) => ReturnType;
+			unsetHoverEvent: () => ReturnType;
 		};
 	}
 }
@@ -147,6 +174,134 @@ export const Fonts = Extension.create({
 						.setMark("textStyle", { font: null })
 						.removeEmptyTextStyle()
 						.run();
+				},
+		};
+	},
+});
+
+export const ClickEventMark = Mark.create({
+	name: "clickEvent",
+
+	addAttributes(): ClickEventAttributes {
+		return {
+			action: null,
+			value: null,
+		};
+	},
+
+	parseHTML() {
+		return [
+			{
+				tag: "span[data-click-event-action]",
+				getAttrs: (element) => {
+					if (typeof element === "string") {
+						return false;
+					}
+					const el = element as HTMLElement;
+					const action = el.getAttribute("data-click-event-action");
+					const value = el.getAttribute("data-click-event-value");
+					if (!action) {
+						return false;
+					}
+					return {
+						action,
+						value,
+					};
+				},
+			},
+		];
+	},
+
+	renderHTML({ HTMLAttributes }) {
+		return [
+			"span",
+			mergeAttributes(
+				{
+					"data-click-event-action": HTMLAttributes.action,
+					"data-click-event-value": HTMLAttributes.value,
+					class: "clickEvent", // Optional styling
+				},
+				HTMLAttributes,
+			),
+			0,
+		];
+	},
+
+	addCommands() {
+		return {
+			setClickEvent:
+				(attributes: ClickEventAttributes) =>
+				({ chain }) => {
+					return chain().setMark(this.name, attributes).run();
+				},
+			unsetClickEvent:
+				() =>
+				({ chain }) => {
+					return chain().unsetMark(this.name).run();
+				},
+		};
+	},
+});
+
+export const HoverEventMark = Mark.create({
+	name: "hoverEvent",
+
+	addAttributes(): ClickEventAttributes {
+		return {
+			action: null,
+			value: null,
+		};
+	},
+
+	parseHTML() {
+		return [
+			{
+				tag: "span[data-hover-event-action]",
+				getAttrs: (element) => {
+					if (typeof element === "string") {
+						return false;
+					}
+					const el = element as HTMLElement;
+					const action = el.getAttribute("data-hover-event-action");
+					const value = el.getAttribute("data-hover-event-value");
+					if (!action) {
+						return false;
+					}
+					return {
+						action,
+						value,
+					};
+				},
+			},
+		];
+	},
+
+	renderHTML({ HTMLAttributes }) {
+		return [
+			"span",
+			mergeAttributes(
+				{
+					"data-click-event-action": HTMLAttributes.action,
+					"data-click-event-value": HTMLAttributes.value,
+					class: "hoverEvent", // Optional styling
+				},
+				HTMLAttributes,
+			),
+			0,
+		];
+	},
+
+	addCommands() {
+		return {
+			setHoverEvent:
+				(attributes: HoverEventAttributes) =>
+				({ chain }) => {
+					return chain().setMark(this.name, attributes).run();
+				},
+			unsetHoverEvent:
+				() =>
+				({ chain }) => {
+					return chain().unsetMark(this.name).run();
 				},
 		};
 	},

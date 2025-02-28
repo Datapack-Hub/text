@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 .btn {
 	@apply p-1 hover:bg-zinc-800 rounded-md transition-all;
@@ -12,5 +10,17 @@
 
 ::-webkit-color-swatch,
 ::-moz-color-swatch {
-  border-color: transparent;
+	border-color: transparent;
+}
+
+.clickEvent::before {
+	content: 'C';
+	font-size: 8pt;
+	background: #fff;
+	color: black;
+}
+
+.hoverEvent::before {
+	content: 'H';
+	font-size: 8pt;
 }

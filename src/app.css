@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 .btn {
 	@apply p-1 hover:bg-zinc-800 rounded-md transition-all;
@@ -8,4 +6,36 @@
 
 .card {
 	@apply p-3 bg-zinc-950 rounded-xl border-2 border-stone-900 flex items-center space-x-2 hover:bg-orange-600 cursor-pointer;
+}
+
+::-webkit-color-swatch,
+::-moz-color-swatch {
+	border-color: transparent;
+}
+
+.tiptap {
+	@apply h-full p-4;
+	@apply focus:outline-none;
+	font-family: Minecraft;
+	@apply text-lg;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+	color: #7F7F7F;
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}
+
+.clickEvent::before {
+	content: 'C';
+	font-size: 8pt;
+	background: #fff;
+	color: black;
+}
+
+.hoverEvent::before {
+	content: 'H';
+	font-size: 8pt;
 }

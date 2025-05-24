@@ -143,9 +143,9 @@
 <div class="flex flex-col h-screen">
     <div class="bg-zinc-950 w-full p-2 px-3 text-zinc-300 flex items-center space-x-1" style="font-family: Lexend">
         <img src="/dph.svg" class="h-5 mr-2"/>
-        <span class="mr-6">Minecraft Text Editor <span class="text-xs">(by Datapack Hub)</span></span>
-        <a href="https://discord.datapackhub.net/" class="underline mr-6">Discord Server</a>
-        <a href="https://datapack.wiki/" class="underline mr-6">Datapack Wiki</a>
+        <span class="mr-6">Minecraft Text Editor <span class="text-xs">(by <a href="https://datapackhub.net/" class="underline">Datapack Hub</a>)</span></span>
+        <a href="https://discord.datapackhub.net/" class="underline mr-6 hidden md:inline">Discord</a>
+        <a href="https://datapack.wiki/" class="underline mr-6 hidden md:inline">DP Wiki</a>
     </div>
     <div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
     {#if editor}

@@ -13,6 +13,21 @@
 	border-color: transparent;
 }
 
+.tiptap {
+	@apply h-full p-4;
+	@apply focus:outline-none;
+	font-family: Minecraft;
+	@apply text-lg;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+	color: #7F7F7F;
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}
+
 .clickEvent::before {
 	content: 'C';
 	font-size: 8pt;

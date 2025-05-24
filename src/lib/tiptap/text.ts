@@ -43,11 +43,11 @@ export type MinecraftText = {
 	underlined?: boolean;
 	strikethrough?: boolean;
 	obfuscated?: boolean;
-	clickEvent?: {
+	click_event?: {
 		action: string;
 		value: string;
 	};
-	hoverEvent?: {
+	hover_event?: {
 		action: string;
 		contents: MinecraftTextWithNoEvents;
 	};

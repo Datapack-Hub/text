@@ -5,6 +5,6 @@
 	let { children } = $props();
 </script>
 
-<div class="font-lexend bg-zinc-900 text-white min-h-screen h-full">
+<div class="font-lexend bg-zinc-900 text-white min-h-screen h-full w-full">
 	{@render children()}
 </div>

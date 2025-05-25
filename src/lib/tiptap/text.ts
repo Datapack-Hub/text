@@ -1,4 +1,4 @@
-import { Extension, Mark, mergeAttributes } from "@tiptap/core";
+import { Extension, Mark, mergeAttributes, Node, type CommandProps } from '@tiptap/core'
 
 export const colorMap = [
 	{ name: "dark_red", value: "#AA0000" },
@@ -36,6 +36,15 @@ export type MinecraftText = {
 	// Text OR translation
 	translate?: string;
 	text?: string;
+	score?: {
+		name: string;
+		objective: string;
+	};
+	nbt?: string;
+	interpret?: string;
+	storage?: string;
+	block?: string;
+	entity?: string;
 	color?: string;
 	font?: string;
 	bold?: boolean;
@@ -63,6 +72,31 @@ interface HoverEventAttributes {
 	value: object;
 }
 
+interface ScoreAttributes {
+	name: string;
+	objective: string;
+}
+
+interface TranslateAttributes {
+	key: string;
+}
+
+interface StorageNBTAttributes {
+	nbt: string;
+	storage: string;
+	interpret: boolean;
+}
+interface BlockNBTAttributes {
+	nbt: string;
+	block: string;
+	interpret: boolean;
+}
+interface EntityNBTAttributes {
+	nbt: string;
+	entity: string;
+	interpret: boolean;
+}
+
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
@@ -88,6 +122,17 @@ declare module "@tiptap/core" {
 			setHoverEvent: (attributes: HoverEventAttributes) => ReturnType;
 			unsetHoverEvent: () => ReturnType;
 		};
+		scoreNode: {
+            insertScore: (attrs: ScoreAttributes) => ReturnType;
+        };
+		translateNode: {
+            insertTranslate: (attrs: TranslateAttributes) => ReturnType;
+        };
+		NBTNode: {
+            insertBlockNBT: (attrs: BlockNBTAttributes) => ReturnType;
+            insertStorageNBT: (attrs: StorageNBTAttributes) => ReturnType;
+            insertEntityNBT: (attrs: EntityNBTAttributes) => ReturnType;
+        };
 	}
 }
 
@@ -244,65 +289,399 @@ export const ClickEventMark = Mark.create({
 });
 
 export const HoverEventMark = Mark.create({
-	name: "hoverEvent",
+    name: "hoverEvent",
 
-	addAttributes(): ClickEventAttributes {
-		return {
-			action: null,
-			value: null,
-		};
-	},
+    addAttributes(): HoverEventAttributes {
+        return {
+            action: null,
+            value: null,
+        };
+    },
 
-	parseHTML() {
-		return [
-			{
-				tag: "span[data-hover-event-action]",
-				getAttrs: (element) => {
-					if (typeof element === "string") {
-						return false;
-					}
-					const el = element as HTMLElement;
-					const action = el.getAttribute("data-hover-event-action");
-					const value = el.getAttribute("data-hover-event-value");
-					if (!action) {
-						return false;
-					}
-					return {
-						action,
-						value,
-					};
-				},
-			},
-		];
-	},
+    parseHTML() {
+        return [
+            {
+                tag: "span[data-hover-event-action]",
+                getAttrs: (element) => {
+                    if (typeof element === "string") {
+                        return false;
+                    }
+                    const el = element as HTMLElement;
+                    const action = el.getAttribute("data-hover-event-action");
+                    const value = el.getAttribute("data-hover-event-value");
+                    if (!action) {
+                        return false;
+                    }
+                    return {
+                        action,
+                        value,
+                    };
+                },
+            },
+        ];
+    },
 
-	renderHTML({ HTMLAttributes }) {
-		return [
-			"span",
-			mergeAttributes(
-				{
-					"data-click-event-action": HTMLAttributes.action,
-					"data-click-event-value": HTMLAttributes.value,
-					class: "hoverEvent", // Optional styling
-				},
-				HTMLAttributes,
-			),
-			0,
-		];
-	},
+    renderHTML({ HTMLAttributes }) {
+        return [
+            "span",
+            mergeAttributes(
+                {
+                    "data-hover-event-action": HTMLAttributes.action,
+                    "data-hover-event-value": HTMLAttributes.value,
+                    class: "hoverEvent",
+                },
+                HTMLAttributes,
+            ),
+            0,
+        ];
+    },
 
-	addCommands() {
-		return {
-			setHoverEvent:
-				(attributes: HoverEventAttributes) =>
-				({ chain }) => {
-					return chain().setMark(this.name, attributes).run();
-				},
-			unsetHoverEvent:
-				() =>
-				({ chain }) => {
-					return chain().unsetMark(this.name).run();
-				},
-		};
-	},
+    addCommands() {
+        return {
+            setHoverEvent:
+                (attributes: HoverEventAttributes) =>
+                ({ chain }) => {
+                    return chain().setMark(this.name, attributes).run();
+                },
+            unsetHoverEvent:
+                () =>
+                ({ chain }) => {
+                    return chain().unsetMark(this.name).run();
+                },
+        };
+    },
 });
+
+export interface NodeOptions {
+  HTMLAttributes: Record<string, any>
+}
+
+export const ScoreNode = Node.create<NodeOptions>({
+  name: 'score',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): ScoreAttributes {
+		return {
+			name: "",
+			objective: "",
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-score-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { name, objective } = node.attrs
+
+	return [
+	  'span',
+	  mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+		'data-score-node': 'true',
+		contenteditable: 'false',
+		style: `
+		  background-color: #555555;
+		  padding: 1px 5px;
+		  border-radius: 4px;
+		  font-size: 0.9em;
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 4px 6px;
+		`,
+	  }),
+	  ['span', {}, `SCORE: ${name} - ${objective}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertScore:
+		(attrs: { name: string; objective: string }) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			},
+		}
+	}
+
+})
+
+export const TranslateNode = Node.create<NodeOptions>({
+  name: 'translate',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): TranslateAttributes {
+		return {
+			key: ""
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-translate-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { key } = node.attrs
+
+	return [
+	  'span',
+	  mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+		'data-translate-node': 'true',
+		contenteditable: 'false',
+		style: `
+		  background-color: #555555;
+		  padding: 1px 5px;
+		  border-radius: 4px;
+		  font-size: 0.9em;
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 4px 6px;
+		`,
+	  }),
+	  ['span', {}, `TRANSLATE: ${key}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertTranslate:
+		(attrs: { name: string; objective: string }) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			},
+		}
+	}
+
+})
+
+export const StorageNBTNode = Node.create<NodeOptions>({
+  name: 'storage_nbt',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): StorageNBTAttributes {
+		return {
+			nbt: "",
+			storage: "",
+			interpret: false
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-nbt-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { nbt, storage } = node.attrs
+	console.log(node.attrs)
+
+	return [
+		'span',
+		mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+			'data-nbt-node': 'true',
+			contenteditable: 'false',
+			style: `
+			background-color: #555555;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 0.9em;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px 6px;
+			`,
+		}),
+		['span', {}, `NBT: ${nbt}, ${storage}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertStorageNBT:
+		(attrs: { name: string; objective: string }) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			}
+		}
+	}
+
+})
+
+export const EntityNBTNode = Node.create<NodeOptions>({
+  name: 'entity_nbt',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): EntityNBTAttributes {
+		return {
+			nbt: "",
+			entity: "",
+			interpret: false
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-nbt-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { nbt, entity } = node.attrs
+	console.log(node.attrs)
+
+	return [
+		'span',
+		mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+			'data-nbt-node': 'true',
+			contenteditable: 'false',
+			style: `
+			background-color: #555555;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 0.9em;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px 6px;
+			`,
+		}),
+		['span', {}, `NBT: ${nbt}, ${entity}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertEntityNBT:
+		(attrs: { name: string; objective: string }) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			}
+		}
+	}
+
+})
+
+export const BlockNBTNode = Node.create<NodeOptions>({
+  name: 'block_nbt',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): BlockNBTAttributes {
+		return {
+			nbt: "",
+			block: "",
+			interpret: false
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-nbt-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { nbt, block } = node.attrs
+	console.log(node.attrs)
+
+	return [
+		'span',
+		mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+			'data-nbt-node': 'true',
+			contenteditable: 'false',
+			style: `
+			background-color: #555555;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 0.9em;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px 6px;
+			`,
+		}),
+		['span', {}, `NBT: ${nbt}, ${block}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertBlockNBT:
+		(attrs: { name: string; objective: string }) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			}
+		}
+	}
+
+})

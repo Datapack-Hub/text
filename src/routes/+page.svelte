@@ -41,12 +41,15 @@
 	import IconBold from "~icons/tabler/bold";
 	import IconItalic from "~icons/tabler/italic";
 	import IconColor from "~icons/tabler/palette";
+	import IconCopy from "~icons/tabler/copy";
 	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconHollow from "~icons/tabler/square";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
+	import IconTick from "~icons/tabler/check";
+	import IconObfuscate from "~icons/tabler/password";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -55,6 +58,8 @@
 	let editor: Editor;
 	let color = "";
 	let fontName = "";
+
+	let recentlyCopied = false;
 
 	// Snapshots and stuff
 	let snapshots: object[] = [];
@@ -69,28 +74,6 @@
 	let hoverEventType = "";
 	let hoverEventValue: any;
 	let hoverEventDialog: Modal;
-	let hoverEventValues: {
-		entity: {
-			uuid: string,
-			id: string,
-			name: string
-		},
-		item: {
-			id: string;
-			count: number;
-			components?: {}[]
-		}
-	} = {
-		entity: {
-			uuid: "",
-			id: "",
-			name: ""
-		},
-		item: {
-			id: "",
-			count: 1
-		}
-	};
 
 	let customType = "-- Select one --";
 	let customDialog: Modal;
@@ -306,10 +289,7 @@
 
 				if(getMarkType(c, "hoverEvent")){
 					const ce = getMarkType(c, "hoverEvent")?.attrs
-					current.hover_event = {action: ce!.action}
-					if(ce!.action == "show_text"){
-						current.hover_event.value = ce!.value
-					}
+					current.hover_event = {action: ce!.action, value: ce!.value}
 				}
 
 				data.push(current)
@@ -422,12 +402,11 @@
 				title="Underline">
 				<IconUnderline />
 			</button>
-			<!-- <button
+			<button
 				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				class:active={editor.isActive("underline")}>
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('obfuscated',) ? 'bg-zinc-800' : ''}">
 				<IconObfuscate />
-			</button> -->
+			</button>
 
 			<div class="w-4"></div>
 
@@ -507,13 +486,29 @@
 					: "Loading..."}</code>
 			<br />
 		{/if}
-		<code class="inline-block p-3 bg-zinc-950 w-full"
-			>{editor
+		<div class="flex items-start bg-zinc-950 p-3 space-x-3">
+			<button 
+			class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+			onclick={() => {
+				navigator.clipboard.writeText(
+					translate(editor.getJSON()).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, 
+					(match) => match.replace(/"/g, ""))
+				);
+				recentlyCopied = true;
+				setTimeout(() => recentlyCopied = false, 2000)
+			}}>
+			{#if recentlyCopied}
+				<IconTick />
+			{:else}
+				<IconCopy />
+			{/if}</button>
+			<code class="inline-block w-full">{editor
 				? translate(editor.getJSON()).replace(
-						/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-						(match) => match.replace(/"/g, ""),
-					)
-				: "Loading..."}</code>
+					/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+					(match) => match.replace(/"/g, ""),
+				) : "Loading..."}
+			</code>
+		</div>
 	</div>
 </div>
 
@@ -597,20 +592,21 @@
 </Modal>
 
 <Modal title="Hover Event" bind:this={hoverEventDialog}>
-		<p>Text to show</p>
-		<MiniEditor bind:output={hoverEventValue}/>
-		<button
-			onclick={() => {
-				hoverEventDialog.close();
-				editor
-					.chain()
-					.focus()
-					.setHoverEvent({ action: hoverEventType, value: hoverEventValue })
-					.run();
-			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
-			Add Hover Event
-		</button>
+	<p>Text to show</p>
+	<MiniEditor bind:output={hoverEventValue}/>
+	<button
+		onclick={() => {
+			console.log(hoverEventValue)
+			editor
+				.chain()
+				.focus()
+				.setHoverEvent({ action: "show_text", value: hoverEventValue })
+				.run();
+			hoverEventDialog.close();
+		}}
+		class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+		Add Hover Event
+	</button>
 </Modal>
 
 <Modal title="Add Custom Source" bind:this={customDialog}>

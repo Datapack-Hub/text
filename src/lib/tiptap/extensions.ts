@@ -13,7 +13,7 @@ interface ClickEventAttributes {
 
 interface HoverEventAttributes {
 	action: string | null;
-	value: object;
+	value: string | null;
 }
 
 interface ScoreAttributes {
@@ -97,8 +97,13 @@ export const Obfuscation = Mark.create({
 	name: "obfuscated",
 	renderHTML({ HTMLAttributes }) {
 		return [
-			"blink",
-			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+			"span",
+			mergeAttributes(
+				{
+					class: "obfuscated",
+				},
+				HTMLAttributes,
+			),
 			0,
 		];
 	},
@@ -429,7 +434,7 @@ export const TranslateNode = Node.create<NodeOptions>({
 	addCommands() {
 		return {
 			insertTranslate:
-				(attrs: { name: string; objective: string }) =>
+				(attrs: { key: string }) =>
 				({ commands }: CommandProps) => {
 					return commands.insertContent({
 						type: this.name,

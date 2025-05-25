@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from "svelte";
 	import { Editor, isMarkActive, type JSONContent } from "@tiptap/core";
 	import StarterKit from "@tiptap/starter-kit";
+	import Placeholder from "@tiptap/extension-placeholder";
 	import Underline from "@tiptap/extension-underline";
 	import Color from "@tiptap/extension-color";
 	import TextStyle from "@tiptap/extension-text-style";
@@ -46,18 +47,18 @@
 				Fonts,
 				ClickEventMark,
 				HoverEventMark,
+				Placeholder.configure({
+					placeholder:
+						"Write text here, and style it with the options above!",
+				})
 			],
-			content: "<p>Hello World!</p>",
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
 			},
 			onUpdate: ({ editor }) => {
 				value = JSON.stringify(editor.getJSON());
-				output = translate(editor.getJSON()).replace(
-					/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-					(match) => match.replace(/"/g, ""),
-				)
+				output = JSON.parse(translate(editor.getJSON()))
 			},
 		});
 	});

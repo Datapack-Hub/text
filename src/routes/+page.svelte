@@ -8,6 +8,7 @@
 		defaultColorLUT,
 		trueMarkOrUndefined,
 		type ExternalSources,
+		addTypeSpecificValues,
 	} from "$lib/tiptap/text";
 
 	import {
@@ -165,132 +166,16 @@
 			const content = p.content || [];
 			let current: MinecraftText
 			content.forEach((c) => {
-				if (c.type == "text") {
-					current = {
-						text: c.text,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined
-					}
-				} else if (c.type == "score") {
-					current = {
-						score: {
-							name: c.attrs?.name,
-							objective: c.attrs?.objective,
-						},
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					};
-				} else if (c.type == "translate") {
-					current = {
-						translate: c.attrs?.key,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
-				} else if (c.type == "storage_nbt") {
-					current = {
-						nbt: c.attrs?.nbt,
-						storage: c.attrs?.storage,
-						interpret: c.attrs?.interpret || undefined,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
-				} else if (c.type == "block_nbt") {
-					current = {
-						nbt: c.attrs?.nbt,
-						block: c.attrs?.block,
-						interpret: c.attrs?.interpret || undefined,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
-				} else if (c.type == "entity_nbt") {
-					current = {
-						nbt: c.attrs?.nbt,
-						entity: c.attrs?.entity,
-						interpret: c.attrs?.interpret || undefined,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
-				} else if (c.type == "keybind") {
-					current = {
-						keybind: c.attrs?.key,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
-				} else if (c.type == "selector") {
-					current = {
-						selector: c.attrs?.selector,
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-					};
+				current = {
+					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+					bold: trueMarkOrUndefined(c, "bold"),
+					italic: trueMarkOrUndefined(c, "italic"),
+					strikethrough: trueMarkOrUndefined(c, "strike"),
+					underlined: trueMarkOrUndefined(c, "underline"),
+					obfuscated: trueMarkOrUndefined(c, "obfuscated")
 				}
 
-				if(getMarkType(c, "clickEvent")){
-					const ce = getMarkType(c, "clickEvent")?.attrs
-					current.click_event = {action: ce!.action}
-					if(ce!.action == "open_url"){
-						current.click_event.url = ce!.value
-					} else if (ce!.action == "run_command" || ce!.action == "suggest_command") {
-						current.click_event.command = ce!.value
-					} else if (ce!.action == "copy_to_clipboard") {
-						current.click_event.value = ce!.value
-					} else if (ce!.action == "change_page") {
-						current.click_event.page = ce!.value
-					} else if (ce!.action == "open_dialog") {
-						current.click_event.dialog = ce!.value
-					}
-				}
-
-				if(getMarkType(c, "hoverEvent")){
-					const ce = getMarkType(c, "hoverEvent")?.attrs
-					current.hover_event = {action: ce!.action, value: ce!.value}
-				}
+				current = addTypeSpecificValues(current, c)
 
 				data.push(current)
 			});

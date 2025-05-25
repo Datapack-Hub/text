@@ -73,7 +73,7 @@ export type MinecraftText = {
 
 		id?: string;
 		count?: number;
-		components?: {}[]
+		components?: {}[];
 
 		name?: MinecraftTextWithNoEvents | MinecraftTextWithNoEvents[];
 		uuid?: string | number[];
@@ -113,12 +113,80 @@ export function trueMarkOrUndefined(
 }
 
 export function defaultColorLUT(color: string): string | undefined {
-    if(!color || color === "null"){
-        return;
-    }
-    return colorMap.find((e) => e.value === color)?.name || color;
+	if (!color || color === "null") {
+		return;
+	}
+	return colorMap.find((e) => e.value === color)?.name || color;
 }
 
 export function getMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
+}
+
+export function addTypeSpecificValues(current: MinecraftText, c: JSONContent) {
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
+			break;
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
+			current.click_event = getMarkType(c, "clickEvent")?.attrs as {
+				action: string;
+				value: string;
+			};
+			current.hover_event = getMarkType(c, "hoverEvent")?.attrs as {
+				action: string;
+				contents: MinecraftTextWithNoEvents;
+			};
+			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+
+	if (getMarkType(c, "clickEvent")) {
+		const ce = getMarkType(c, "clickEvent")?.attrs;
+		current.click_event = { action: ce!.action };
+		switch (ce!.action) {
+			case "open_url":
+				current.click_event.url = ce!.value;
+				break;
+			case "run_command":
+			case "suggest_command":
+				current.click_event.command = ce!.value;
+				break;
+			case "copy_to_clipboard":
+				current.click_event.value = ce!.value;
+				break;
+			case "change_page":
+				current.click_event.page = ce!.value;
+				break;
+			case "open_dialog":
+				current.click_event.dialog = ce!.value;
+				break;
+		}
+	}
+
+	if (getMarkType(c, "hoverEvent")) {
+		const ce = getMarkType(c, "hoverEvent")?.attrs;
+		current.hover_event = { action: ce!.action, value: ce!.value };
+	}
+
+	return current;
 }

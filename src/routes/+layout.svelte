@@ -16,6 +16,6 @@
 	<meta name="author" content="Datapack Hub">
 </svelte:head>
 
-<div class="font-lexend bg-zinc-900 text-white min-h-screen h-full w-full">
+<div class="font-lexend bg-zinc-900 text-white min-h-screen min-w-screen h-full w-full">
 	{@render children()}
 </div>

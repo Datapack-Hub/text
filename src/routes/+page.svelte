@@ -481,8 +481,8 @@
 	</div>
 
 	<div>
-		{#if dev}
-			<code class="inline-block p-3"
+		{#if dev && false}
+			<code class="inline-block p-3 overflow-x-scroll"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
 					: "Loading..."}</code>
@@ -504,7 +504,7 @@
 			{:else}
 				<IconCopy />
 			{/if}</button>
-			<code class="inline-block w-full">{editor
+			<code class="inline-block w-full overflow-auto max-h-56">{editor
 				? translate(editor.getJSON()).replace(
 					/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
 					(match) => match.replace(/"/g, ""),

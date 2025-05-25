@@ -12,7 +12,6 @@
 
 	import {
 		ClickEventMark,
-		Fonts,
 		HoverEventMark,
 		Obfuscation,
 		ScoreNode,
@@ -40,7 +39,6 @@
 	// Icons
 	import IconCustom from "~icons/tabler/plus";
 	import IconBold from "~icons/tabler/bold";
-	import IconSave from "~icons/tabler/device-floppy";
 	import IconItalic from "~icons/tabler/italic";
 	import IconColor from "~icons/tabler/palette";
 	import IconClickEvent from "~icons/tabler/hand-finger";
@@ -69,8 +67,30 @@
 	let clickEventDialog: Modal;
 
 	let hoverEventType = "";
-	let hoverEventValue: object;
+	let hoverEventValue: any;
 	let hoverEventDialog: Modal;
+	let hoverEventValues: {
+		entity: {
+			uuid: string,
+			id: string,
+			name: string
+		},
+		item: {
+			id: string;
+			count: number;
+			components?: {}[]
+		}
+	} = {
+		entity: {
+			uuid: "",
+			id: "",
+			name: ""
+		},
+		item: {
+			id: "",
+			count: 1
+		}
+	};
 
 	let customType = "-- Select one --";
 	let customDialog: Modal;
@@ -118,7 +138,6 @@
 				Color,
 				TextStyle,
 				Obfuscation,
-				Fonts,
 				ClickEventMark,
 				HoverEventMark,
 				ScoreNode,
@@ -186,7 +205,6 @@
 						strikethrough: trueMarkOrUndefined(c, "strike"),
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
 						click_event: getMarkType(c, "clickEvent")?.attrs as {
 							action: string;
 							value: string;
@@ -283,6 +301,14 @@
 						current.click_event.page = ce!.value
 					} else if (ce!.action == "open_dialog") {
 						current.click_event.dialog = ce!.value
+					}
+				}
+
+				if(getMarkType(c, "hoverEvent")){
+					const ce = getMarkType(c, "hoverEvent")?.attrs
+					current.hover_event = {action: ce!.action}
+					if(ce!.action == "show_text"){
+						current.hover_event.value = ce!.value
 					}
 				}
 
@@ -449,8 +475,11 @@
 				<IconClickEvent />
 			</button>
 			<button
-				onclick={() => hoverEventDialog.open()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				onclick={() => {
+					if(editor.isActive("hoverEvent")) {editor.chain().focus().unsetHoverEvent().run();} 
+					else {hoverEventDialog.open()}
+				}}
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('hoverEvent') ? 'bg-zinc-800': ''}"
 				title="Hover Event">
 				<IconHoverEvent />
 			</button>
@@ -568,34 +597,20 @@
 </Modal>
 
 <Modal title="Hover Event" bind:this={hoverEventDialog}>
-	<p>Event Type</p>
-	<select bind:value={hoverEventType} class="bg-zinc-900 p-2 rounded-md">
-		<option value="show_text">Show Text</option>
-		<option value="show_entity">Show Entity</option>
-		<option value="show_item">Show Item</option>
-	</select>
-
-	{#if hoverEventType === "show_text"}
-		<p class="my-2">Text to show</p>
-		<MiniEditor />
-	{/if}
-
-	<div class="flex items-center space-x-2">
-		{#if clickEventType}
-			<button
-				onclick={() => {
-					clickEventDialog.close();
-					editor
-						.chain()
-						.focus()
-						.setClickEvent({ action: clickEventType, value: clickEventValue })
-						.run();
-				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
-				Add Click Event
-			</button>
-		{/if}
-	</div>
+		<p>Text to show</p>
+		<MiniEditor bind:output={hoverEventValue}/>
+		<button
+			onclick={() => {
+				hoverEventDialog.close();
+				editor
+					.chain()
+					.focus()
+					.setHoverEvent({ action: hoverEventType, value: hoverEventValue })
+					.run();
+			}}
+			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+			Add Hover Event
+		</button>
 </Modal>
 
 <Modal title="Add Custom Source" bind:this={customDialog}>

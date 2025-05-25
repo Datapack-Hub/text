@@ -29,7 +29,17 @@
 
 .clickEvent {
 	background-color: #3c3c40;
-	padding: 1px;
+	border-left: dashed #0DC7CA;
+	padding: 4px;
+	padding-left: 5px;
+	border-radius: 4px;
+}
+
+.hoverEvent {
+	background-color: #3c3c40;
+	border-left: dashed #DF30D6;
+	padding: 4px;
+	padding-left: 5px;
 	border-radius: 4px;
 }
 

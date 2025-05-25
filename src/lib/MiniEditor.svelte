@@ -28,6 +28,8 @@
 	// TODO: convert to non-legacy mode
 	export let value = "";
 
+	export let output = "";
+
 	let element: HTMLElement;
 	let editor: Editor;
 	let color = "";
@@ -52,6 +54,10 @@
 			},
 			onUpdate: ({ editor }) => {
 				value = JSON.stringify(editor.getJSON());
+				output = translate(editor.getJSON()).replace(
+					/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+					(match) => match.replace(/"/g, ""),
+				)
 			},
 		});
 	});
@@ -82,15 +88,6 @@
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-					font: undefined,
-					click_event: getMarkType(c, "clickEvent")?.attrs as {
-						action: string;
-						value: string;
-					},
-					hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-						action: string;
-						contents: MinecraftTextWithNoEvents;
-					},
 				});
 			});
 

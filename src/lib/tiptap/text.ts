@@ -68,7 +68,15 @@ export type MinecraftText = {
 	};
 	hover_event?: {
 		action: string;
-		contents: MinecraftTextWithNoEvents;
+
+		value?: MinecraftTextWithNoEvents | MinecraftTextWithNoEvents[];
+
+		id?: string;
+		count?: number;
+		components?: {}[]
+
+		name?: MinecraftTextWithNoEvents | MinecraftTextWithNoEvents[];
+		uuid?: string | number[];
 	};
 };
 
@@ -104,8 +112,11 @@ export function trueMarkOrUndefined(
 	return value === true ? value : undefined;
 }
 
-export function defaultColorLUT(color: string): string {
-	return colorMap.find((e) => e.value === color)?.name || color;
+export function defaultColorLUT(color: string): string | undefined {
+    if(!color || color === "null"){
+        return;
+    }
+    return colorMap.find((e) => e.value === color)?.name || color;
 }
 
 export function getMarkType(c: JSONContent, type: string) {

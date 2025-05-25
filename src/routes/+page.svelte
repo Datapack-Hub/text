@@ -21,6 +21,7 @@
         StorageNBTNode,
         EntityNBTNode,
         KeybindNode,
+        SelectorNode,
 		type MinecraftText,
 		type MinecraftTextWithNoEvents,
 	} from "$lib/tiptap/text";
@@ -80,6 +81,9 @@
         },
         keybind: {
             key: string
+        },
+        selector: {
+            selector: string
         }
     } = {
         score: {
@@ -99,6 +103,9 @@
         },
         keybind: {
             key: ""
+        },
+        selector: {
+            selector: ""
         }
     };
 
@@ -120,6 +127,7 @@
                 StorageNBTNode,
                 EntityNBTNode,
                 KeybindNode,
+                SelectorNode,
                 Placeholder.configure({
                     placeholder: 'Write text here, style it with the options above, and the output text components will appear at the bottom!',
                 })
@@ -294,6 +302,25 @@
                             contents: MinecraftTextWithNoEvents;
                         },
                     });
+                } else if (c.type == "selector") {
+                    data.push({
+                        selector: c.attrs?.selector,
+                        color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+                        bold: trueMarkOrUndefined(c, "bold"),
+                        italic: trueMarkOrUndefined(c, "italic"),
+                        strikethrough: trueMarkOrUndefined(c, "strike"),
+                        underlined: trueMarkOrUndefined(c, "underline"),
+                        obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+                        font: undefined,
+                        click_event: getMarkType(c, "clickEvent")?.attrs as {
+                            action: string;
+                            value: string;
+                        },
+                        hover_event: getMarkType(c, "hoverEvent")?.attrs as {
+                            action: string;
+                            contents: MinecraftTextWithNoEvents;
+                        },
+                    });
                 }
                 
             });
@@ -429,13 +456,6 @@
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
             class:active={editor.isActive("underline")}>
             <IconHoverEvent />
-        </button>
-
-        <button
-            onclick={() => editor.chain().focus().insertScore({ name: 'John Doe', objective: 'Math101' }).run()}
-            title="Default"
-            class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md">
-            Score
         </button>
 
         <!-- <label for="font">Custom Font:</label>
@@ -634,6 +654,15 @@
             editor.chain().focus().insertKeybind({ key: customValues.keybind.key }).run();
         }} class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
             Add Keybind
+        </button>
+    {:else if customType === "selector"}
+        <p class="mt-2">Selector</p>
+        <input type="text" class="bg-zinc-900 p-2 rounded-md" placeholder="@p[tag=something]" bind:value={customValues.selector.selector} />
+        <button onclick={() => {
+            customDialog.close();
+            editor.chain().focus().insertSelector({ selector: customValues.selector.selector }).run();
+        }} class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+            Add Selector
         </button>
     {/if}
 </Modal>

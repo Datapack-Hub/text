@@ -51,6 +51,8 @@ export type MinecraftText = {
 
 	keybind?: string;
 
+	selector?: string;
+
 	color?: string;
 	font?: string;
 	bold?: boolean;
@@ -107,6 +109,10 @@ interface KeybindAttributes {
 	key: string;
 }
 
+interface SelectorAttributes {
+	selector: string;
+}
+
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
@@ -145,6 +151,9 @@ declare module "@tiptap/core" {
         };
 		keybindNode: {
             insertKeybind: (attrs: KeybindAttributes) => ReturnType;
+        };
+		selectorNode: {
+            insertSelector: (attrs: SelectorAttributes) => ReturnType;
         };
 	}
 }
@@ -753,6 +762,71 @@ export const KeybindNode = Node.create<NodeOptions>({
 	return {
 		insertKeybind:
 		(attrs: KeybindAttributes) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			}
+		}
+	}
+
+})
+
+export const SelectorNode = Node.create<NodeOptions>({
+  name: 'selector',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): SelectorAttributes {
+		return {
+			selector: ""
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-selector-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { selector } = node.attrs
+	console.log(node.attrs)
+
+	return [
+		'span',
+		mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+			'data-selector-node': 'true',
+			contenteditable: 'false',
+			style: `
+			background-color: #555555;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 0.9em;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px 6px;
+			`,
+		}),
+		['span', {}, `SELECTOR: ${selector}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertSelector:
+		(attrs: SelectorAttributes) =>
 			({ commands }: CommandProps) => {
 				return commands.insertContent({
 					type: this.name,

@@ -42,6 +42,7 @@
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square";
 	import IconColor from "~icons/tabler/palette";
+	import IconCopy from "~icons/tabler/copy";
     
 
 	// TODO: convert to non-legacy mode
@@ -343,7 +344,8 @@
 		return value === true ? value : undefined;
 	}
 
-	function defaultColorLUT(color: string): string {
+	function defaultColorLUT(color: string): string | undefined {
+        if (color == null) return undefined
 		return colorMap.find((e) => e.value === color)?.name || color;
 	}
 
@@ -367,7 +369,8 @@
     {#if editor}
         <button
             onclick={customDialog.open}
-            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium">
+            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+            title="Add Custom Source">
             <IconCustom />
         </button>
         
@@ -375,25 +378,26 @@
 
         <button
             onclick={() => editor.chain().focus().toggleBold().run()}
-            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('bold') ? 'bg-zinc-800': ''}">
+            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('bold') ? 'bg-zinc-800': ''}"
+            title="Bold">
             <IconBold />
         </button>
         <button
             onclick={() => editor.chain().focus().toggleItalic().run()}
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('italic') ? 'bg-zinc-800': ''}"
-            class:active={editor.isActive("italic")}>
+            title="Italic">
             <IconItalic />
         </button>
         <button
             onclick={() => editor.chain().focus().toggleStrike().run()}
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('strike') ? 'bg-zinc-800': ''}"
-            class:active={editor.isActive("strikethrough")}>
+            title="Strikethrough">
             <IconStrikethrough />
         </button>
         <button
             onclick={() => editor.chain().focus().toggleUnderline().run()}
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('underline') ? 'bg-zinc-800': ''}"
-            class:active={editor.isActive("underline")}>
+            title="Underline">
             <IconUnderline />
         </button>
         <!-- <button
@@ -435,7 +439,7 @@
             <IconHollow />
         </button>
 
-        <label for="color" class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"><IconColor /></label>
+        <label for="color" class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium" title="Custom Color"><IconColor /></label>
         <input
             type="color"
             id="color"
@@ -448,13 +452,13 @@
         <button
             onclick={() => clickEventDialog.open()}
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
+            title="Click Event">
             <IconClickEvent />
         </button>
         <button
             onclick={() => hoverEventDialog.open()}
             class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
+            title="Hover Event">
             <IconHoverEvent />
         </button>
 
@@ -478,7 +482,10 @@
             <code class="inline-block p-3">DEV ONLY: {editor ? JSON.stringify(editor.getJSON()) : "Loading..."}</code>
             <br />
         {/if}
-        <code class="inline-block p-3 bg-zinc-950 w-full">{editor ? translate(editor.getJSON()).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) => match.replace(/"/g, "")) : "Loading..."}</code>
+        <div class="flex items-center space-x-3 p-3 bg-zinc-950 w-full">
+            <button class="p-2 hover:bg-white/10 active:bg-white/15 rounded-md" onclick={() => navigator.clipboard.writeText(translate(editor.getJSON()).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) => match.replace(/"/g, "")))}><IconCopy /></button>
+            <code class="inline-block w-full">{editor ? translate(editor.getJSON()).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) => match.replace(/"/g, "")) : "Loading..."}</code>
+        </div>
     </div>
 </div>
 

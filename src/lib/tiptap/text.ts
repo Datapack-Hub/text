@@ -35,16 +35,22 @@ export type MinecraftTextWithNoEvents = Pick<
 export type MinecraftText = {
 	// Text OR translation
 	translate?: string;
+
 	text?: string;
+
 	score?: {
 		name: string;
 		objective: string;
 	};
+
 	nbt?: string;
 	interpret?: string;
 	storage?: string;
 	block?: string;
 	entity?: string;
+
+	keybind?: string;
+
 	color?: string;
 	font?: string;
 	bold?: boolean;
@@ -97,6 +103,10 @@ interface EntityNBTAttributes {
 	interpret: boolean;
 }
 
+interface KeybindAttributes {
+	key: string;
+}
+
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
@@ -132,6 +142,9 @@ declare module "@tiptap/core" {
             insertBlockNBT: (attrs: BlockNBTAttributes) => ReturnType;
             insertStorageNBT: (attrs: StorageNBTAttributes) => ReturnType;
             insertEntityNBT: (attrs: EntityNBTAttributes) => ReturnType;
+        };
+		keybindNode: {
+            insertKeybind: (attrs: KeybindAttributes) => ReturnType;
         };
 	}
 }
@@ -540,7 +553,7 @@ export const StorageNBTNode = Node.create<NodeOptions>({
   addCommands() {
 	return {
 		insertStorageNBT:
-		(attrs: { name: string; objective: string }) =>
+		(attrs: StorageNBTAttributes) =>
 			({ commands }: CommandProps) => {
 				return commands.insertContent({
 					type: this.name,
@@ -607,7 +620,7 @@ export const EntityNBTNode = Node.create<NodeOptions>({
   addCommands() {
 	return {
 		insertEntityNBT:
-		(attrs: { name: string; objective: string }) =>
+		(attrs: EntityNBTAttributes) =>
 			({ commands }: CommandProps) => {
 				return commands.insertContent({
 					type: this.name,
@@ -674,7 +687,72 @@ export const BlockNBTNode = Node.create<NodeOptions>({
   addCommands() {
 	return {
 		insertBlockNBT:
-		(attrs: { name: string; objective: string }) =>
+		(attrs: BlockNBTAttributes) =>
+			({ commands }: CommandProps) => {
+				return commands.insertContent({
+					type: this.name,
+					attrs,
+				})
+			}
+		}
+	}
+
+})
+
+export const KeybindNode = Node.create<NodeOptions>({
+  name: 'keybind',
+
+  inline: true,
+  group: 'inline',
+  atom: true,
+
+  addOptions() {
+	return {
+	  HTMLAttributes: {},
+	}
+  },
+
+  addAttributes(): KeybindAttributes {
+		return {
+			key: ""
+		};
+	},
+
+  parseHTML() {
+	return [
+	  {
+		tag: 'span[data-keybind-node]',
+	  },
+	]
+  },
+
+  renderHTML({ HTMLAttributes, node }) {
+	const { key } = node.attrs
+	console.log(node.attrs)
+
+	return [
+		'span',
+		mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+			'data-keybind-node': 'true',
+			contenteditable: 'false',
+			style: `
+			background-color: #555555;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 0.9em;
+			display: inline-flex;
+			align-items: center;
+			gap: 4px 6px;
+			`,
+		}),
+		['span', {}, `KEYBIND: ${key}`],
+	]
+  },
+
+  addCommands() {
+	return {
+		insertKeybind:
+		(attrs: KeybindAttributes) =>
 			({ commands }: CommandProps) => {
 				return commands.insertContent({
 					type: this.name,

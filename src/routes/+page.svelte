@@ -20,6 +20,7 @@
         BlockNBTNode,
         StorageNBTNode,
         EntityNBTNode,
+        KeybindNode,
 		type MinecraftText,
 		type MinecraftTextWithNoEvents,
 	} from "$lib/tiptap/text";
@@ -76,6 +77,9 @@
             block: string,
             path: string,
             interpret: boolean
+        },
+        keybind: {
+            key: string
         }
     } = {
         score: {
@@ -92,6 +96,9 @@
             block: "", 
             path: "",
             interpret: false
+        },
+        keybind: {
+            key: ""
         }
     };
 
@@ -112,6 +119,7 @@
                 BlockNBTNode,
                 StorageNBTNode,
                 EntityNBTNode,
+                KeybindNode,
                 Placeholder.configure({
                     placeholder: 'Write text here, style it with the options above, and the output text components will appear at the bottom!',
                 })
@@ -251,6 +259,25 @@
                         nbt: c.attrs?.nbt,
                         entity: c.attrs?.entity,
                         interpret: c.attrs?.interpret || undefined,
+                        color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+                        bold: trueMarkOrUndefined(c, "bold"),
+                        italic: trueMarkOrUndefined(c, "italic"),
+                        strikethrough: trueMarkOrUndefined(c, "strike"),
+                        underlined: trueMarkOrUndefined(c, "underline"),
+                        obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+                        font: undefined,
+                        click_event: getMarkType(c, "clickEvent")?.attrs as {
+                            action: string;
+                            value: string;
+                        },
+                        hover_event: getMarkType(c, "hoverEvent")?.attrs as {
+                            action: string;
+                            contents: MinecraftTextWithNoEvents;
+                        },
+                    });
+                } else if (c.type == "keybind") {
+                    data.push({
+                        keybind: c.attrs?.key,
                         color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
                         bold: trueMarkOrUndefined(c, "bold"),
                         italic: trueMarkOrUndefined(c, "italic"),
@@ -599,5 +626,14 @@
                 Add NBT Value
             </button>
         {/if}
+    {:else if customType === "keybind"}
+        <p class="mt-2">Keybind</p>
+        <input type="text" class="bg-zinc-900 p-2 rounded-md" placeholder="key.jump" bind:value={customValues.keybind.key} />
+        <button onclick={() => {
+            customDialog.close();
+            editor.chain().focus().insertKeybind({ key: customValues.keybind.key }).run();
+        }} class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+            Add Keybind
+        </button>
     {/if}
 </Modal>

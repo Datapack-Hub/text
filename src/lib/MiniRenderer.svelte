@@ -30,7 +30,7 @@
 				HoverEventMark,
 			],
 			content: value,
-		});
+		}).setEditable(false);
 	});
 </script>
 

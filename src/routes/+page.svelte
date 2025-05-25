@@ -27,9 +27,8 @@
 	// Components
 	import Modal from "$lib/Modal.svelte";
 	import MiniEditor from "$lib/MiniEditor.svelte";
+	import MiniRenderer from "$lib/MiniRenderer.svelte";
 
-	// Icons
-	import IconCustom from "~icons/tabler/plus";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -38,6 +37,8 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 
+	// Icons
+	import IconCustom from "~icons/tabler/plus";
 	import IconBold from "~icons/tabler/bold";
 	import IconClickEvent from "~icons/tabler/click";
 	import IconSave from "~icons/tabler/device-floppy";
@@ -48,7 +49,6 @@
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
-	import MiniRenderer from "$lib/MiniRenderer.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -58,6 +58,11 @@
 	let color = "";
 	let fontName = "";
 
+	// Snapshots and stuff
+	let snapshots: object[] = [];
+	let recentlySaved = false;
+	let loadDialog: Modal
+
 	// Dialogs
 	let clickEventType = "";
 	let clickEventValue = "";
@@ -66,7 +71,6 @@
 	let hoverEventType = "";
 	let hoverEventValue: object;
 	let hoverEventDialog: Modal;
-	let snapshots: object[] = [];
 
 	let customType = "-- Select one --";
 	let customDialog: Modal;
@@ -97,7 +101,9 @@
 	onMount(() => {
 		if (localStorage.getItem("content")) {
 			value = localStorage.getItem("content")!;
-		}
+		} else {
+            value = "[]"
+        }
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
@@ -355,26 +361,26 @@
 		} else {
 			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
 		}
+		recentlySaved = true
+		setTimeout(() => {
+			recentlySaved = false
+		}, 4000)
 	}
 </script>
 
 <div class="flex flex-col h-screen">
-	<div
-		class="bg-zinc-950 w-full p-2 px-3 text-zinc-300 flex items-center space-x-1"
-		style="font-family: Lexend">
-		<img src="/dph.svg" class="h-5 mr-2" alt="logo" />
-		<span class="mr-6"
-			>Minecraft Text Editor <span class="text-xs"
-				>(by <a href="https://datapackhub.net/" class="underline"
-					>Datapack Hub</a
-				>)</span
-			></span>
-		<a
-			href="https://discord.datapackhub.net/"
-			class="underline mr-6 hidden md:inline">Discord Server</a>
-		<a href="https://datapack.wiki/" class="underline mr-6 hidden md:inline"
-			>Datapack Wiki</a>
+	<div class="bg-zinc-950 w-full text-zinc-300 flex items-center" style="font-family: Lexend">
+		<div class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">
+			<img src="/dph.svg" class="h-5" alt="logo" />
+			<span class="ml-3 nomob">Minecraft Text Editor <span class="text-xs">(by <a href="https://datapackhub.net" class="underline">Datapack Hub</a>)</span></span>
+		</div>
+		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
+		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={loadDialog.open}>Load</button>
+		<a href="https://discord.datapackhub.net/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Discord Server</a>
+		<a href="https://datapack.wiki/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Datapack Wiki</a>
+		
 	</div>
+
 	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
 		{#if editor}
 			<button
@@ -427,24 +433,11 @@
 				<IconUnderline />
 			</button>
 			<!-- <button
-            onclick={() => editor.chain().focus().toggleObfuscated().run()}
-            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
-            <IconObfuscate />
-        </button> -->
-
-			<!-- <button
-            onclick={() => editor.chain().focus().setFont(fontName).run()}
-            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
-            Font
-        </button>
-        <button
-            onclick={() => editor.chain().focus().unsetFont().run()}
-            class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
-            Remove Font
-        </button> -->
+				onclick={() => editor.chain().focus().toggleObfuscated().run()}
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				class:active={editor.isActive("underline")}>
+				<IconObfuscate />
+			</button> -->
 
 			<div class="w-4"></div>
 
@@ -480,6 +473,8 @@
 				<IconHollow />
 			</button>
 
+			<div class="w-4"></div>
+
 			<button
 				onclick={() => clickEventDialog.open()}
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
@@ -490,19 +485,6 @@
 				onclick={() => hoverEventDialog.open()}
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 				title="Hover Event">
-				<IconHoverEvent />
-			</button>
-
-			<button
-				onclick={() => clickEventDialog.open()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				class:active={editor.isActive("underline")}>
-				<IconClickEvent />
-			</button>
-			<button
-				onclick={() => hoverEventDialog.open()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				class:active={editor.isActive("underline")}>
 				<IconHoverEvent />
 			</button>
 
@@ -520,43 +502,6 @@
 		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow"
 		bind:this={element}>
 	</div>
-
-	<button
-		class="bg-zinc-800 p-2 w-fit m-2 rounded-md flex items-center gap-2"
-		onclick={debounce(saveSnapshot, 300)}><IconSave /><span>Save Snapshot</span></button>
-
-	<details class="p-2">
-		<summary>
-			<span class="text-white">Snapshots</span>
-		</summary>
-		<ul>
-			{#each snapshots as snapshot (snapshot)}
-				<li class="bg-zinc-800 p-2 my-2 rounded-md w-1/2">
-					<MiniRenderer value={snapshot} />
-					<button
-						class="bg-zinc-900 p-1 rounded-md"
-						onclick={() => {
-                            debounce(() => {
-                                editor.commands.setContent(snapshot);
-                                editor.commands.focus();
-                            }, 200)();
-						}}>
-						Load Snapshot
-					</button>
-					<button
-						class="bg-zinc-900 p-1 rounded-md"
-						onclick={() => {
-							debounce(() => {
-                                snapshots = snapshots.filter((_, index) => index !== snapshots.indexOf(snapshot))
-                                localStorage.setItem("snapshots", JSON.stringify(snapshots));
-                            }, 1000)();
-						}}>
-						Delete Snapshot
-					</button>
-				</li>
-			{/each}
-		</ul>
-	</details>
 
 	<div>
 		{#if dev}
@@ -920,4 +865,29 @@
 			Add Selector
 		</button>
 	{/if}
+</Modal>
+
+<Modal title="Load a snapshot" bind:this={loadDialog}>
+	<div class="flex flex-col space-y-2 w-full">
+		{#if snapshots.length == 0}
+		<p>You have not saved anything yet!</p>
+		{/if}
+		{#each snapshots as snapshot (snapshot)}
+			<div class="flex flex-col space-y-0">
+				<div class="bg-zinc-900 rounded-t-md rounded-br-md">
+					<MiniRenderer value={snapshot} />
+				</div>
+				<div class="flex bg-zinc-950 rounded-b-md w-fit">
+					<button class="hover:bg-white/2 py-2 px-3" onclick={() => {
+						editor.commands.setContent(snapshot);
+						editor.commands.focus();
+					}}>Load</button>
+					<button class="hover:bg-white/2 py-2 px-3" onclick={() => {
+						snapshots = snapshots.filter((_, index) => index !== snapshots.indexOf(snapshot))
+						localStorage.setItem("snapshots", JSON.stringify(snapshots));
+					}}>Delete</button>
+				</div>
+			</div>
+		{/each}
+	</div>
 </Modal>

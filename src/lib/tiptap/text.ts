@@ -5,14 +5,14 @@ export const colorMap = [
 	{ name: "red", value: "#FF5555" },
 	{ name: "gold", value: "#FFAA00" },
 	{ name: "yellow", value: "#FFFF55" },
-	{ name: "dark_green", value: "#00AA00" },
 	{ name: "green", value: "#55FF55" },
+	{ name: "dark_green", value: "#00AA00" },
 	{ name: "aqua", value: "#55FFFF" },
 	{ name: "dark_aqua", value: "#00AAAA" },
-	{ name: "dark_blue", value: "#0000AA" },
 	{ name: "blue", value: "#5555FF" },
-	{ name: "light_purple", value: "#FF55FF" },
+	{ name: "dark_blue", value: "#0000AA" },
 	{ name: "dark_purple", value: "#AA00AA" },
+	{ name: "light_purple", value: "#FF55FF" },
 	{ name: "white", value: "#FFFFFF" },
 	{ name: "gray", value: "#AAAAAA" },
 	{ name: "dark_gray", value: "#555555" },
@@ -31,9 +31,7 @@ export type MinecraftTextWithNoEvents = Pick<
 	| "obfuscated"
 >;
 
-// Create a type that replicates the Minecraft JSON text format
 export type MinecraftText = {
-	// Text OR translation
 	translate?: string;
 
 	text?: string;

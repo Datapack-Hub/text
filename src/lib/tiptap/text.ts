@@ -60,7 +60,11 @@ export type MinecraftText = {
 	obfuscated?: boolean;
 	click_event?: {
 		action: string;
-		value: string;
+		url?: string;
+		command?: string;
+		value?: string;
+		page?: string;
+		dialog?: string;
 	};
 	hover_event?: {
 		action: string;

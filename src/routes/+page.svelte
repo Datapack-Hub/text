@@ -40,10 +40,10 @@
 	// Icons
 	import IconCustom from "~icons/tabler/plus";
 	import IconBold from "~icons/tabler/bold";
-	import IconClickEvent from "~icons/tabler/click";
 	import IconSave from "~icons/tabler/device-floppy";
 	import IconItalic from "~icons/tabler/italic";
 	import IconColor from "~icons/tabler/palette";
+	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconHollow from "~icons/tabler/square";
 	import IconSquare from "~icons/tabler/square-filled";
@@ -152,7 +152,7 @@
 
 	function translate(json: JSONContent): string {
 		if (!json.content![0].content) {
-			return "waiting for output...";
+			return "waiting for input...";
 		}
 
 		const paragraphs = json.content!;
@@ -161,9 +161,10 @@
 
 		paragraphs.forEach((p, i) => {
 			const content = p.content || [];
+			let current: MinecraftText
 			content.forEach((c) => {
 				if (c.type == "text") {
-					data.push({
+					current = {
 						text: c.text,
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
@@ -171,18 +172,10 @@
 						strikethrough: trueMarkOrUndefined(c, "strike"),
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+						font: undefined
+					}
 				} else if (c.type == "score") {
-					data.push({
+					current = {
 						score: {
 							name: c.attrs?.name,
 							objective: c.attrs?.objective,
@@ -202,9 +195,9 @@
 							action: string;
 							contents: MinecraftTextWithNoEvents;
 						},
-					});
+					};
 				} else if (c.type == "translate") {
-					data.push({
+					current = {
 						translate: c.attrs?.key,
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
@@ -213,17 +206,9 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				} else if (c.type == "storage_nbt") {
-					data.push({
+					current = {
 						nbt: c.attrs?.nbt,
 						storage: c.attrs?.storage,
 						interpret: c.attrs?.interpret || undefined,
@@ -234,17 +219,9 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				} else if (c.type == "block_nbt") {
-					data.push({
+					current = {
 						nbt: c.attrs?.nbt,
 						block: c.attrs?.block,
 						interpret: c.attrs?.interpret || undefined,
@@ -255,17 +232,9 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				} else if (c.type == "entity_nbt") {
-					data.push({
+					current = {
 						nbt: c.attrs?.nbt,
 						entity: c.attrs?.entity,
 						interpret: c.attrs?.interpret || undefined,
@@ -276,17 +245,9 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				} else if (c.type == "keybind") {
-					data.push({
+					current = {
 						keybind: c.attrs?.key,
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
@@ -295,17 +256,9 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				} else if (c.type == "selector") {
-					data.push({
+					current = {
 						selector: c.attrs?.selector,
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
@@ -314,16 +267,26 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 						font: undefined,
-						click_event: getMarkType(c, "clickEvent")?.attrs as {
-							action: string;
-							value: string;
-						},
-						hover_event: getMarkType(c, "hoverEvent")?.attrs as {
-							action: string;
-							contents: MinecraftTextWithNoEvents;
-						},
-					});
+					};
 				}
+
+				if(getMarkType(c, "clickEvent")){
+					const ce = getMarkType(c, "clickEvent")?.attrs
+					current.click_event = {action: ce!.action}
+					if(ce!.action == "open_url"){
+						current.click_event.url = ce!.value
+					} else if (ce!.action == "run_command" || ce!.action == "suggest_command") {
+						current.click_event.command = ce!.value
+					} else if (ce!.action == "copy_to_clipboard") {
+						current.click_event.value = ce!.value
+					} else if (ce!.action == "change_page") {
+						current.click_event.page = ce!.value
+					} else if (ce!.action == "open_dialog") {
+						current.click_event.dialog = ce!.value
+					}
+				}
+
+				data.push(current)
 			});
 
 			if (i < paragraphs.length - 1) {
@@ -376,7 +339,8 @@
 		</div>
 		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={loadDialog.open}>Load</button>
-		<a href="https://discord.datapackhub.net/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Discord Server</a>
+		<div class="flex-grow"></div>
+		<a href="https://discord.datapackhub.net/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Discord</a>
 		<a href="https://datapack.wiki/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Datapack Wiki</a>
 		
 	</div>
@@ -476,9 +440,12 @@
 			<div class="w-4"></div>
 
 			<button
-				onclick={() => clickEventDialog.open()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				title="Click Event">
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('clickEvent') ? 'bg-zinc-800': ''}"
+				title="Click Event"
+				onclick={() => {
+					if(editor.isActive("clickEvent")) {editor.chain().focus().unsetClickEvent().run();} 
+					else {clickEventDialog.open()}
+				}}>
 				<IconClickEvent />
 			</button>
 			<button

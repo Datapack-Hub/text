@@ -44,7 +44,7 @@
 	import IconCopy from "~icons/tabler/copy";
 	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconHoverEvent from "~icons/tabler/pointer";
-	import IconHollow from "~icons/tabler/square";
+	import IconHollow from "~icons/tabler/square-x";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
@@ -434,6 +434,7 @@
 					<IconSquare />
 				</button>
 			{/each}
+			{#if editor.isActive('textStyle')}
 			<button
 				onclick={() => editor.chain().focus().unsetColor().run()}
 				title="Default"
@@ -441,6 +442,7 @@
 				class:active={editor.isActive("underline")}>
 				<IconHollow />
 			</button>
+			{/if}
 
 			<div class="w-4"></div>
 

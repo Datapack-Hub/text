@@ -1,13 +1,5 @@
 @import "tailwindcss";
 
-.btn {
-	@apply p-1 hover:bg-zinc-800 rounded-md transition-all;
-}
-
-.card {
-	@apply p-3 bg-zinc-950 rounded-xl border-2 border-stone-900 flex items-center space-x-2 hover:bg-orange-600 cursor-pointer;
-}
-
 ::-webkit-color-swatch,
 ::-moz-color-swatch {
 	border-color: transparent;
@@ -21,7 +13,7 @@
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-	color: #7F7F7F;
+	color: #7f7f7f;
 	content: attr(data-placeholder);
 	float: left;
 	height: 0;
@@ -36,9 +28,9 @@
 }
 
 .clickEvent {
-	background-color: #3C3C40;
+	background-color: #3c3c40;
 	padding: 1px;
-	border-radius: 4px
+	border-radius: 4px;
 }
 
 .hoverEvent::before {

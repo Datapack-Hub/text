@@ -31,7 +31,7 @@
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
-	import TextStyle from "@tiptap/extension-text-style";
+	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
@@ -119,7 +119,7 @@
 				StarterKit,
 				Underline,
 				Color,
-				TextStyle,
+				FixedTextStyle,
 				Obfuscation,
 				ClickEventMark,
 				HoverEventMark,

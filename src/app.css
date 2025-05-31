@@ -29,7 +29,7 @@
 
 .clickEvent {
 	background-color: #3c3c40;
-	border-left: dashed #0DC7CA;
+	border-left: dashed #0dc7ca;
 	padding: 4px;
 	padding-left: 5px;
 	border-radius: 4px;
@@ -37,7 +37,7 @@
 
 .hoverEvent {
 	background-color: #3c3c40;
-	border-left: dashed #DF30D6;
+	border-left: dashed #df30d6;
 	padding: 4px;
 	padding-left: 5px;
 	border-radius: 4px;
@@ -46,7 +46,7 @@
 .obfuscated {
 	color: transparent;
 	caret-color: white;
-	text-shadow: 0 0 3px rgba(255,255,255,1);
+	text-shadow: 0 0 3px rgba(255, 255, 255, 1);
 	filter: blur(1px);
 }
 

@@ -1,56 +1,52 @@
 <script lang="ts">
 	import { dev } from "$app/environment";
 	import {
+		addTypeSpecificValues,
 		colorMap,
-		type MinecraftText,
-		type MinecraftTextWithNoEvents,
-		getMarkType,
 		defaultColorLUT,
 		trueMarkOrUndefined,
 		type ExternalSources,
-		addTypeSpecificValues,
+		type MinecraftText,
 	} from "$lib/tiptap/text";
 
 	import {
+		BlockNBTNode,
 		ClickEventMark,
+		EntityNBTNode,
 		HoverEventMark,
+		KeybindNode,
 		Obfuscation,
 		ScoreNode,
-		TranslateNode,
-		BlockNBTNode,
-		StorageNBTNode,
-		EntityNBTNode,
-		KeybindNode,
 		SelectorNode,
+		StorageNBTNode,
+		TranslateNode,
 	} from "$lib/tiptap/extensions";
-
 	// Components
-	import Modal from "$lib/Modal.svelte";
 	import MiniEditor from "$lib/MiniEditor.svelte";
 	import MiniRenderer from "$lib/MiniRenderer.svelte";
+	import Modal from "$lib/Modal.svelte";
 
+	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
-	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-
 	// Icons
-	import IconCustom from "~icons/tabler/plus";
 	import IconBold from "~icons/tabler/bold";
-	import IconItalic from "~icons/tabler/italic";
-	import IconColor from "~icons/tabler/palette";
+	import IconTick from "~icons/tabler/check";
 	import IconCopy from "~icons/tabler/copy";
 	import IconClickEvent from "~icons/tabler/hand-finger";
+	import IconItalic from "~icons/tabler/italic";
+	import IconColor from "~icons/tabler/palette";
+	import IconObfuscate from "~icons/tabler/password";
+	import IconCustom from "~icons/tabler/plus";
 	import IconHoverEvent from "~icons/tabler/pointer";
-	import IconHollow from "~icons/tabler/square-x";
 	import IconSquare from "~icons/tabler/square-filled";
+	import IconHollow from "~icons/tabler/square-x";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
-	import IconTick from "~icons/tabler/check";
-	import IconObfuscate from "~icons/tabler/password";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -65,7 +61,7 @@
 	// Snapshots and stuff
 	let snapshots: object[] = [];
 	let recentlySaved = false;
-	let loadDialog: Modal
+	let loadDialog: Modal;
 
 	// Dialogs
 	let clickEventType = "";
@@ -102,12 +98,23 @@
 		},
 	};
 
+	import * as nbt from "nbtify";
+
+	nbt
+		.read(new TextEncoder().encode('["",{hello: "world"}]'))
+		.then((thing) => {
+			console.log(thing);
+		})
+		.catch((err) => {
+			console.error("Error parsing NBT:", err);
+		});
+
 	onMount(() => {
 		if (localStorage.getItem("content")) {
 			value = localStorage.getItem("content")!;
 		} else {
-            value = "[]"
-        }
+			value = "[]";
+		}
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
@@ -164,7 +171,7 @@
 
 		paragraphs.forEach((p, i) => {
 			const content = p.content || [];
-			let current: MinecraftText
+			let current: MinecraftText;
 			content.forEach((c) => {
 				current = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
@@ -172,12 +179,12 @@
 					italic: trueMarkOrUndefined(c, "italic"),
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
-					obfuscated: trueMarkOrUndefined(c, "obfuscated")
-				}
+					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+				};
 
-				current = addTypeSpecificValues(current, c)
+				current = addTypeSpecificValues(current, c);
 
-				data.push(current)
+				data.push(current);
 			});
 
 			if (i < paragraphs.length - 1) {
@@ -215,25 +222,41 @@
 		} else {
 			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
 		}
-		recentlySaved = true
+		recentlySaved = true;
 		setTimeout(() => {
-			recentlySaved = false
-		}, 4000)
+			recentlySaved = false;
+		}, 4000);
 	}
 </script>
 
 <div class="flex flex-col h-screen">
-	<div class="bg-zinc-950 w-full text-zinc-300 flex items-center" style="font-family: Lexend">
+	<div
+		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
+		style="font-family: Lexend">
 		<div class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">
 			<img src="/dph.svg" class="h-5" alt="logo" />
-			<span class="ml-3 nomob">Minecraft Text Editor <span class="text-xs">(by <a href="https://datapackhub.net" class="underline">Datapack Hub</a>)</span></span>
+			<span class="ml-3 nomob"
+				>Minecraft Text Editor <span class="text-xs"
+					>(by <a href="https://datapackhub.net" class="underline"
+						>Datapack Hub</a
+					>)</span
+				></span>
 		</div>
-		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
-		<button class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer" onclick={loadDialog.open}>Load</button>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			onclick={loadDialog.open}>Load</button>
 		<div class="flex-grow"></div>
-		<a href="https://discord.datapackhub.net/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Discord</a>
-		<a href="https://datapack.wiki/" class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">Datapack Wiki</a>
-		
+		<a
+			href="https://discord.datapackhub.net/"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			>Discord</a>
+		<a
+			href="https://datapack.wiki/"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			>Datapack Wiki</a>
 	</div>
 
 	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
@@ -289,7 +312,11 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('obfuscated',) ? 'bg-zinc-800' : ''}">
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+					'obfuscated',
+				)
+					? 'bg-zinc-800'
+					: ''}">
 				<IconObfuscate />
 			</button>
 
@@ -303,8 +330,7 @@
 				type="color"
 				id="color"
 				bind:value={color}
-				onchange={customColorHandler}
-				class="invisible w-0" />
+				onchange={customColorHandler} />
 			{#each colorMap as color}
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
@@ -319,33 +345,47 @@
 					<IconSquare />
 				</button>
 			{/each}
-			{#if editor.isActive('textStyle')}
-			<button
-				onclick={() => editor.chain().focus().unsetColor().run()}
-				title="Default"
-				class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md"
-				class:active={editor.isActive("underline")}>
-				<IconHollow />
-			</button>
+			{#if editor.isActive("textStyle")}
+				<button
+					onclick={() => editor.chain().focus().unsetColor().run()}
+					title="Default"
+					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md"
+					class:active={editor.isActive("underline")}>
+					<IconHollow />
+				</button>
 			{/if}
 
 			<div class="w-4"></div>
 
 			<button
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('clickEvent') ? 'bg-zinc-800': ''}"
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+					'clickEvent',
+				)
+					? 'bg-zinc-800'
+					: ''}"
 				title="Click Event"
 				onclick={() => {
-					if(editor.isActive("clickEvent")) {editor.chain().focus().unsetClickEvent().run();} 
-					else {clickEventDialog.open()}
+					if (editor.isActive("clickEvent")) {
+						editor.chain().focus().unsetClickEvent().run();
+					} else {
+						clickEventDialog.open();
+					}
 				}}>
 				<IconClickEvent />
 			</button>
 			<button
 				onclick={() => {
-					if(editor.isActive("hoverEvent")) {editor.chain().focus().unsetHoverEvent().run();} 
-					else {hoverEventDialog.open()}
+					if (editor.isActive("hoverEvent")) {
+						editor.chain().focus().unsetHoverEvent().run();
+					} else {
+						hoverEventDialog.open();
+					}
 				}}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive('hoverEvent') ? 'bg-zinc-800': ''}"
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+					'hoverEvent',
+				)
+					? 'bg-zinc-800'
+					: ''}"
 				title="Hover Event">
 				<IconHoverEvent />
 			</button>
@@ -366,7 +406,7 @@
 	</div>
 
 	<div>
-		{#if dev && false}
+		{#if dev}
 			<code class="inline-block p-3 overflow-x-scroll"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
@@ -374,26 +414,30 @@
 			<br />
 		{/if}
 		<div class="flex items-start bg-zinc-950 p-3 space-x-3">
-			<button 
-			class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
-			onclick={() => {
-				navigator.clipboard.writeText(
-					translate(editor.getJSON()).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, 
-					(match) => match.replace(/"/g, ""))
-				);
-				recentlyCopied = true;
-				setTimeout(() => recentlyCopied = false, 2000)
-			}}>
-			{#if recentlyCopied}
-				<IconTick />
-			{:else}
-				<IconCopy />
-			{/if}</button>
-			<code class="inline-block w-full overflow-auto max-h-56">{editor
-				? translate(editor.getJSON()).replace(
-					/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-					(match) => match.replace(/"/g, ""),
-				) : "Loading..."}
+			<button
+				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				onclick={() => {
+					navigator.clipboard.writeText(
+						translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						),
+					);
+					recentlyCopied = true;
+					setTimeout(() => (recentlyCopied = false), 2000);
+				}}>
+				{#if recentlyCopied}
+					<IconTick />
+				{:else}
+					<IconCopy />
+				{/if}</button>
+			<code class="inline-block w-full overflow-auto max-h-56"
+				>{editor
+					? translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						)
+					: "Loading..."}
 			</code>
 		</div>
 	</div>
@@ -480,10 +524,10 @@
 
 <Modal title="Hover Event" bind:this={hoverEventDialog}>
 	<p>Text to show</p>
-	<MiniEditor bind:output={hoverEventValue}/>
+	<MiniEditor bind:output={hoverEventValue} />
 	<button
 		onclick={() => {
-			console.log(hoverEventValue)
+			console.log(hoverEventValue);
 			editor
 				.chain()
 				.focus()
@@ -735,7 +779,7 @@
 <Modal title="Load a snapshot" bind:this={loadDialog}>
 	<div class="flex flex-col space-y-2 w-full">
 		{#if snapshots.length == 0}
-		<p>You have not saved anything yet!</p>
+			<p>You have not saved anything yet!</p>
 		{/if}
 		{#each snapshots as snapshot (snapshot)}
 			<div class="flex flex-col space-y-0">
@@ -743,14 +787,20 @@
 					<MiniRenderer value={snapshot} />
 				</div>
 				<div class="flex bg-zinc-950 rounded-b-md w-fit">
-					<button class="hover:bg-white/2 py-2 px-3" onclick={() => {
-						editor.commands.setContent(snapshot);
-						editor.commands.focus();
-					}}>Load</button>
-					<button class="hover:bg-white/2 py-2 px-3" onclick={() => {
-						snapshots = snapshots.filter((_, index) => index !== snapshots.indexOf(snapshot))
-						localStorage.setItem("snapshots", JSON.stringify(snapshots));
-					}}>Delete</button>
+					<button
+						class="hover:bg-white/2 py-2 px-3"
+						onclick={() => {
+							editor.commands.setContent(snapshot);
+							editor.commands.focus();
+						}}>Load</button>
+					<button
+						class="hover:bg-white/2 py-2 px-3"
+						onclick={() => {
+							snapshots = snapshots.filter(
+								(_, index) => index !== snapshots.indexOf(snapshot),
+							);
+							localStorage.setItem("snapshots", JSON.stringify(snapshots));
+						}}>Delete</button>
 				</div>
 			</div>
 		{/each}

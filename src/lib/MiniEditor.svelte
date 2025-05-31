@@ -48,9 +48,8 @@
 				ClickEventMark,
 				HoverEventMark,
 				Placeholder.configure({
-					placeholder:
-						"Write text here, and style it with the options above!",
-				})
+					placeholder: "Write text here, and style it with the options above!",
+				}),
 			],
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
@@ -58,7 +57,7 @@
 			},
 			onUpdate: ({ editor }) => {
 				value = JSON.stringify(editor.getJSON());
-				output = JSON.parse(translate(editor.getJSON()))
+				output = JSON.parse(translate(editor.getJSON()));
 			},
 		});
 	});
@@ -177,7 +176,7 @@
             <IconObfuscate />
         </button> -->
 
-			<div class="w-4" />
+			<div class="w-4"></div>
 
 			{#each colorMap as color}
 				<button

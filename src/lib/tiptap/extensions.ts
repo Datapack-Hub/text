@@ -748,9 +748,8 @@ export const SelectorNode = Node.create<NodeOptions>({
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px 6px;
+            display: inline-block;
+			user-select: all;
             `,
 			}),
 			["span", {}, `SELECTOR: ${selector}`],

@@ -9,7 +9,7 @@
 	import {
 		colorMap,
 		type MinecraftText,
-		type MinecraftTextWithNoEvents,
+		type BaseMinecraftText,
 	} from "$lib/tiptap/text";
 
 	import IconBold from "~icons/tabler/bold";

@@ -52,6 +52,7 @@
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
 	import IconDelete from "~icons/tabler/trash";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -107,28 +108,18 @@
 		},
 	};
 
-	import * as nbt from "nbtify";
-
-	nbt
-		.read(new TextEncoder().encode('["",{hello: "world"}]'))
-		.then((thing) => {
-			console.log(thing);
-		})
-		.catch((err) => {
-			console.error("Error parsing NBT:", err);
-		});
-
+	
 	onMount(() => {
 		if (localStorage.getItem("content")) {
 			value = localStorage.getItem("content")!;
 		} else {
 			value = "[]";
 		}
-
+		
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
 		}
-
+		
 		editor = new Editor({
 			element: element,
 			content: JSON.parse(value),
@@ -149,7 +140,7 @@
 				SelectorNode,
 				Placeholder.configure({
 					placeholder:
-						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
+					"Write text here, style it with the options above, and the output text components will appear at the bottom!",
 				}),
 			],
 			onTransaction: () => {
@@ -162,7 +153,7 @@
 			},
 		});
 	});
-
+	
 	onDestroy(() => {
 		if (editor) {
 			editor.destroy();
@@ -177,12 +168,12 @@
 		if (!json.content![0].content) {
 			return "waiting for input...";
 		}
-
+		
 		const paragraphs = json.content!;
-
+		
 		if(export_type == "standard"){
 			let data: (MinecraftText | string)[] = [""];
-
+			
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
 				let current: MinecraftText;
@@ -195,26 +186,27 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
-
+					
 					current = addTypeSpecificValues(current, c);
-
+					
 					data.push(current);
 				});
-
+				
 				if (i < paragraphs.length - 1) {
 					data.push("\n");
 				}
 			});
-
+			
+			console.log(JSON.stringify(snbtToDocument(convertToTextOrEmpty(JSON.stringify(data)))))
 			return JSON.stringify(data);
 		} else if (export_type == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
-
+			
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
 				let current_line: (MinecraftText | string)[] = []
 				let current_component: MinecraftText;
-
+				
 				content.forEach((c, i) => {
 					current_component = {
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
@@ -224,7 +216,7 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
-
+					
 					// For lore: default behaviour is to be purple and italic
 					// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
 					// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
@@ -244,29 +236,30 @@
 							}
 						}
 					}
-
+					
 					current_component = addTypeSpecificValues(current_component, c, false);
 					current_line.push(current_component);
 				});
-
+				
 				if(current_line.length == 2){
 					data.push(current_line[1])
 				} else {
 					data.push(current_line)
 				}
-
+				
 			});
-
+			
+			console.log(JSON.stringify(snbtToDocument(convertToTextOrEmpty(JSON.stringify(data)))))
 			return JSON.stringify(data);
 		} else {return "[]"}
 		
 	}
-
+	
 	function customColorHandler() {
 		editor.chain().focus().setColor(color).run();
 		colorDialog.close()
 	}
-
+	
 	const debounce = (callback: Function, wait: number) => {
 		let timeoutId: number;
 		return (...args: any[]) => {

@@ -19,7 +19,7 @@ export const colorMap = [
 	{ name: "black", value: "#000000" },
 ];
 
-export type MinecraftTextWithNoEvents = Pick<
+export type BaseMinecraftText = Pick<
 	MinecraftText,
 	| "text"
 	| "color"
@@ -33,8 +33,8 @@ export type MinecraftTextWithNoEvents = Pick<
 
 export type MinecraftText = {
 	translate?: string;
-	with?: string[]
-	fallback?: string
+	with?: string[];
+	fallback?: string;
 
 	text?: string;
 
@@ -71,13 +71,13 @@ export type MinecraftText = {
 	hover_event?: {
 		action: string;
 
-		value?: MinecraftTextWithNoEvents | MinecraftTextWithNoEvents[];
+		value?: BaseMinecraftText | BaseMinecraftText[];
 
 		id?: string;
 		count?: number;
 		components?: {}[];
 
-		name?: MinecraftTextWithNoEvents | MinecraftTextWithNoEvents[];
+		name?: BaseMinecraftText | BaseMinecraftText[];
 		uuid?: string | number[];
 	};
 };
@@ -127,7 +127,11 @@ export function getMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
-export function addTypeSpecificValues(current: MinecraftText, c: JSONContent, includeInteractivity = true) {
+export function addTypeSpecificValues(
+	current: MinecraftText,
+	c: JSONContent,
+	includeInteractivity = true,
+) {
 	switch (c.type) {
 		case "text":
 			current.text = c.text;
@@ -143,15 +147,15 @@ export function addTypeSpecificValues(current: MinecraftText, c: JSONContent, in
 			};
 			current.hover_event = getMarkType(c, "hoverEvent")?.attrs as {
 				action: string;
-				contents: MinecraftTextWithNoEvents;
+				contents: BaseMinecraftText;
 			};
 			break;
 		case "translate":
 			current.translate = c.attrs?.key;
-			if(c.attrs?.params && c.attrs?.params.length != 0){
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
 				current.with = c.attrs?.params;
 			}
-			if(c.attrs?.fallback){
+			if (c.attrs?.fallback) {
 				current.fallback = c.attrs?.fallback;
 			}
 			break;
@@ -198,7 +202,6 @@ export function addTypeSpecificValues(current: MinecraftText, c: JSONContent, in
 			current.hover_event = { action: ce!.action, value: ce!.value };
 		}
 	}
-	
 
 	return current;
 }

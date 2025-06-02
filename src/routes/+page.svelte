@@ -986,5 +986,25 @@
 			</code>
 		</div>
 
+		<p class="mt-2">As JSON:</p>
+		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+			<button
+				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				onclick={() => {
+					navigator.clipboard.writeText(
+						translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						),
+					);
+					recentlyCopied = true;
+					setTimeout(() => (recentlyCopied = false), 2000);
+				}}>
+					<IconCopy />
+				</button>
+			<code class="inline-block w-full overflow-auto max-h-56"
+				>{editor ? translate(editor.getJSON()) : "Loading..."}]
+			</code>
+		</div>
 	</div>
 </Modal>

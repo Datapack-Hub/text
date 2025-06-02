@@ -82,7 +82,7 @@
 		},
 		translate: {
 			key: "",
-			params: ["james"],
+			params: [],
 			fallback: undefined
 		},
 		nbt: {

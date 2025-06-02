@@ -33,6 +33,8 @@ export type MinecraftTextWithNoEvents = Pick<
 
 export type MinecraftText = {
 	translate?: string;
+	with?: string[]
+	fallback?: string
 
 	text?: string;
 
@@ -87,6 +89,8 @@ export type ExternalSources = {
 	};
 	translate: {
 		key: string;
+		params: string[];
+		fallback?: string;
 	};
 	nbt: {
 		sourceType: string;
@@ -144,6 +148,12 @@ export function addTypeSpecificValues(current: MinecraftText, c: JSONContent) {
 			break;
 		case "translate":
 			current.translate = c.attrs?.key;
+			if(c.attrs?.params && c.attrs?.params.length != 0){
+				current.with = c.attrs?.params;
+			}
+			if(c.attrs?.fallback){
+				current.fallback = c.attrs?.fallback;
+			}
 			break;
 		case "storage_nbt":
 		case "block_nbt":

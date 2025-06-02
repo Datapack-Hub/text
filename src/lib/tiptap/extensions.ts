@@ -23,6 +23,8 @@ interface ScoreAttributes {
 
 interface TranslateAttributes {
 	key: string;
+	params: string[];
+	fallback?: string;
 }
 
 interface StorageNBTAttributes {
@@ -398,6 +400,8 @@ export const TranslateNode = Node.create<NodeOptions>({
 	addAttributes(): TranslateAttributes {
 		return {
 			key: "",
+			fallback: undefined,
+			params: [],
 		};
 	},
 
@@ -434,7 +438,7 @@ export const TranslateNode = Node.create<NodeOptions>({
 	addCommands() {
 		return {
 			insertTranslate:
-				(attrs: { key: string }) =>
+				(attrs: TranslateAttributes) =>
 				({ commands }: CommandProps) => {
 					return commands.insertContent({
 						type: this.name,

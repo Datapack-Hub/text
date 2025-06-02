@@ -47,6 +47,7 @@
 	import IconHollow from "~icons/tabler/square-x";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
+	import IconDelete from "~icons/tabler/trash";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -81,6 +82,8 @@
 		},
 		translate: {
 			key: "",
+			params: ["james"],
+			fallback: undefined
 		},
 		nbt: {
 			sourceType: "",
@@ -325,10 +328,12 @@
 			<label
 				for="color"
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				style="color: {color}"
 				title="Custom Color"><IconColor /></label>
 			<input
 				type="color"
 				id="color"
+				class="invisible w-0"
 				bind:value={color}
 				onchange={customColorHandler} />
 			{#each colorMap as color}
@@ -558,13 +563,47 @@
 			placeholder="item.minecraft.beef"
 			bind:value={customValues.translate.key} />
 
+		<p class="mt-2">Fallback</p>
+		<input
+			type="text"
+			class="bg-zinc-900 p-2 rounded-md"
+			placeholder="This text is shown if the key does not exist"
+			bind:value={customValues.translate.fallback} />
+
+		<p class="mt-2">Parameters</p>
+		{#each customValues.translate.params ?? [] as p, i}
+		<div class="flex items-center space-x-1">
+			<input
+				type="text"
+				class="bg-zinc-900 p-2 rounded-md flex-grow h-10"
+				placeholder="Parameter {i}"
+				bind:value={p} />
+			<button
+				onclick={() => {
+					customValues.translate.params.splice(i,1)
+					customValues.translate.params = customValues.translate.params
+				}}
+				class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 h-10 aspect-square flex items-center justify-center">
+				<IconDelete />
+			</button>
+		</div>
+		{/each}
+		<button
+			onclick={() => {
+				customValues.translate.params.push("")
+				customValues.translate.params = customValues.translate.params
+			}}
+			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			Add Parameter
+		</button>
+
 		<button
 			onclick={() => {
 				customDialog.close();
 				editor
 					.chain()
 					.focus()
-					.insertTranslate({ key: customValues.translate.key })
+					.insertTranslate({ key: customValues.translate.key, params: customValues.translate.params, fallback: customValues.translate.fallback })
 					.run();
 			}}
 			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">

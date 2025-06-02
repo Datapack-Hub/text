@@ -127,7 +127,7 @@ export function getMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
-export function addTypeSpecificValues(current: MinecraftText, c: JSONContent) {
+export function addTypeSpecificValues(current: MinecraftText, c: JSONContent, includeInteractivity = true) {
 	switch (c.type) {
 		case "text":
 			current.text = c.text;
@@ -169,34 +169,36 @@ export function addTypeSpecificValues(current: MinecraftText, c: JSONContent) {
 			current.selector = c.attrs?.selector;
 			break;
 	}
+	if (includeInteractivity) {
+		if (getMarkType(c, "clickEvent")) {
+			const ce = getMarkType(c, "clickEvent")?.attrs;
+			current.click_event = { action: ce!.action };
+			switch (ce!.action) {
+				case "open_url":
+					current.click_event.url = ce!.value;
+					break;
+				case "run_command":
+				case "suggest_command":
+					current.click_event.command = ce!.value;
+					break;
+				case "copy_to_clipboard":
+					current.click_event.value = ce!.value;
+					break;
+				case "change_page":
+					current.click_event.page = ce!.value;
+					break;
+				case "open_dialog":
+					current.click_event.dialog = ce!.value;
+					break;
+			}
+		}
 
-	if (getMarkType(c, "clickEvent")) {
-		const ce = getMarkType(c, "clickEvent")?.attrs;
-		current.click_event = { action: ce!.action };
-		switch (ce!.action) {
-			case "open_url":
-				current.click_event.url = ce!.value;
-				break;
-			case "run_command":
-			case "suggest_command":
-				current.click_event.command = ce!.value;
-				break;
-			case "copy_to_clipboard":
-				current.click_event.value = ce!.value;
-				break;
-			case "change_page":
-				current.click_event.page = ce!.value;
-				break;
-			case "open_dialog":
-				current.click_event.dialog = ce!.value;
-				break;
+		if (getMarkType(c, "hoverEvent")) {
+			const ce = getMarkType(c, "hoverEvent")?.attrs;
+			current.hover_event = { action: ce!.action, value: ce!.value };
 		}
 	}
-
-	if (getMarkType(c, "hoverEvent")) {
-		const ce = getMarkType(c, "hoverEvent")?.attrs;
-		current.hover_event = { action: ce!.action, value: ce!.value };
-	}
+	
 
 	return current;
 }

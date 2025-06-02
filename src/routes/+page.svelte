@@ -58,6 +58,7 @@
 	let color = "#ffffff";
 	let colorDialog: Modal;
 	let fontName = "";
+	let outputDialog: Modal;
 
 	let recentlyCopied = false;
 
@@ -165,39 +166,73 @@
 		}
 	});
 
-	function translate(json: JSONContent): string {
+	function translate(json: JSONContent, export_type: string = "standard"): string {
 		if (!json.content![0].content) {
 			return "waiting for input...";
 		}
 
 		const paragraphs = json.content!;
 
-		let data: (MinecraftText | string)[] = [""];
+		if(export_type == "standard"){
+			let data: (MinecraftText | string)[] = [""];
 
-		paragraphs.forEach((p, i) => {
-			const content = p.content || [];
-			let current: MinecraftText;
-			content.forEach((c) => {
-				current = {
-					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-					bold: trueMarkOrUndefined(c, "bold"),
-					italic: trueMarkOrUndefined(c, "italic"),
-					strikethrough: trueMarkOrUndefined(c, "strike"),
-					underlined: trueMarkOrUndefined(c, "underline"),
-					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-				};
+			paragraphs.forEach((p, i) => {
+				const content = p.content || [];
+				let current: MinecraftText;
+				content.forEach((c) => {
+					current = {
+						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+						bold: trueMarkOrUndefined(c, "bold"),
+						italic: trueMarkOrUndefined(c, "italic"),
+						strikethrough: trueMarkOrUndefined(c, "strike"),
+						underlined: trueMarkOrUndefined(c, "underline"),
+						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					};
 
-				current = addTypeSpecificValues(current, c);
+					current = addTypeSpecificValues(current, c);
 
-				data.push(current);
+					data.push(current);
+				});
+
+				if (i < paragraphs.length - 1) {
+					data.push("\n");
+				}
 			});
 
-			if (i < paragraphs.length - 1) {
-				data.push("\n");
-			}
-		});
+			return JSON.stringify(data);
+		} else if (export_type == "item_lore") {
+			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
 
-		return JSON.stringify(data);
+			paragraphs.forEach((p, i) => {
+				const content = p.content || [];
+				let current_line: (MinecraftText | string)[] = [""]
+				let current_component: MinecraftText;
+
+				content.forEach((c) => {
+					current_component = {
+						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+						bold: trueMarkOrUndefined(c, "bold"),
+						italic: trueMarkOrUndefined(c, "italic"),
+						strikethrough: trueMarkOrUndefined(c, "strike"),
+						underlined: trueMarkOrUndefined(c, "underline"),
+						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					};
+
+					current_component = addTypeSpecificValues(current_component, c, false);
+					current_line.push(current_component);
+				});
+
+				if(current_line.length == 2){
+					data.push(current_line[1])
+				} else {
+					data.push(current_line)
+				}
+
+			});
+
+			return JSON.stringify(data);
+		} else {return "[]"}
+		
 	}
 
 	function customColorHandler() {
@@ -254,6 +289,9 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			onclick={outputDialog.open}>More Formats</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
@@ -862,5 +900,62 @@
 				</div>
 			</div>
 		{/each}
+	</div>
+</Modal>
+
+<Modal title="More output formats" bind:this={outputDialog} opened big>
+	<div class="flex flex-col w-full">
+		<p>For tellraw commands (send to chat):</p>
+		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+			<button
+				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				onclick={() => {
+					navigator.clipboard.writeText(
+						translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						),
+					);
+					recentlyCopied = true;
+					setTimeout(() => (recentlyCopied = false), 2000);
+				}}>
+					<IconCopy />
+				</button>
+			<code class="inline-block w-full overflow-auto max-h-56"
+				>/tellraw @s {editor
+					? translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						)
+					: "Loading..."}
+			</code>
+		</div>
+
+		<p class="mt-2">As a lore component:</p>
+		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+			<button
+				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				onclick={() => {
+					navigator.clipboard.writeText(
+						translate(editor.getJSON()).replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						),
+					);
+					recentlyCopied = true;
+					setTimeout(() => (recentlyCopied = false), 2000);
+				}}>
+					<IconCopy />
+				</button>
+			<code class="inline-block w-full overflow-auto max-h-56"
+				>[lore={editor
+					? translate(editor.getJSON(), "item_lore").replace(
+							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+							(match) => match.replace(/"/g, ""),
+						)
+					: "Loading..."}]
+			</code>
+		</div>
+
 	</div>
 </Modal>

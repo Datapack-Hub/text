@@ -923,7 +923,7 @@
 	</div>
 </Modal>
 
-<Modal title="More output formats" bind:this={outputDialog} opened big>
+<Modal title="More output formats" bind:this={outputDialog} big>
 	<div class="flex flex-col w-full">
 		<p>For tellraw commands (send to chat):</p>
 		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">

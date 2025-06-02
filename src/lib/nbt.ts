@@ -9,14 +9,12 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 	}
 
 	raw = raw.replace(/([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '"$1":');
-	console.log("Parsing SNBT:", raw, JSON.parse(raw));
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
 	try {
 		parsed = JSON.parse(raw);
 	} catch (e) {
-		console.error("Failed to parse SNBT:", e);
 		return [""];
 	}
 
@@ -41,13 +39,8 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 			continue;
         }
         
-        console.log("Processing text:", text);
-
 		let finalText = mapPropertiesToType(text);
-		console.log("Mapped text:", finalText);
-
         finalText = applyStyling(text, finalText);
-        console.log("Styled text:", finalText);
 
 		baseDocument.content![0].content?.push(finalText);
 	}

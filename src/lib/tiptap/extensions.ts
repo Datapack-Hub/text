@@ -480,7 +480,6 @@ export const StorageNBTNode = Node.create<NodeOptions>({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const { nbt, storage } = node.attrs;
-		console.log(node.attrs);
 
 		return [
 			"span",
@@ -546,7 +545,6 @@ export const EntityNBTNode = Node.create<NodeOptions>({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const { nbt, entity } = node.attrs;
-		console.log(node.attrs);
 
 		return [
 			"span",
@@ -612,7 +610,6 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const { nbt, block } = node.attrs;
-		console.log(node.attrs);
 
 		return [
 			"span",
@@ -676,7 +673,6 @@ export const KeybindNode = Node.create<NodeOptions>({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const { key } = node.attrs;
-		console.log(node.attrs);
 
 		return [
 			"span",
@@ -740,7 +736,6 @@ export const SelectorNode = Node.create<NodeOptions>({
 
 	renderHTML({ HTMLAttributes, node }) {
 		const { selector } = node.attrs;
-		console.log(node.attrs);
 
 		return [
 			"span",

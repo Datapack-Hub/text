@@ -25,10 +25,10 @@
 	import MiniEditor from "$lib/MiniEditor.svelte";
 	import MiniRenderer from "$lib/MiniRenderer.svelte";
 	import Modal from "$lib/Modal.svelte";
-	import ColorPicker from 'svelte-awesome-color-picker';
+	import ColorPicker from "svelte-awesome-color-picker";
 
 	import tippy from "tippy.js";
-  	import 'tippy.js/dist/tippy.css'; // optional
+	import "tippy.js/dist/tippy.css"; // optional
 
 	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import { Editor, type JSONContent } from "@tiptap/core";
@@ -90,7 +90,7 @@
 		translate: {
 			key: "",
 			params: [],
-			fallback: undefined
+			fallback: undefined,
 		},
 		nbt: {
 			sourceType: "",
@@ -108,18 +108,17 @@
 		},
 	};
 
-	
 	onMount(() => {
 		if (localStorage.getItem("content")) {
 			value = localStorage.getItem("content")!;
 		} else {
 			value = "[]";
 		}
-		
+
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
 		}
-		
+
 		editor = new Editor({
 			element: element,
 			content: JSON.parse(value),
@@ -140,7 +139,7 @@
 				SelectorNode,
 				Placeholder.configure({
 					placeholder:
-					"Write text here, style it with the options above, and the output text components will appear at the bottom!",
+						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
 				}),
 			],
 			onTransaction: () => {
@@ -153,27 +152,33 @@
 			},
 		});
 	});
-	
+
 	onDestroy(() => {
 		if (editor) {
 			editor.destroy();
 		}
 	});
 
-	function cap(val: string) {
-		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	function toTitleCase(str: string) {
+		return str.replace(
+			/\w\S*/g,
+			(text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
+		);
 	}
 
-	function translate(json: JSONContent, export_type: string = "standard"): string {
+	function translate(
+		json: JSONContent,
+		export_type: string = "standard",
+	): string {
 		if (!json.content![0].content) {
 			return "waiting for input...";
 		}
-		
+
 		const paragraphs = json.content!;
-		
-		if(export_type == "standard"){
+
+		if (export_type == "standard") {
 			let data: (MinecraftText | string)[] = [""];
-			
+
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
 				let current: MinecraftText;
@@ -186,27 +191,31 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
-					
+
 					current = addTypeSpecificValues(current, c);
-					
+
 					data.push(current);
 				});
-				
+
 				if (i < paragraphs.length - 1) {
 					data.push("\n");
 				}
 			});
-			
-			console.log(JSON.stringify(snbtToDocument(convertToTextOrEmpty(JSON.stringify(data)))))
+
+			console.log(
+				JSON.stringify(
+					snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
+				),
+			);
 			return JSON.stringify(data);
 		} else if (export_type == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
-			
+
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
-				let current_line: (MinecraftText | string)[] = []
+				let current_line: (MinecraftText | string)[] = [];
 				let current_component: MinecraftText;
-				
+
 				content.forEach((c, i) => {
 					current_component = {
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
@@ -216,7 +225,7 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
-					
+
 					// For lore: default behaviour is to be purple and italic
 					// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
 					// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
@@ -224,42 +233,50 @@
 						if (current_component.color || current_component.italic) {
 							current_line.push({
 								italic: false,
-								color: "white"
-							})
+								color: "white",
+							});
 						} else {
 							if (!current_component.color) {
-								current_component.color = "white"
+								current_component.color = "white";
 							}
-							
+
 							if (!current_component.italic) {
-								current_component.italic = false
+								current_component.italic = false;
 							}
 						}
 					}
-					
-					current_component = addTypeSpecificValues(current_component, c, false);
+
+					current_component = addTypeSpecificValues(
+						current_component,
+						c,
+						false,
+					);
 					current_line.push(current_component);
 				});
-				
-				if(current_line.length == 2){
-					data.push(current_line[1])
+
+				if (current_line.length == 2) {
+					data.push(current_line[1]);
 				} else {
-					data.push(current_line)
+					data.push(current_line);
 				}
-				
 			});
-			
-			console.log(JSON.stringify(snbtToDocument(convertToTextOrEmpty(JSON.stringify(data)))))
+
+			console.log(
+				JSON.stringify(
+					snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
+				),
+			);
 			return JSON.stringify(data);
-		} else {return "[]"}
-		
+		} else {
+			return "[]";
+		}
 	}
-	
+
 	function customColorHandler() {
 		editor.chain().focus().setColor(color).run();
-		colorDialog.close()
+		colorDialog.close();
 	}
-	
+
 	const debounce = (callback: Function, wait: number) => {
 		let timeoutId: number;
 		return (...args: any[]) => {
@@ -328,7 +345,7 @@
 			<button
 				onclick={customDialog.open}
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				use:tippy={{content: "Add Custom Source", placement: "bottom"}}>
+				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
 				<IconCustom />
 			</button>
 
@@ -341,7 +358,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: "Bold", placement: "bottom"}}>
+				use:tippy={{ content: "Bold", placement: "bottom" }}>
 				<IconBold />
 			</button>
 			<button
@@ -351,7 +368,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: "Italic", placement: "bottom"}}>
+				use:tippy={{ content: "Italic", placement: "bottom" }}>
 				<IconItalic />
 			</button>
 			<button
@@ -361,7 +378,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: "Strikethrough", placement: "bottom"}}>
+				use:tippy={{ content: "Strikethrough", placement: "bottom" }}>
 				<IconStrikethrough />
 			</button>
 			<button
@@ -371,7 +388,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: "Underline", placement: "bottom"}}>
+				use:tippy={{ content: "Underline", placement: "bottom" }}>
 				<IconUnderline />
 			</button>
 			<button
@@ -381,7 +398,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: "Obfuscated", placement: "bottom"}}>
+				use:tippy={{ content: "Obfuscated", placement: "bottom" }}>
 				<IconObfuscate />
 			</button>
 
@@ -391,11 +408,15 @@
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 				style="color: {color}"
 				onclick={colorDialog.open}
-				use:tippy={{content: "Custom Color", placement: "bottom"}}><IconColor /></button>
+				use:tippy={{ content: "Custom Color", placement: "bottom" }}
+				><IconColor /></button>
 			{#each colorMap as color}
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
-					use:tippy={{content: cap(color.name.replace("_"," ")), placement: "bottom"}}
+					use:tippy={{
+						content: toTitleCase(color.name.replace("_", " ")),
+						placement: "bottom",
+					}}
 					class="p-1 text-lg hover:bg-zinc-800 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
@@ -409,7 +430,7 @@
 			{#if editor.isActive("textStyle")}
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					use:tippy={{content: "Unset color", placement: "bottom"}}
+					use:tippy={{ content: "Unset color", placement: "bottom" }}
 					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
@@ -424,7 +445,12 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: (editor.isActive("clickEvent")) ? "Unset Click Event" : "Add Click Event", placement: "bottom"}}
+				use:tippy={{
+					content: editor.isActive("clickEvent")
+						? "Unset Click Event"
+						: "Add Click Event",
+					placement: "bottom",
+				}}
 				onclick={() => {
 					if (editor.isActive("clickEvent")) {
 						editor.chain().focus().unsetClickEvent().run();
@@ -447,7 +473,12 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{content: (editor.isActive("hoverEvent")) ? "Unset Hover Event" : "Add Hover Event", placement: "bottom"}}>
+				use:tippy={{
+					content: editor.isActive("hoverEvent")
+						? "Unset Hover Event"
+						: "Add Hover Event",
+					placement: "bottom",
+				}}>
 				<IconHoverEvent />
 			</button>
 
@@ -487,7 +518,7 @@
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}
-				use:tippy={{content: "Copy"}}>
+				use:tippy={{ content: "Copy" }}>
 				{#if recentlyCopied}
 					<IconTick />
 				{:else}
@@ -589,7 +620,6 @@
 	<MiniEditor bind:output={hoverEventValue} />
 	<button
 		onclick={() => {
-			console.log(hoverEventValue);
 			editor
 				.chain()
 				.focus()
@@ -629,26 +659,26 @@
 
 		<p class="mt-2">Parameters</p>
 		{#each customValues.translate.params ?? [] as p, i}
-		<div class="flex items-center space-x-1">
-			<input
-				type="text"
-				class="bg-zinc-900 p-2 rounded-md flex-grow h-10"
-				placeholder="Parameter {i}"
-				bind:value={p} />
-			<button
-				onclick={() => {
-					customValues.translate.params.splice(i,1)
-					customValues.translate.params = customValues.translate.params
-				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 h-10 aspect-square flex items-center justify-center">
-				<IconDelete />
-			</button>
-		</div>
+			<div class="flex items-center space-x-1">
+				<input
+					type="text"
+					class="bg-zinc-900 p-2 rounded-md flex-grow h-10"
+					placeholder="Parameter {i}"
+					bind:value={p} />
+				<button
+					onclick={() => {
+						customValues.translate.params.splice(i, 1);
+						customValues.translate.params = customValues.translate.params;
+					}}
+					class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 h-10 aspect-square flex items-center justify-center">
+					<IconDelete />
+				</button>
+			</div>
 		{/each}
 		<button
 			onclick={() => {
-				customValues.translate.params.push("")
-				customValues.translate.params = customValues.translate.params
+				customValues.translate.params.push("");
+				customValues.translate.params = customValues.translate.params;
 			}}
 			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
 			Add Parameter
@@ -660,7 +690,11 @@
 				editor
 					.chain()
 					.focus()
-					.insertTranslate({ key: customValues.translate.key, params: customValues.translate.params, fallback: customValues.translate.fallback })
+					.insertTranslate({
+						key: customValues.translate.key,
+						params: customValues.translate.params,
+						fallback: customValues.translate.fallback,
+					})
 					.run();
 			}}
 			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
@@ -874,23 +908,22 @@
 
 <Modal title="Custom Color" bind:this={colorDialog} small nopad>
 	<div class="flex flex-col w-full py-4">
-			<ColorPicker
-				bind:hex={color}
-				position="responsive"
-				--cp-bg-color="none"
-				--cp-border-color="none"
-				--cp-text-color="white"
-				--cp-input-color="#18181b"
-				--cp-button-hover-color="#18181b"
-				isDialog={false}
-				isAlpha={false}
-			/>
+		<ColorPicker
+			bind:hex={color}
+			position="responsive"
+			--cp-bg-color="none"
+			--cp-border-color="none"
+			--cp-text-color="white"
+			--cp-input-color="#18181b"
+			--cp-button-hover-color="#18181b"
+			isDialog={false}
+			isAlpha={false} />
 
-			<button
-				onclick={customColorHandler}
-				class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 mx-4">
-				Done
-			</button>
+		<button
+			onclick={customColorHandler}
+			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 mx-4">
+			Done
+		</button>
 	</div>
 </Modal>
 
@@ -934,16 +967,16 @@
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"/tellraw @s " +
-						translate(editor.getJSON()).replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						),
+							translate(editor.getJSON()).replace(
+								/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+								(match) => match.replace(/"/g, ""),
+							),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
-					<IconCopy />
-				</button>
+				<IconCopy />
+			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>/tellraw @s {editor
 					? translate(editor.getJSON()).replace(
@@ -961,17 +994,17 @@
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"[lore=" +
-						translate(editor.getJSON(), "item_lore").replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						) +
-						"]"
+							translate(editor.getJSON(), "item_lore").replace(
+								/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+								(match) => match.replace(/"/g, ""),
+							) +
+							"]",
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
-					<IconCopy />
-				</button>
+				<IconCopy />
+			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>[lore={editor
 					? translate(editor.getJSON(), "item_lore").replace(
@@ -987,14 +1020,12 @@
 			<button
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
-					navigator.clipboard.writeText(
-						translate(editor.getJSON())
-					);
+					navigator.clipboard.writeText(translate(editor.getJSON()));
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
-					<IconCopy />
-				</button>
+				<IconCopy />
+			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>{editor ? translate(editor.getJSON()) : "Loading..."}]
 			</code>

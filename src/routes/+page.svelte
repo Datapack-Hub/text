@@ -205,10 +205,10 @@
 
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
-				let current_line: (MinecraftText | string)[] = [""]
+				let current_line: (MinecraftText | string)[] = []
 				let current_component: MinecraftText;
 
-				content.forEach((c) => {
+				content.forEach((c, i) => {
 					current_component = {
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
@@ -217,6 +217,26 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
+
+					// For lore: default behaviour is to be purple and italic
+					// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
+					// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
+					if (i == 0) {
+						if (current_component.color || current_component.italic) {
+							current_line.push({
+								italic: false,
+								color: "white"
+							})
+						} else {
+							if (!current_component.color) {
+								current_component.color = "white"
+							}
+							
+							if (!current_component.italic) {
+								current_component.italic = false
+							}
+						}
+					}
 
 					current_component = addTypeSpecificValues(current_component, c, false);
 					current_line.push(current_component);

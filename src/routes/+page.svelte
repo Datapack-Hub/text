@@ -940,6 +940,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
+						"/tellraw @s " +
 						translate(editor.getJSON()).replace(
 							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
 							(match) => match.replace(/"/g, ""),
@@ -966,10 +967,12 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						translate(editor.getJSON()).replace(
+						"[lore=" +
+						translate(editor.getJSON(), "item_lore").replace(
 							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
 							(match) => match.replace(/"/g, ""),
-						),
+						) +
+						"]"
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -992,10 +995,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						translate(editor.getJSON()).replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						),
+						translate(editor.getJSON())
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);

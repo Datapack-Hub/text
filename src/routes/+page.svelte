@@ -27,6 +27,9 @@
 	import Modal from "$lib/Modal.svelte";
 	import ColorPicker from 'svelte-awesome-color-picker';
 
+	import tippy from "tippy.js";
+  	import 'tippy.js/dist/tippy.css'; // optional
+
 	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
@@ -165,6 +168,10 @@
 			editor.destroy();
 		}
 	});
+
+	function cap(val: string) {
+		return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+	}
 
 	function translate(json: JSONContent, export_type: string = "standard"): string {
 		if (!json.content![0].content) {
@@ -328,7 +335,7 @@
 			<button
 				onclick={customDialog.open}
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
-				title="Add Custom Source">
+				use:tippy={{content: "Add Custom Source", placement: "bottom"}}>
 				<IconCustom />
 			</button>
 
@@ -341,7 +348,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Bold">
+				use:tippy={{content: "Bold", placement: "bottom"}}>
 				<IconBold />
 			</button>
 			<button
@@ -351,7 +358,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Italic">
+				use:tippy={{content: "Italic", placement: "bottom"}}>
 				<IconItalic />
 			</button>
 			<button
@@ -361,7 +368,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Strikethrough">
+				use:tippy={{content: "Strikethrough", placement: "bottom"}}>
 				<IconStrikethrough />
 			</button>
 			<button
@@ -371,7 +378,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Underline">
+				use:tippy={{content: "Underline", placement: "bottom"}}>
 				<IconUnderline />
 			</button>
 			<button
@@ -380,7 +387,8 @@
 					'obfuscated',
 				)
 					? 'bg-zinc-800'
-					: ''}">
+					: ''}"
+				use:tippy={{content: "Obfuscated", placement: "bottom"}}>
 				<IconObfuscate />
 			</button>
 
@@ -389,12 +397,12 @@
 			<button
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 				style="color: {color}"
-				title="Custom Color"
-				onclick={colorDialog.open}><IconColor /></button>
+				onclick={colorDialog.open}
+				use:tippy={{content: "Custom Color", placement: "bottom"}}><IconColor /></button>
 			{#each colorMap as color}
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
-					title={color.name}
+					use:tippy={{content: cap(color.name.replace("_"," ")), placement: "bottom"}}
 					class="p-1 text-lg hover:bg-zinc-800 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
@@ -408,7 +416,7 @@
 			{#if editor.isActive("textStyle")}
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					title="Default"
+					use:tippy={{content: "Unset color", placement: "bottom"}}
 					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
@@ -423,7 +431,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Click Event"
+				use:tippy={{content: (editor.isActive("clickEvent")) ? "Unset Click Event" : "Add Click Event", placement: "bottom"}}
 				onclick={() => {
 					if (editor.isActive("clickEvent")) {
 						editor.chain().focus().unsetClickEvent().run();
@@ -446,7 +454,7 @@
 				)
 					? 'bg-zinc-800'
 					: ''}"
-				title="Hover Event">
+				use:tippy={{content: (editor.isActive("hoverEvent")) ? "Unset Hover Event" : "Add Hover Event", placement: "bottom"}}>
 				<IconHoverEvent />
 			</button>
 
@@ -485,7 +493,8 @@
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
-				}}>
+				}}
+				use:tippy={{content: "Copy"}}>
 				{#if recentlyCopied}
 					<IconTick />
 				{:else}

@@ -25,6 +25,7 @@
 	import MiniEditor from "$lib/MiniEditor.svelte";
 	import MiniRenderer from "$lib/MiniRenderer.svelte";
 	import Modal from "$lib/Modal.svelte";
+	import ColorPicker from 'svelte-awesome-color-picker';
 
 	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
 	import { Editor, type JSONContent } from "@tiptap/core";
@@ -54,7 +55,8 @@
 
 	let element: HTMLElement;
 	let editor: Editor;
-	let color = "";
+	let color = "#ffffff";
+	let colorDialog: Modal;
 	let fontName = "";
 
 	let recentlyCopied = false;
@@ -200,6 +202,7 @@
 
 	function customColorHandler() {
 		editor.chain().focus().setColor(color).run();
+		colorDialog.close()
 	}
 
 	const debounce = (callback: Function, wait: number) => {
@@ -325,17 +328,11 @@
 
 			<div class="w-4"></div>
 
-			<label
-				for="color"
+			<button
 				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
 				style="color: {color}"
-				title="Custom Color"><IconColor /></label>
-			<input
-				type="color"
-				id="color"
-				class="invisible w-0"
-				bind:value={color}
-				onchange={customColorHandler} />
+				title="Custom Color"
+				onclick={colorDialog.open}><IconColor /></button>
 			{#each colorMap as color}
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
@@ -813,6 +810,28 @@
 			Add Selector
 		</button>
 	{/if}
+</Modal>
+
+<Modal title="Custom Color" bind:this={colorDialog} small nopad>
+	<div class="flex flex-col w-full py-4">
+			<ColorPicker
+				bind:hex={color}
+				position="responsive"
+				--cp-bg-color="none"
+				--cp-border-color="none"
+				--cp-text-color="white"
+				--cp-input-color="#18181b"
+				--cp-button-hover-color="#18181b"
+				isDialog={false}
+				isAlpha={false}
+			/>
+
+			<button
+				onclick={customColorHandler}
+				class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 mx-4">
+				Done
+			</button>
+	</div>
 </Modal>
 
 <Modal title="Load a snapshot" bind:this={loadDialog}>

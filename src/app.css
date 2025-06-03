@@ -5,6 +5,10 @@
 	border-color: transparent;
 }
 
+.mc {
+	font-family: Minecraft;
+}
+
 .tiptap {
 	@apply h-full p-4;
 	@apply focus:outline-none;

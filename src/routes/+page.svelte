@@ -64,6 +64,10 @@
 	let fontName = "";
 	let outputDialog: Modal;
 
+	// Import
+	let importDialog: Modal;
+	let importText: string;
+
 	let recentlyCopied = false;
 
 	// Snapshots and stuff
@@ -108,6 +112,14 @@
 		},
 	};
 
+	function importToEditor() {
+		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText))
+		console.log(importText)
+		console.log(jsonContent)
+		editor.commands.setContent(jsonContent);
+		importDialog.close()
+	}
+
 	onMount(() => {
 		if (localStorage.getItem("content")) {
 			value = localStorage.getItem("content")!;
@@ -123,7 +135,16 @@
 			element: element,
 			content: JSON.parse(value),
 			extensions: [
-				StarterKit,
+				StarterKit.configure({
+					blockquote: false,
+					bulletList: false,
+					codeBlock: false,
+					hardBreak: false,
+					heading: false,
+					horizontalRule: false,
+					listItem: false,
+					orderedList: false,
+				}),
 				Underline,
 				Color,
 				FixedTextStyle,
@@ -320,6 +341,9 @@
 					>)</span
 				></span>
 		</div>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			onclick={importDialog.open}>Import</button>
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
@@ -1030,5 +1054,21 @@
 				>{editor ? translate(editor.getJSON()) : "Loading..."}]
 			</code>
 		</div>
+	</div>
+</Modal>
+
+<Modal title="Import from NBT" bind:this={importDialog} big>
+	<div class="flex flex-col w-full space-y-2">
+		<p>Paste your text components below to import them into the editor. This will clear the current contents of the editor!</p>
+		<input 
+			class="flex items-start bg-zinc-950 p-3 rounded-lg mc" 
+			placeholder="Paste NBT text components here" 
+			bind:value={importText}/>
+
+		<button
+			onclick={importToEditor}
+			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			Import
+		</button>
 	</div>
 </Modal>

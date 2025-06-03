@@ -64,6 +64,8 @@
 	let fontName = "";
 	let outputDialog: Modal;
 
+	let doesContentExist: boolean = false
+
 	// Import
 	let importDialog: Modal;
 	let importText: string;
@@ -221,9 +223,12 @@
 			});
 
 			if (data.length === 1 && data[0] === "") {
+				doesContentExist = false
 				if(Math.random() < 0.002) { return "🤓 <- james is waiting for you to type something" }
 				return "waiting for input..."
 			}
+
+			doesContentExist = true
 
 			console.log(
 				JSON.stringify(
@@ -346,15 +351,17 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={importDialog.open}>Import</button>
+		{#if doesContentExist}
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			onclick={outputDialog.open}>Export</button>
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
+		{/if}
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
-			onclick={outputDialog.open}>More Formats</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
@@ -532,6 +539,7 @@
 			<br />
 		{/if}
 		<div class="flex items-start bg-zinc-950 p-3 space-x-3">
+			{#if doesContentExist}
 			<button
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
@@ -550,6 +558,7 @@
 				{:else}
 					<IconCopy />
 				{/if}</button>
+			{/if}
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>{editor
 					? translate(editor.getJSON()).replace(

@@ -123,6 +123,13 @@ export function defaultColorLUT(color: string): string | undefined {
 	return colorMap.find((e) => e.value === color)?.name || color;
 }
 
+export function colorNameToHexCode(color: string): string | undefined {
+	if (!color || color === "null") {
+		return;
+	}
+	return colorMap.find((e) => e.name === color)?.value || color;
+}
+
 export function getMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }

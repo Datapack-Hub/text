@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import type { MinecraftText } from "./tiptap/text";
+import { colorNameToHexCode, type MinecraftText } from "./tiptap/text";
 
 type TextOrEmpty = "" | MinecraftText;
 
@@ -130,7 +130,7 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		finalText.marks?.push({
 			type: "textStyle",
 			attrs: {
-				color: text.color,
+				color: colorNameToHexCode(text.color)
 			},
 		});
 	}

@@ -1,7 +1,7 @@
 import type { JSONContent } from "@tiptap/core";
 import { colorNameToHexCode, type MinecraftText } from "./tiptap/text";
 
-type TextOrEmpty = "" | MinecraftText;
+type TextOrEmpty = string | "" | MinecraftText;
 
 export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 	if (raw === "") {
@@ -22,30 +22,84 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 }
 
 export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
-	// requote keys
+    console.log("snbtToDocument input:", raw);
 
-	let baseDocument: JSONContent = {
-		type: "doc",
-		content: [
-			{
-				type: "paragraph",
-				content: [],
-			},
-		],
-	};
+    let baseDocument: JSONContent = {
+        type: "doc",
+        content: [],
+    };
 
-	for (const text of raw) {
-		if (text === "") {
-			continue;
+    let currentParagraph: JSONContent = {
+        type: "paragraph",
+        content: [ ],
+    };
+
+    function pushParagraph() {
+        // Only push if not empty (besides the initial "")
+        if (currentParagraph.content && currentParagraph.content.length > 1) {
+            console.log("Pushing paragraph:", currentParagraph);
+            baseDocument.content!.push(currentParagraph);
         }
-        
-		let finalText = mapPropertiesToType(text);
-        finalText = applyStyling(text, finalText);
+        // Always start with an empty string
+        currentParagraph = {
+            type: "paragraph",
+            content: [ { type: "text", text: "" } ],
+        };
+    }
 
-		baseDocument.content![0].content?.push(finalText);
-	}
+    for (const text of raw) {
+        console.log("Processing text entry:", text);
 
-	return baseDocument;
+        if (text == "") {
+			console.log("String is blank, empty")
+			continue;
+		}
+        // Handle plain string
+        if (typeof text === "string") {
+            const lines = text.split("\n");
+            console.log("Plain string lines:", lines);
+            for (let i = 0; i < lines.length; i++) {
+                if (i > 0) pushParagraph();
+                if (lines[i] !== "") {
+                    console.log("Adding plain string line to paragraph:", lines[i]);
+                    currentParagraph.content!.push({
+                        type: "text",
+                        text: lines[i],
+                    });
+                }
+            }
+            continue;
+        }
+
+        // Handle MinecraftText object
+        const textValue = text.text ?? "";
+		if(textValue == "") { continue }
+        const lines = textValue.split("\n");
+        console.log("MinecraftText lines:", lines);
+        for (let i = 0; i < lines.length; i++) {
+            if (i > 0) pushParagraph();
+            // Clone the text object for this line, but update the text property
+            const lineText: MinecraftText = { ...text, text: lines[i] };
+            let finalText = mapPropertiesToType(lineText);
+            console.log("Mapped lineText to finalText:", finalText);
+            finalText = applyStyling(lineText, finalText);
+            console.log("After styling:", finalText);
+            // Only push if not empty string
+            if (lines[i] !== "") {
+                console.log("Adding MinecraftText line to paragraph:", finalText);
+                currentParagraph.content!.push(finalText);
+            }
+        }
+    }
+
+    // Push the last paragraph if it has content
+    if (currentParagraph.content && currentParagraph.content.length > 1) {
+        console.log("Pushing last paragraph:", currentParagraph);
+        baseDocument.content!.push(currentParagraph);
+    }
+
+    console.log("Final baseDocument:", baseDocument);
+    return baseDocument;
 }
 
 function mapPropertiesToType(source: MinecraftText): JSONContent {

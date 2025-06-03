@@ -191,10 +191,6 @@
 		json: JSONContent,
 		export_type: string = "standard",
 	): string {
-		if (!json.content![0].content) {
-			return "waiting for input...";
-		}
-
 		const paragraphs = json.content!;
 
 		if (export_type == "standard") {
@@ -203,6 +199,7 @@
 			paragraphs.forEach((p, i) => {
 				const content = p.content || [];
 				let current: MinecraftText;
+
 				content.forEach((c) => {
 					current = {
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
@@ -222,6 +219,11 @@
 					data.push("\n");
 				}
 			});
+
+			if (data.length === 1 && data[0] === "") {
+				if(Math.random() < 0.002) { return "🤓 <- james is waiting for you to type something" }
+				return "waiting for input..."
+			}
 
 			console.log(
 				JSON.stringify(

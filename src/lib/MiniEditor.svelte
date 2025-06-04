@@ -10,6 +10,7 @@
 		colorMap,
 		type MinecraftText,
 		type BaseMinecraftText,
+		addTypeSpecificValues,
 	} from "$lib/tiptap/text";
 
 	import IconBold from "~icons/tabler/bold";
@@ -17,14 +18,16 @@
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
 	import IconSquare from "~icons/tabler/square-filled";
-	import IconHollow from "~icons/tabler/square";
+	import IconHollow from "~icons/tabler/square-x";
 	import IconColor from "~icons/tabler/palette";
+	import IconObfuscate from "~icons/tabler/password";
 	import {
 		ClickEventMark,
 		Fonts,
 		HoverEventMark,
 		Obfuscation,
 	} from "$lib/tiptap/extensions";
+	import { convertToTextOrEmpty, snbtToDocument } from "./nbt";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -68,27 +71,30 @@
 		}
 	});
 
-	function translate(json: JSONContent): string {
-		if (!json.content![0].content) {
-			return "waiting for output...";
-		}
-
+	function translate(
+		json: JSONContent
+	): string {
 		const paragraphs = json.content!;
 
 		let data: (MinecraftText | string)[] = [""];
 
 		paragraphs.forEach((p, i) => {
-			const content = p.content!;
+			const content = p.content || [];
+			let current: MinecraftText;
+
 			content.forEach((c) => {
-				data.push({
-					text: c.text,
+				current = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),
 					italic: trueMarkOrUndefined(c, "italic"),
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-				});
+				};
+
+				current = addTypeSpecificValues(current, c);
+
+				data.push(current);
 			});
 
 			if (i < paragraphs.length - 1) {
@@ -96,6 +102,16 @@
 			}
 		});
 
+		if (data.length === 1 && data[0] === "") {
+			return ""
+		}
+
+
+		console.log(
+			JSON.stringify(
+				snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
+			),
+		);
 		return JSON.stringify(data);
 	}
 
@@ -115,15 +131,17 @@
 		editor.chain().focus().setColor(color).run();
 	}
 
-	function getMarkType(c: JSONContent, type: string) {
-		return c.marks?.find((e) => e.type === type);
-	}
-
 	export function getValue() {
 		return translate(editor.getJSON()).replace(
 			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
 			(match) => match.replace(/"/g, ""),
 		);
+	}
+
+	export function importText(input: string) {
+		const jsonContent = snbtToDocument(convertToTextOrEmpty(input))
+		console.log(jsonContent)
+		editor.commands.setContent(jsonContent);
 	}
 </script>
 
@@ -165,16 +183,18 @@
 					'underline',
 				)
 					? 'bg-zinc-800'
-					: ''}"
-				class:active={editor.isActive("underline")}>
+					: ''}">
 				<IconUnderline />
 			</button>
-			<!-- <button
-            onclick={() => editor.chain().focus().toggleObfuscated().run()}
-            class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium"
-            class:active={editor.isActive("underline")}>
-            <IconObfuscate />
-        </button> -->
+			<button
+				onclick={() => editor.chain().focus().toggleObfuscated().run()}
+				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+					'obfuscated',
+				)
+					? 'bg-zinc-800'
+					: ''}">
+				<IconObfuscate />
+			</button>
 
 			<div class="w-4"></div>
 
@@ -192,13 +212,13 @@
 					<IconSquare />
 				</button>
 			{/each}
-			<button
-				onclick={() => editor.chain().focus().unsetColor().run()}
-				title="Default"
-				class="p-0.5 text-sm hover:bg-zinc-800 text-zinc-500 rounded-md"
-				class:active={editor.isActive("underline")}>
-				<IconHollow />
-			</button>
+			{#if editor.isActive("textStyle")}
+				<button
+					onclick={() => editor.chain().focus().unsetColor().run()}
+					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md">
+					<IconHollow />
+				</button>
+			{/if}
 
 			<label
 				for="color"

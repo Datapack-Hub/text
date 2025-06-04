@@ -86,6 +86,7 @@
 
 	let hoverEventType = "";
 	let hoverEventValue: any;
+	let hoverEventEditor: MiniEditor;
 	let hoverEventDialog: Modal;
 
 	let customType = "-- Select one --";
@@ -232,11 +233,6 @@
 
 			doesContentExist = true
 
-			console.log(
-				JSON.stringify(
-					snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
-				),
-			);
 			return JSON.stringify(data);
 		} else if (export_type == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
@@ -554,7 +550,34 @@
 					placement: "bottom",
 				}}
 				onclick={() => {
-					
+					const { from, to } = editor.state.selection;
+					let start = from, end = to;
+					const doc = editor.state.doc;
+
+					function sameHoverEventMark(pos: number) {
+						const node = doc.nodeAt(pos);
+						return node?.marks?.find(m => m.type.name === "hoverEvent");
+					}
+					const mark = sameHoverEventMark(from);
+					if (!mark) return;
+
+					// Expand left
+					while (start > 0 && JSON.stringify(sameHoverEventMark(start - 1)?.attrs) === JSON.stringify(mark.attrs)) {
+						start--;
+					}
+					// Expand right
+					while (end < doc.content.size && JSON.stringify(sameHoverEventMark(end)?.attrs) === JSON.stringify(mark.attrs)) {
+						end++;
+					}
+
+					editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+					const { action, value } = mark.attrs;
+					hoverEventType = action;
+					hoverEventDialog.open();
+					console.log(JSON.stringify(value))
+					if (hoverEventEditor) {
+						hoverEventEditor.importText(JSON.stringify(value));
+					}
 				}}>
 				<IconEdit />
 			</button>
@@ -689,7 +712,7 @@
 
 <Modal title="Hover Event" bind:this={hoverEventDialog}>
 	<p>Text to show</p>
-	<MiniEditor bind:output={hoverEventValue} />
+	<MiniEditor bind:this={hoverEventEditor} bind:output={hoverEventValue} />
 	<button
 		onclick={() => {
 			editor

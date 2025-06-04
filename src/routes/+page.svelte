@@ -889,15 +889,13 @@
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div>
-				<input
-					name="interpret"
-					type="checkbox"
-					class="bg-zinc-900 p-2 rounded-md mt-2"
-					placeholder="Items[0].id"
-					bind:checked={customValues.nbt.interpret} />
-				<label for="interpret" class="mt-2"
-					>Interpret (parse nbt value as a text component)</label>
+			<div class="flex items-center space-x-2 mt-2">
+				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+					{#if customValues.nbt.interpret}
+					<IconTick class="m-auto text-lg" />
+					{/if}
+				</button>
+				<label for="interpret">Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button
@@ -931,15 +929,13 @@
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div>
-				<input
-					name="interpret"
-					type="checkbox"
-					class="bg-zinc-900 p-2 rounded-md mt-2"
-					placeholder="Items[0].id"
-					bind:checked={customValues.nbt.interpret} />
-				<label for="interpret" class="mt-2"
-					>Interpret (parse nbt value as a text component)</label>
+			<div class="flex items-center space-x-2 mt-2">
+				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+					{#if customValues.nbt.interpret}
+					<IconTick class="m-auto text-lg" />
+					{/if}
+				</button>
+				<label for="interpret">Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button
@@ -973,15 +969,13 @@
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div>
-				<input
-					name="interpret"
-					type="checkbox"
-					class="bg-zinc-900 p-2 rounded-md mt-2"
-					placeholder="Items[0].id"
-					bind:checked={customValues.nbt.interpret} />
-				<label for="interpret" class="mt-2"
-					>Interpret (parse nbt value as a text component)</label>
+			<div class="flex items-center space-x-2 mt-2">
+				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+					{#if customValues.nbt.interpret}
+					<IconTick class="m-auto text-lg" />
+					{/if}
+				</button>
+				<label for="interpret">Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button

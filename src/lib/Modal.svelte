@@ -1,6 +1,6 @@
 <script lang="ts">
 	import IconClose from "~icons/tabler/x";
-	import { onMount, onDestroy } from "svelte";
+	import { onMount } from "svelte";
 
 	export let opened = false;
 	export let title = "Modal";
@@ -24,10 +24,6 @@
 
 	onMount(() => {
 		window.addEventListener("keydown", handleKeydown);
-	});
-
-	onDestroy(() => {
-		window.removeEventListener("keydown", handleKeydown);
 	});
 </script>
 

@@ -38,6 +38,8 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
+	import { generateGradient } from "typescript-color-gradient";
+
 
 	// Icons
 	import IconBold from "~icons/tabler/bold";
@@ -55,6 +57,7 @@
 	import IconUnderline from "~icons/tabler/underline";
 	import IconDelete from "~icons/tabler/trash";
 	import IconEdit from "~icons/tabler/pencil";
+	import IconGradient from "~icons/tabler/contrast-2-filled";
 
 	import IconNBT from "~icons/tabler/braces";
 	import IconTranslate from "~icons/tabler/language";
@@ -86,6 +89,9 @@
 	let loadDialog: Modal;
 
 	// Dialogs
+	let gradientDialog: Modal
+	let gradientSteps: string[] = ["#ffffff"]
+
 	let clickEventType = "";
 	let clickEventValue = "";
 	let clickEventDialog: Modal;
@@ -342,6 +348,54 @@
 			recentlySaved = false;
 		}, 4000);
 	}
+
+	function applyGradient(gradientColors: string[]) {
+		const { from, to } = editor.state.selection;
+		if (from === to) return;
+
+		const doc = editor.state.doc;
+		let text = "";
+		let textPositions: { pos: number; len: number }[] = [];
+
+		// Collect all text and their positions in the selection
+		doc.nodesBetween(from, to, (node, pos) => {
+			if (node.isText) {
+				const nodeStart = Math.max(from, pos);
+				const nodeEnd = Math.min(to, pos + node.text!.length);
+				const sliceStart = nodeStart - pos;
+				const sliceEnd = nodeEnd - pos;
+				const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
+				if (part.length > 0) {
+					text += part;
+					textPositions.push({ pos: nodeStart, len: part.length });
+				}
+			}
+		});
+		if (!text.length) return;
+
+		const total = text.length;
+		if (total === 0 || gradientColors.length < 2) return;
+
+		const gradientArray = generateGradient(gradientColors, total);
+
+		// Remove color from selection first
+		editor.chain().focus().setTextSelection({ from, to }).unsetColor().run();
+
+		let charIndex = 0;
+		for (const { pos, len } of textPositions) {
+			for (let i = 0; i < len; i++) {
+				const color = gradientArray[charIndex];
+				editor
+					.chain()
+					.setTextSelection({ from: pos + i, to: pos + i + 1 })
+					.setColor(color)
+					.run();
+				charIndex++;
+			}
+		}
+		editor.chain().focus().setTextSelection({ from, to }).run();
+	}
+	
 </script>
 
 <div class="flex flex-col h-screen">
@@ -447,6 +501,11 @@
 				onclick={colorDialog.open}
 				use:tippy={{ content: "Custom Color", placement: "bottom" }}
 				><IconColor /></button>
+			<button
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+				onclick={gradientDialog.open}
+				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
+				><IconGradient /></button>
 			{#each colorMap as color}
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
@@ -1180,6 +1239,53 @@
 			onclick={importToEditor}
 			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
 			Import
+		</button>
+	</div>
+</Modal>
+
+<Modal title="Color Gradient" bind:this={gradientDialog} opened>
+	<div class="flex flex-col w-full space-y-2">
+		<p>Add colours to the gradient below:</p>
+		<div class="flex flex-col space-y-1">
+			{#each gradientSteps ?? [] as step, i}
+			<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
+				<div class="flex-grow">
+					<ColorPicker
+						bind:hex={step}
+						position="responsive"
+						--cp-bg-color="#18181b"
+						--cp-text-color="white"
+						--cp-input-color="#0C0C0E"
+						--cp-button-hover-color="#18181b"
+						textInputModes={["hex"]}
+						isAlpha={false} />
+				</div>
+				<button
+					onclick={() => {
+						gradientSteps.splice(i, 1);
+						gradientSteps = gradientSteps;
+					}}
+					class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/20 h-9 aspect-square flex items-center justify-center">
+					<IconDelete />
+				</button>
+			</div>
+			{/each}
+			<button
+				onclick={() => {
+					gradientSteps.push("#ffffff");
+					gradientSteps = gradientSteps;
+				}}
+				class="bg-zinc-900 p-2 rounded-md cursor-pointer hover:bg-black/50 aspect-square h-9 w-9">
+				<IconCustom class="m-auto" />
+			</button>
+		</div>
+		<button
+			onclick={() => {
+				applyGradient(gradientSteps);
+				gradientDialog.close();
+			}}
+			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			Apply Gradient
 		</button>
 	</div>
 </Modal>

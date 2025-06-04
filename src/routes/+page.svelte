@@ -733,7 +733,7 @@
 	</button>
 </Modal>
 
-<Modal title="Add Custom Source" bind:this={customDialog} opened>
+<Modal title="Add Custom Source" bind:this={customDialog}>
 	<p>Select a source type to add</p>
 	{#if !customType}
 	<div class="grid grid-cols-3 gap-2">

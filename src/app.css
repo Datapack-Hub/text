@@ -33,13 +33,6 @@ button {
 	pointer-events: none;
 }
 
-/* .clickEvent::before {
-	content: url(/click.svg);
-	text-size: 5px;
-	color: white;
-	padding-right: 2px;
-} */
-
 .clickEvent {
 	background-color: #3c3c40;
 	border-bottom: solid #ff5555 2px;
@@ -54,20 +47,12 @@ button {
 }
 
 .obfuscated {
-	color: transparent;
-	caret-color: white;
-	text-shadow: 0 0 3px rgba(255, 255, 255, 1);
-	filter: blur(1px);
+	filter: blur(2px);
 }
 
-.color-picker{
+.color-picker {
 	margin: none;
 }
-
-/* .hoverEvent::before {
-	content: '<svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-pointer"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7.904 17.563a1.2 1.2 0 0 0 2.228 .308l2.09 -3.093l4.907 4.907a1.067 1.067 0 0 0 1.509 0l1.047 -1.047a1.067 1.067 0 0 0 0 -1.509l-4.907 -4.907l3.113 -2.09a1.2 1.2 0 0 0 -.309 -2.228l-13.582 -3.904l3.904 13.563z" /></svg>';
-	font-size: 8pt;
-} */
 
 .nomob {
 	@apply hidden md:inline;

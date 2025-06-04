@@ -2,6 +2,7 @@
 	import { dev } from "$app/environment";
 	import {
 		addTypeSpecificValues,
+		applyGradient,
 		colorMap,
 		defaultColorLUT,
 		trueMarkOrUndefined,
@@ -20,50 +21,44 @@
 		SelectorNode,
 		StorageNBTNode,
 		TranslateNode,
-	} from "$lib/tiptap/extensions";
+		FixedTextStyle,
+	} from "$lib/tiptap/extensions/index";
 	// Components
-	import MiniEditor from "$lib/MiniEditor.svelte";
-	import MiniRenderer from "$lib/MiniRenderer.svelte";
+	import MiniEditor from "$lib/components/MiniEditor.svelte";
+	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
 	import Modal from "$lib/Modal.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import tippy from "tippy.js";
-	import "tippy.js/dist/tippy.css"; // optional
+	import "tippy.js/dist/tippy.css";
+// optional
 
-	import { FixedTextStyle } from "$lib/tiptap/FixedTextStyle";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
-	import { generateGradient } from "typescript-color-gradient";
-
-
-	// Icons
-	import IconBold from "~icons/tabler/bold";
+// Icons
 	import IconTick from "~icons/tabler/check";
+	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
 	import IconClickEvent from "~icons/tabler/hand-finger";
-	import IconItalic from "~icons/tabler/italic";
 	import IconColor from "~icons/tabler/palette";
-	import IconObfuscate from "~icons/tabler/password";
+	import IconEdit from "~icons/tabler/pencil";
 	import IconCustom from "~icons/tabler/plus";
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconStrikethrough from "~icons/tabler/strikethrough";
-	import IconUnderline from "~icons/tabler/underline";
 	import IconDelete from "~icons/tabler/trash";
-	import IconEdit from "~icons/tabler/pencil";
-	import IconGradient from "~icons/tabler/contrast-2-filled";
 
-	import IconNBT from "~icons/tabler/braces";
-	import IconTranslate from "~icons/tabler/language";
+	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
+	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
+	import IconTranslate from "~icons/tabler/language";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -72,10 +67,9 @@
 	let editor: Editor;
 	let color = "#ffffff";
 	let colorDialog: Modal;
-	let fontName = "";
 	let outputDialog: Modal;
 
-	let doesContentExist: boolean = false
+	let doesContentExist: boolean = false;
 
 	// Import
 	let importDialog: Modal;
@@ -89,8 +83,8 @@
 	let loadDialog: Modal;
 
 	// Dialogs
-	let gradientDialog: Modal
-	let gradientSteps: string[] = ["#ffffff"]
+	let gradientDialog: Modal;
+	let gradientSteps: string[] = ["#ffffff"];
 
 	let clickEventType = "";
 	let clickEventValue = "";
@@ -130,11 +124,9 @@
 	};
 
 	function importToEditor() {
-		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText))
-		console.log(importText)
-		console.log(jsonContent)
+		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor.commands.setContent(jsonContent);
-		importDialog.close()
+		importDialog.close();
 	}
 
 	onMount(() => {
@@ -142,14 +134,14 @@
 			value = localStorage.getItem("content")!;
 		} else {
 			value = "[]";
-			localStorage.setItem("content","")
+			localStorage.setItem("content", "");
 		}
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
 		} else {
-			snapshots = []
-			localStorage.setItem("snapshots", "")
+			snapshots = [];
+			localStorage.setItem("snapshots", "");
 		}
 
 		editor = new Editor({
@@ -210,11 +202,11 @@
 
 	function translate(
 		json: JSONContent,
-		export_type: string = "standard",
+		exportType: string = "standard",
 	): string {
 		const paragraphs = json.content!;
 
-		if (export_type == "standard") {
+		if (exportType == "standard") {
 			let data: (MinecraftText | string)[] = [""];
 
 			paragraphs.forEach((p, i) => {
@@ -242,24 +234,26 @@
 			});
 
 			if (data.length === 1 && data[0] === "") {
-				doesContentExist = false
-				if(Math.random() < 0.002) { return "🤓 <- james is waiting for you to type something" }
-				return "waiting for input..."
+				doesContentExist = false;
+				if (Math.random() < 0.002) {
+					return "🤓 <- james is waiting for you to type something";
+				}
+				return "waiting for input...";
 			}
 
-			doesContentExist = true
+			doesContentExist = true;
 
 			return JSON.stringify(data);
-		} else if (export_type == "item_lore") {
+		} else if (exportType == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
 
-			paragraphs.forEach((p, i) => {
+			paragraphs.forEach((p) => {
 				const content = p.content || [];
-				let current_line: (MinecraftText | string)[] = [];
-				let current_component: MinecraftText;
+				let currentLine: (MinecraftText | string)[] = [];
+				let currentComponent: MinecraftText;
 
 				content.forEach((c, i) => {
-					current_component = {
+					currentComponent = {
 						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 						bold: trueMarkOrUndefined(c, "bold"),
 						italic: trueMarkOrUndefined(c, "italic"),
@@ -271,47 +265,48 @@
 					// For lore: default behaviour is to be purple and italic
 					// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
 					// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
-					if (i == 0) {
-						if (current_component.color || current_component.italic) {
-							current_line.push({
+					if (i === 0) {
+						if (currentComponent.color || currentComponent.italic) {
+							currentLine.push({
 								italic: false,
 								color: "white",
 							});
 						} else {
-							if (!current_component.color) {
-								current_component.color = "white";
+							if (!currentComponent.color) {
+								currentComponent.color = "white";
 							}
 
-							if (!current_component.italic) {
-								current_component.italic = false;
+							if (!currentComponent.italic) {
+								currentComponent.italic = false;
 							}
 						}
 					}
 
-					current_component = addTypeSpecificValues(
-						current_component,
-						c,
-						false,
-					);
-					current_line.push(current_component);
+					currentComponent = addTypeSpecificValues(currentComponent, c, false);
+					currentLine.push(currentComponent);
 				});
 
-				if (current_line.length == 2) {
-					data.push(current_line[1]);
+				if (currentLine.length == 2) {
+					data.push(currentLine[1]);
 				} else {
-					data.push(current_line);
+					data.push(currentLine);
 				}
 			});
 
-			console.log(
-				JSON.stringify(
-					snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
-				),
-			);
 			return JSON.stringify(data);
 		} else {
 			return "[]";
 		}
+	}
+
+	function translateToNBT(
+		jsonContent: JSONContent,
+		exportType: string = "standard",
+	): string {
+		return translate(jsonContent, exportType).replace(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			(match) => match.replace(/"/g, ""),
+		);
 	}
 
 	function customColorHandler() {
@@ -341,7 +336,7 @@
 			localStorage.setItem("snapshots", JSON.stringify(snapshots));
 		} else {
 			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
-			snapshots = [editor.getJSON()]
+			snapshots = [editor.getJSON()];
 		}
 		recentlySaved = true;
 		setTimeout(() => {
@@ -349,53 +344,83 @@
 		}, 4000);
 	}
 
-	function applyGradient(gradientColors: string[]) {
+	function hoverEditButtonHandler() {
 		const { from, to } = editor.state.selection;
-		if (from === to) return;
-
+		let start = from,
+			end = to;
 		const doc = editor.state.doc;
-		let text = "";
-		let textPositions: { pos: number; len: number }[] = [];
 
-		// Collect all text and their positions in the selection
-		doc.nodesBetween(from, to, (node, pos) => {
-			if (node.isText) {
-				const nodeStart = Math.max(from, pos);
-				const nodeEnd = Math.min(to, pos + node.text!.length);
-				const sliceStart = nodeStart - pos;
-				const sliceEnd = nodeEnd - pos;
-				const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
-				if (part.length > 0) {
-					text += part;
-					textPositions.push({ pos: nodeStart, len: part.length });
-				}
-			}
-		});
-		if (!text.length) return;
-
-		const total = text.length;
-		if (total === 0 || gradientColors.length < 2) return;
-
-		const gradientArray = generateGradient(gradientColors, total);
-
-		// Remove color from selection first
-		editor.chain().focus().setTextSelection({ from, to }).unsetColor().run();
-
-		let charIndex = 0;
-		for (const { pos, len } of textPositions) {
-			for (let i = 0; i < len; i++) {
-				const color = gradientArray[charIndex];
-				editor
-					.chain()
-					.setTextSelection({ from: pos + i, to: pos + i + 1 })
-					.setColor(color)
-					.run();
-				charIndex++;
-			}
+		function sameHoverEventMark(pos: number) {
+			const node = doc.nodeAt(pos);
+			return node?.marks?.find((m) => m.type.name === "hoverEvent");
 		}
-		editor.chain().focus().setTextSelection({ from, to }).run();
+		const mark = sameHoverEventMark(from);
+		if (!mark) return;
+
+		// Expand left
+		while (
+			start > 0 &&
+			JSON.stringify(sameHoverEventMark(start - 1)?.attrs) ===
+				JSON.stringify(mark.attrs)
+		) {
+			start--;
+		}
+		// Expand right
+		while (
+			end < doc.content.size &&
+			JSON.stringify(sameHoverEventMark(end)?.attrs) ===
+				JSON.stringify(mark.attrs)
+		) {
+			end++;
+		}
+
+		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+		const { action, value } = mark.attrs;
+		hoverEventType = action;
+		hoverEventDialog.open();
+		if (hoverEventEditor) {
+			hoverEventEditor.importText(JSON.stringify(value));
+		}
 	}
-	
+
+	function clickEditButtonHandler() {
+		// cobble if you want to move this elsewhere then please do
+		// what the heck -cbble_
+		const { from, to } = editor.state.selection;
+		let start = from,
+			end = to;
+		const doc = editor.state.doc;
+
+		function sameClickEventMark(pos: number) {
+			const node = doc.nodeAt(pos);
+			return node?.marks?.find((m) => m.type.name === "clickEvent");
+		}
+		const mark = sameClickEventMark(from);
+		if (!mark) return;
+
+		// Expand left
+		while (
+			start > 0 &&
+			JSON.stringify(sameClickEventMark(start - 1)?.attrs) ===
+				JSON.stringify(mark.attrs)
+		) {
+			start--;
+		}
+		// Expand right
+		while (
+			end < doc.content.size &&
+			JSON.stringify(sameClickEventMark(end)?.attrs) ===
+				JSON.stringify(mark.attrs)
+		) {
+			end++;
+		}
+
+		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+		const { action, value } = mark.attrs;
+		clickEventType = action;
+		clickEventValue = value;
+		clickEventDialog.open();
+	}
 </script>
 
 <div class="flex flex-col h-screen">
@@ -410,12 +435,12 @@
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={importDialog.open}>Import</button>
 		{#if doesContentExist}
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
-			onclick={outputDialog.open}>Export</button>
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
-			onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
+			<button
+				class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+				onclick={outputDialog.open}>Export</button>
+			<button
+				class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
@@ -434,7 +459,10 @@
 	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
 		{#if editor}
 			<button
-				onclick={() => {customDialog.open(); customType = undefined;}}
+				onclick={() => {
+					customDialog.open();
+					customType = undefined;
+				}}
 				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
 				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
 				<IconCustom />
@@ -442,56 +470,7 @@
 
 			<div class="w-4"></div>
 
-			<button
-				onclick={() => editor.chain().focus().toggleBold().run()}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'bold',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Bold", placement: "bottom" }}>
-				<IconBold />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleItalic().run()}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'italic',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Italic", placement: "bottom" }}>
-				<IconItalic />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleStrike().run()}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'strike',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Strikethrough", placement: "bottom" }}>
-				<IconStrikethrough />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleUnderline().run()}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'underline',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Underline", placement: "bottom" }}>
-				<IconUnderline />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'obfuscated',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Obfuscated", placement: "bottom" }}>
-				<IconObfuscate />
-			</button>
+			<TextStyleButtons {editor} />
 
 			<div class="w-4"></div>
 
@@ -508,6 +487,7 @@
 				><IconGradient /></button>
 			{#each colorMap as color}
 				<button
+					aria-label="set color to {color.name}"
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
 					use:tippy={{
 						content: toTitleCase(color.name.replace("_", " ")),
@@ -555,42 +535,15 @@
 				<IconClickEvent />
 			</button>
 			{#if editor.isActive("clickEvent")}
-			<button
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
-				use:tippy={{
-					content: "Edit Click Event",
-					placement: "bottom",
-				}}
-				onclick={() => {
-					// cobble if you want to move this elsewhere then please do
-					const { from, to } = editor.state.selection;
-					let start = from, end = to;
-					const doc = editor.state.doc;
-
-					function sameClickEventMark(pos: number) {
-						const node = doc.nodeAt(pos);
-						return node?.marks?.find(m => m.type.name === "clickEvent");
-					}
-					const mark = sameClickEventMark(from);
-					if (!mark) return;
-
-					// Expand left
-					while (start > 0 && JSON.stringify(sameClickEventMark(start - 1)?.attrs) === JSON.stringify(mark.attrs)) {
-						start--;
-					}
-					// Expand right
-					while (end < doc.content.size && JSON.stringify(sameClickEventMark(end)?.attrs) === JSON.stringify(mark.attrs)) {
-						end++;
-					}
-
-					editor.chain().focus().setTextSelection({ from: start, to: end }).run();
-					const { action, value } = mark.attrs;
-					clickEventType = action;
-					clickEventValue = value;
-					clickEventDialog.open();
-				}}>
-				<IconEdit />
-			</button>
+				<button
+					class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+					use:tippy={{
+						content: "Edit Click Event",
+						placement: "bottom",
+					}}
+					onclick={clickEditButtonHandler}>
+					<IconEdit />
+				</button>
 			{/if}
 
 			<button
@@ -601,7 +554,9 @@
 						hoverEventDialog.open();
 					}
 				}}
-				class="{editor.isActive("clickEvent") || editor.isActive("hoverEvent") ? "ml-2" : ""} p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
+					? 'ml-2'
+					: ''} p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'hoverEvent',
 				)
 					? 'bg-zinc-800'
@@ -613,50 +568,22 @@
 				<IconHoverEvent />
 			</button>
 			{#if editor.isActive("hoverEvent")}
-			<button
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
-				use:tippy={{
-					content: "Edit Hover Event",
-					placement: "bottom",
-				}}
-				onclick={() => {
-					const { from, to } = editor.state.selection;
-					let start = from, end = to;
-					const doc = editor.state.doc;
-
-					function sameHoverEventMark(pos: number) {
-						const node = doc.nodeAt(pos);
-						return node?.marks?.find(m => m.type.name === "hoverEvent");
-					}
-					const mark = sameHoverEventMark(from);
-					if (!mark) return;
-
-					// Expand left
-					while (start > 0 && JSON.stringify(sameHoverEventMark(start - 1)?.attrs) === JSON.stringify(mark.attrs)) {
-						start--;
-					}
-					// Expand right
-					while (end < doc.content.size && JSON.stringify(sameHoverEventMark(end)?.attrs) === JSON.stringify(mark.attrs)) {
-						end++;
-					}
-
-					editor.chain().focus().setTextSelection({ from: start, to: end }).run();
-					const { action, value } = mark.attrs;
-					hoverEventType = action;
-					hoverEventDialog.open();
-					console.log(JSON.stringify(value))
-					if (hoverEventEditor) {
-						hoverEventEditor.importText(JSON.stringify(value));
-					}
-				}}>
-				<IconEdit />
-			</button>
+				<button
+					class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+					use:tippy={{
+						content: "Edit Hover Event",
+						placement: "bottom",
+					}}
+					onclick={hoverEditButtonHandler}>
+					<IconEdit />
+				</button>
 			{/if}
 		{/if}
 	</div>
 
 	<div
 		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow"
+		spellcheck="false"
 		bind:this={element}>
 	</div>
 
@@ -670,32 +597,22 @@
 		{/if}
 		<div class="flex items-start bg-zinc-950 p-3 space-x-3">
 			{#if doesContentExist}
-			<button
-				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
-				onclick={() => {
-					navigator.clipboard.writeText(
-						translate(editor.getJSON()).replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						),
-					);
-					recentlyCopied = true;
-					setTimeout(() => (recentlyCopied = false), 2000);
-				}}
-				use:tippy={{ content: "Copy" }}>
-				{#if recentlyCopied}
-					<IconTick />
-				{:else}
-					<IconCopy />
-				{/if}</button>
+				<button
+					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+					onclick={() => {
+						navigator.clipboard.writeText(translateToNBT(editor.getJSON()));
+						recentlyCopied = true;
+						setTimeout(() => (recentlyCopied = false), 2000);
+					}}
+					use:tippy={{ content: "Copy" }}>
+					{#if recentlyCopied}
+						<IconTick />
+					{:else}
+						<IconCopy />
+					{/if}</button>
 			{/if}
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>{editor
-					? translate(editor.getJSON()).replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						)
-					: "Loading..."}
+				>{editor ? translateToNBT(editor.getJSON()) : "Loading..."}
 			</code>
 		</div>
 	</div>
@@ -800,46 +717,56 @@
 <Modal title="Add Custom Source" bind:this={customDialog}>
 	<p>Select a source type to add</p>
 	{#if !customType}
-	<div class="grid grid-cols-3 gap-2">
-	<button 
-		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "translate"}}>
-		<IconTranslate class="text-2xl"/>
-		<span>Translate Key</span>
-	</button>
-	<button 
-		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "nbt"}}>
-		<IconNBT class="text-2xl"/>
-		<span>NBT Value</span>
-	</button>
-	<button 
-		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "score"}}>
-		<IconScore class="text-2xl"/>
-		<span>Score Value</span>
-	</button>
-	<button 
-		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "selector"}}>
-		<IconSelector class="text-2xl"/>
-		<span>Selector</span>
-	</button>
-	<button 
-		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "keybind"}}>
-		<IconKeybind class="text-2xl"/>
-		<span>Keybind</span>
-	</button>
-	</div>
+		<div class="grid grid-cols-3 gap-2">
+			<button
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				onclick={() => {
+					customType = "translate";
+				}}>
+				<IconTranslate class="text-2xl" />
+				<span>Translate Key</span>
+			</button>
+			<button
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				onclick={() => {
+					customType = "nbt";
+				}}>
+				<IconNBT class="text-2xl" />
+				<span>NBT Value</span>
+			</button>
+			<button
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				onclick={() => {
+					customType = "score";
+				}}>
+				<IconScore class="text-2xl" />
+				<span>Score Value</span>
+			</button>
+			<button
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				onclick={() => {
+					customType = "selector";
+				}}>
+				<IconSelector class="text-2xl" />
+				<span>Selector</span>
+			</button>
+			<button
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				onclick={() => {
+					customType = "keybind";
+				}}>
+				<IconKeybind class="text-2xl" />
+				<span>Keybind</span>
+			</button>
+		</div>
 	{:else}
-	<select bind:value={customType} class="bg-zinc-900 p-2 rounded-md">
-		<option value="translate">Translate Key</option>
-		<option value="score">Score Value</option>
-		<option value="nbt">NBT Value</option>
-		<option value="selector">Selector</option>
-		<option value="keybind">Keybind</option>
-	</select>
+		<select bind:value={customType} class="bg-zinc-900 p-2 rounded-md">
+			<option value="translate">Translate Key</option>
+			<option value="score">Score Value</option>
+			<option value="nbt">NBT Value</option>
+			<option value="selector">Selector</option>
+			<option value="keybind">Keybind</option>
+		</select>
 	{/if}
 
 	{#if customType === "translate"}
@@ -954,12 +881,16 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="flex items-center space-x-2 mt-2">
-				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+				<button
+					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					onclick={() =>
+						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
-					<IconTick class="m-auto text-lg" />
+						<IconTick class="m-auto text-lg" />
 					{/if}
 				</button>
-				<label for="interpret">Interpret (parse nbt value as a text component)</label>
+				<label for="interpret"
+					>Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button
@@ -994,12 +925,16 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="flex items-center space-x-2 mt-2">
-				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+				<button
+					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					onclick={() =>
+						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
-					<IconTick class="m-auto text-lg" />
+						<IconTick class="m-auto text-lg" />
 					{/if}
 				</button>
-				<label for="interpret">Interpret (parse nbt value as a text component)</label>
+				<label for="interpret"
+					>Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button
@@ -1034,12 +969,16 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="flex items-center space-x-2 mt-2">
-				<button class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center" onclick={() => customValues.nbt.interpret = !customValues.nbt.interpret}>
+				<button
+					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					onclick={() =>
+						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
-					<IconTick class="m-auto text-lg" />
+						<IconTick class="m-auto text-lg" />
 					{/if}
 				</button>
-				<label for="interpret">Interpret (parse nbt value as a text component)</label>
+				<label for="interpret"
+					>Interpret (parse nbt value as a text component)</label>
 			</div>
 
 			<button
@@ -1160,11 +1099,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"/tellraw @s " +
-							translate(editor.getJSON()).replace(
-								/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-								(match) => match.replace(/"/g, ""),
-							),
+						"/tellraw @s " + translateToNBT(editor.getJSON()),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -1172,12 +1107,7 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>/tellraw @s {editor
-					? translate(editor.getJSON()).replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						)
-					: "Loading..."}
+				>/tellraw @s {editor ? translateToNBT(editor.getJSON()) : "Loading..."}
 			</code>
 		</div>
 
@@ -1187,12 +1117,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"[lore=" +
-							translate(editor.getJSON(), "item_lore").replace(
-								/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-								(match) => match.replace(/"/g, ""),
-							) +
-							"]",
+						`[lore=${translateToNBT(editor.getJSON(), "item_lore")}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -1201,10 +1126,7 @@
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>[lore={editor
-					? translate(editor.getJSON(), "item_lore").replace(
-							/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-							(match) => match.replace(/"/g, ""),
-						)
+					? translateToNBT(editor.getJSON(), "item_lore")
 					: "Loading..."}]
 			</code>
 		</div>
@@ -1229,11 +1151,14 @@
 
 <Modal title="Import from NBT" bind:this={importDialog} big>
 	<div class="flex flex-col w-full space-y-2">
-		<p>Paste your text components below to import them into the editor. This will clear the current contents of the editor!</p>
-		<input 
-			class="flex items-start bg-zinc-950 p-3 rounded-lg mc" 
-			placeholder="Paste NBT text components here" 
-			bind:value={importText}/>
+		<p>
+			Paste your text components below to import them into the editor. This will
+			clear the current contents of the editor!
+		</p>
+		<input
+			class="flex items-start bg-zinc-950 p-3 rounded-lg mc"
+			placeholder="Paste NBT text components here"
+			bind:value={importText} />
 
 		<button
 			onclick={importToEditor}
@@ -1248,27 +1173,27 @@
 		<p>Add colours to the gradient below:</p>
 		<div class="flex flex-col space-y-1">
 			{#each gradientSteps ?? [] as step, i}
-			<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
-				<div class="flex-grow">
-					<ColorPicker
-						bind:hex={step}
-						position="responsive"
-						--cp-bg-color="#18181b"
-						--cp-text-color="white"
-						--cp-input-color="#0C0C0E"
-						--cp-button-hover-color="#18181b"
-						textInputModes={["hex"]}
-						isAlpha={false} />
+				<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
+					<div class="flex-grow">
+						<ColorPicker
+							bind:hex={step}
+							position="responsive"
+							--cp-bg-color="#18181b"
+							--cp-text-color="white"
+							--cp-input-color="#0C0C0E"
+							--cp-button-hover-color="#18181b"
+							textInputModes={["hex"]}
+							isAlpha={false} />
+					</div>
+					<button
+						onclick={() => {
+							gradientSteps.splice(i, 1);
+							gradientSteps = gradientSteps;
+						}}
+						class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/20 h-9 aspect-square flex items-center justify-center">
+						<IconDelete />
+					</button>
 				</div>
-				<button
-					onclick={() => {
-						gradientSteps.splice(i, 1);
-						gradientSteps = gradientSteps;
-					}}
-					class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/20 h-9 aspect-square flex items-center justify-center">
-					<IconDelete />
-				</button>
-			</div>
 			{/each}
 			<button
 				onclick={() => {
@@ -1281,7 +1206,7 @@
 		</div>
 		<button
 			onclick={() => {
-				applyGradient(gradientSteps);
+				applyGradient(editor, gradientSteps);
 				gradientDialog.close();
 			}}
 			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">

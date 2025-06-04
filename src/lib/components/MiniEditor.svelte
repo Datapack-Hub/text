@@ -1,33 +1,33 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
-	import { Editor, isMarkActive, type JSONContent } from "@tiptap/core";
-	import StarterKit from "@tiptap/starter-kit";
-	import Placeholder from "@tiptap/extension-placeholder";
-	import Underline from "@tiptap/extension-underline";
-	import Color from "@tiptap/extension-color";
-	import TextStyle from "@tiptap/extension-text-style";
 	import {
-		colorMap,
-		type MinecraftText,
-		type BaseMinecraftText,
 		addTypeSpecificValues,
+		colorMap,
+		type MinecraftText
 	} from "$lib/tiptap/text";
+	import { Editor, type JSONContent } from "@tiptap/core";
+	import Color from "@tiptap/extension-color";
+	import Placeholder from "@tiptap/extension-placeholder";
+	import TextStyle from "@tiptap/extension-text-style";
+	import Underline from "@tiptap/extension-underline";
+	import StarterKit from "@tiptap/starter-kit";
+	import { onDestroy, onMount } from "svelte";
 
 	import IconBold from "~icons/tabler/bold";
 	import IconItalic from "~icons/tabler/italic";
-	import IconStrikethrough from "~icons/tabler/strikethrough";
-	import IconUnderline from "~icons/tabler/underline";
-	import IconSquare from "~icons/tabler/square-filled";
-	import IconHollow from "~icons/tabler/square-x";
 	import IconColor from "~icons/tabler/palette";
 	import IconObfuscate from "~icons/tabler/password";
+	import IconSquare from "~icons/tabler/square-filled";
+	import IconHollow from "~icons/tabler/square-x";
+	import IconStrikethrough from "~icons/tabler/strikethrough";
+	import IconUnderline from "~icons/tabler/underline";
+	import { convertToTextOrEmpty, snbtToDocument } from "../nbt";
+
 	import {
 		ClickEventMark,
-		Fonts,
 		HoverEventMark,
-		Obfuscation,
+		Obfuscation
 	} from "$lib/tiptap/extensions";
-	import { convertToTextOrEmpty, snbtToDocument } from "./nbt";
+	import TextStyleButtons from "./TextStyleButtons.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -47,7 +47,6 @@
 				Color,
 				TextStyle,
 				Obfuscation,
-				Fonts,
 				ClickEventMark,
 				HoverEventMark,
 				Placeholder.configure({
@@ -71,9 +70,7 @@
 		}
 	});
 
-	function translate(
-		json: JSONContent
-	): string {
+	function translate(json: JSONContent): string {
 		const paragraphs = json.content!;
 
 		let data: (MinecraftText | string)[] = [""];
@@ -103,15 +100,9 @@
 		});
 
 		if (data.length === 1 && data[0] === "") {
-			return ""
+			return "";
 		}
 
-
-		console.log(
-			JSON.stringify(
-				snbtToDocument(convertToTextOrEmpty(JSON.stringify(data))),
-			),
-		);
 		return JSON.stringify(data);
 	}
 
@@ -139,8 +130,7 @@
 	}
 
 	export function importText(input: string) {
-		const jsonContent = snbtToDocument(convertToTextOrEmpty(input))
-		console.log(jsonContent)
+		const jsonContent = snbtToDocument(convertToTextOrEmpty(input));
 		editor.commands.setContent(jsonContent);
 	}
 </script>
@@ -148,53 +138,7 @@
 <div class="flex flex-col">
 	<div class="w-full p-2 bg-black/50 flex items-center flex-wrap rounded-t-md">
 		{#if editor}
-			<button
-				onclick={() => editor.chain().focus().toggleBold().run()}
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'bold',
-				)
-					? 'bg-zinc-800'
-					: ''}">
-				<IconBold />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleItalic().run()}
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'italic',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				class:active={editor.isActive("italic")}>
-				<IconItalic />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleStrike().run()}
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'strike',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				class:active={editor.isActive("strikethrough")}>
-				<IconStrikethrough />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleUnderline().run()}
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'underline',
-				)
-					? 'bg-zinc-800'
-					: ''}">
-				<IconUnderline />
-			</button>
-			<button
-				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
-					'obfuscated',
-				)
-					? 'bg-zinc-800'
-					: ''}">
-				<IconObfuscate />
-			</button>
+			<TextStyleButtons {editor} />
 
 			<div class="w-4"></div>
 
@@ -214,6 +158,7 @@
 			{/each}
 			{#if editor.isActive("textStyle")}
 				<button
+					aria-label="unset color"
 					onclick={() => editor.chain().focus().unsetColor().run()}
 					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md">
 					<IconHollow />

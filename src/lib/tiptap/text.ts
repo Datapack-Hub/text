@@ -1,4 +1,5 @@
-import { type JSONContent } from "@tiptap/core";
+import { Editor, type JSONContent } from "@tiptap/core";
+import { generateGradient } from "typescript-color-gradient";
 
 export const colorMap = [
 	{ name: "dark_red", value: "#AA0000" },
@@ -213,4 +214,51 @@ export function addTypeSpecificValues(
 	}
 
 	return current;
+}
+
+export function applyGradient(editor: Editor, gradientColors: string[]) {
+	const { from, to } = editor.state.selection;
+	if (from === to) return;
+
+	const doc = editor.state.doc;
+	let text = "";
+	let textPositions: { pos: number; len: number }[] = [];
+
+	// Collect all text and their positions in the selection
+	doc.nodesBetween(from, to, (node, pos) => {
+		if (node.isText) {
+			const nodeStart = Math.max(from, pos);
+			const nodeEnd = Math.min(to, pos + node.text!.length);
+			const sliceStart = nodeStart - pos;
+			const sliceEnd = nodeEnd - pos;
+			const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
+			if (part.length > 0) {
+				text += part;
+				textPositions.push({ pos: nodeStart, len: part.length });
+			}
+		}
+	});
+	if (!text.length) return;
+
+	const total = text.length;
+	if (total === 0 || gradientColors.length < 2) return;
+
+	const gradientArray = generateGradient(gradientColors, total);
+
+	// Remove color from selection first
+	editor.chain().focus().setTextSelection({ from, to }).unsetColor().run();
+
+	let charIndex = 0;
+	for (const { pos, len } of textPositions) {
+		for (let i = 0; i < len; i++) {
+			const color = gradientArray[charIndex];
+			editor
+				.chain()
+				.setTextSelection({ from: pos + i, to: pos + i + 1 })
+				.setColor(color)
+				.run();
+			charIndex++;
+		}
+	}
+	editor.chain().focus().setTextSelection({ from, to }).run();
 }

@@ -5,9 +5,10 @@
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onMount } from "svelte";
+	import { HoverEventMark } from "$lib/tiptap/extensions/marks/HoverEventMark";
+	import { ClickEventMark } from "$lib/tiptap/extensions/marks/ClickEventMark";
 	import {
 		Obfuscation,
-		Fonts,
 		BlockNBTNode,
 		EntityNBTNode,
 		KeybindNode,
@@ -15,8 +16,6 @@
 		SelectorNode,
 		StorageNBTNode,
 		TranslateNode,
-		ClickEventMark,
-		HoverEventMark
 	} from "$lib/tiptap/extensions";
 
 	let { value } = $props();
@@ -32,7 +31,6 @@
 				Color,
 				TextStyle,
 				Obfuscation,
-				Fonts,
 				ClickEventMark,
 				HoverEventMark,
 				BlockNBTNode,
@@ -41,7 +39,7 @@
 				ScoreNode,
 				SelectorNode,
 				StorageNBTNode,
-				TranslateNode
+				TranslateNode,
 			],
 			content: value,
 		}).setEditable(false);

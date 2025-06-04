@@ -11,8 +11,7 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 	try {
 		parsed = JSON.parse(raw);
 	} catch (e) {
-		console.error("Failed to parse SNBT:", e);
-		console.error(raw)
+		console.error("Failed to parse SNBT:", e, raw);
 		return [""];
 	}
 
@@ -37,12 +36,11 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 	};
 
 	for (const text of raw) {
-
 		if (typeof text === "string") {
 			if (text === "") {
 				continue;
 			}
-			
+
 			baseDocument.content?.push({
 				type: "paragraph",
 			});
@@ -62,7 +60,7 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 		paragraphContent!.push(finalText);
 	}
 
-	baseDocument = fixBrokenNewLines(baseDocument)
+	baseDocument = fixBrokenNewLines(baseDocument);
 	return baseDocument;
 }
 
@@ -140,15 +138,15 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 }
 
 function applyStyling(text: MinecraftText, finalText: JSONContent) {
-    if (!finalText.marks) {
-        finalText.marks = [];
-    }
+	if (!finalText.marks) {
+		finalText.marks = [];
+	}
 
 	if (text.color) {
 		finalText.marks?.push({
 			type: "textStyle",
 			attrs: {
-				color: colorNameToHexCode(text.color)
+				color: colorNameToHexCode(text.color),
 			},
 		});
 	}
@@ -183,25 +181,29 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		});
 	}
 
-    if (text.click_event) {
-        
-        const cE = text.click_event
+	if (text.click_event) {
+		const cE = text.click_event;
 
-        // Check if only one of the properties is set, throw an error if more than one is set
-        if ((cE.url && (cE.command || cE.value || cE.page || cE.dialog)) ||
-            (cE.command && (cE.url || cE.value || cE.page || cE.dialog)) ||
-            (cE.value && (cE.url || cE.command || cE.page || cE.dialog)) ||
-            (cE.page && (cE.url || cE.command || cE.value || cE.dialog)) ||
-            (cE.dialog && (cE.url || cE.command || cE.value || cE.page))) {
-            throw new Error("Click event can only have one of url, command, value, page, or dialog set.");
-        }
+		// Check if only one of the properties is set, throw an error if more than one is set
+		if (
+			(cE.url && (cE.command || cE.value || cE.page || cE.dialog)) ||
+			(cE.command && (cE.url || cE.value || cE.page || cE.dialog)) ||
+			(cE.value && (cE.url || cE.command || cE.page || cE.dialog)) ||
+			(cE.page && (cE.url || cE.command || cE.value || cE.dialog)) ||
+			(cE.dialog && (cE.url || cE.command || cE.value || cE.page))
+		) {
+			throw new Error(
+				"Click event can only have one of url, command, value, page, or dialog set.",
+			);
+		}
 
-        const actionSource = cE.url || cE.command || cE.value || cE.page || cE.dialog;
+		const actionSource =
+			cE.url || cE.command || cE.value || cE.page || cE.dialog;
 
 		finalText.marks?.push({
 			type: "clickEvent",
-            attrs: {
-                action: cE.action,
+			attrs: {
+				action: cE.action,
 				value: actionSource,
 			},
 		});
@@ -210,14 +212,14 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 	if (text.hover_event) {
 		finalText.marks?.push({
 			type: "hoverEvent",
-            attrs: {
-                action: text.hover_event.action,
-                value: text.hover_event.value,
-                id: text.hover_event.id,
-                count: text.hover_event.count,
-                components: text.hover_event.components,
-                name: text.hover_event.name,
-                uuid: text.hover_event.uuid,
+			attrs: {
+				action: text.hover_event.action,
+				value: text.hover_event.value,
+				id: text.hover_event.id,
+				count: text.hover_event.count,
+				components: text.hover_event.components,
+				name: text.hover_event.name,
+				uuid: text.hover_event.uuid,
 			},
 		});
 	}
@@ -235,57 +237,57 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 }
 
 function fixBrokenNewLines(doc: any) {
-  const fixedContent = [];
+	const fixedContent = [];
 
-  for (const node of doc.content) {
-    if (node.type !== 'paragraph' || !node.content) {
-      // Non-paragraph nodes are copied as-is
-      fixedContent.push(node);
-      continue;
-    }
+	for (const node of doc.content) {
+		if (node.type !== "paragraph" || !node.content) {
+			// Non-paragraph nodes are copied as-is
+			fixedContent.push(node);
+			continue;
+		}
 
-    let currentParagraph = [];
+		let currentParagraph = [];
 
-    for (const child of node.content) {
-      if (child.type !== 'text' || !child.text.includes('\n')) {
-        // No newline — add to current paragraph
-        currentParagraph.push(child);
-        continue;
-      }
+		for (const child of node.content) {
+			if (child.type !== "text" || !child.text.includes("\n")) {
+				// No newline — add to current paragraph
+				currentParagraph.push(child);
+				continue;
+			}
 
-      // Text node contains newlines — split it
-      const lines = child.text.split('\n');
-      for (let i = 0; i < lines.length; i++) {
-        if (i > 0) {
-          // Push previous paragraph and start a new one
-          fixedContent.push({
-            type: 'paragraph',
-            content: currentParagraph
-          });
-          currentParagraph = [];
-        }
-        // Only add non-empty text nodes
-        if (lines[i]) {
-          currentParagraph.push({
-            type: 'text',
-            text: lines[i],
-            ...(child.marks ? { marks: child.marks } : {})
-          });
-        }
-      }
-    }
+			// Text node contains newlines — split it
+			const lines = child.text.split("\n");
+			for (let i = 0; i < lines.length; i++) {
+				if (i > 0) {
+					// Push previous paragraph and start a new one
+					fixedContent.push({
+						type: "paragraph",
+						content: currentParagraph,
+					});
+					currentParagraph = [];
+				}
+				// Only add non-empty text nodes
+				if (lines[i]) {
+					currentParagraph.push({
+						type: "text",
+						text: lines[i],
+						...(child.marks ? { marks: child.marks } : {}),
+					});
+				}
+			}
+		}
 
-    // Add the last paragraph
-    if (currentParagraph.length > 0) {
-      fixedContent.push({
-        type: 'paragraph',
-        content: currentParagraph
-      });
-    }
-  }
+		// Add the last paragraph
+		if (currentParagraph.length > 0) {
+			fixedContent.push({
+				type: "paragraph",
+				content: currentParagraph,
+			});
+		}
+	}
 
-  return {
-    type: 'doc',
-    content: fixedContent
-  };
+	return {
+		type: "doc",
+		content: fixedContent,
+	};
 }

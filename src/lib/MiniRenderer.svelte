@@ -8,8 +8,15 @@
 	import {
 		Obfuscation,
 		Fonts,
+		BlockNBTNode,
+		EntityNBTNode,
+		KeybindNode,
+		ScoreNode,
+		SelectorNode,
+		StorageNBTNode,
+		TranslateNode,
 		ClickEventMark,
-		HoverEventMark,
+		HoverEventMark
 	} from "$lib/tiptap/extensions";
 
 	let { value } = $props();
@@ -28,6 +35,13 @@
 				Fonts,
 				ClickEventMark,
 				HoverEventMark,
+				BlockNBTNode,
+				EntityNBTNode,
+				KeybindNode,
+				ScoreNode,
+				SelectorNode,
+				StorageNBTNode,
+				TranslateNode
 			],
 			content: value,
 		}).setEditable(false);

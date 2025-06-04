@@ -136,10 +136,14 @@
 			value = localStorage.getItem("content")!;
 		} else {
 			value = "[]";
+			localStorage.setItem("content","")
 		}
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
+		} else {
+			snapshots = []
+			localStorage.setItem("snapshots", "")
 		}
 
 		editor = new Editor({
@@ -331,6 +335,7 @@
 			localStorage.setItem("snapshots", JSON.stringify(snapshots));
 		} else {
 			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
+			snapshots = [editor.getJSON()]
 		}
 		recentlySaved = true;
 		setTimeout(() => {

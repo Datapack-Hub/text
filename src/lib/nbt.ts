@@ -222,14 +222,14 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		});
 	}
 
-	if (text.font) {
-		finalText.marks?.push({
-			type: "font",
-			attrs: {
-				font: text.font,
-			},
-		});
-	}
+	// if (text.font) {
+	// 	finalText.marks?.push({
+	// 		type: "font",
+	// 		attrs: {
+	// 			font: text.font,
+	// 		},
+	// 	});
+	// }
 
 	return finalText;
 }

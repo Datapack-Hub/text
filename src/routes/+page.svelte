@@ -95,7 +95,7 @@
 	let hoverEventEditor: MiniEditor;
 	let hoverEventDialog: Modal;
 
-	let customType: string;
+	let customType: string | undefined;
 	let customDialog: Modal;
 	let customValues: ExternalSources = {
 		score: {

@@ -4,7 +4,7 @@ import { colorNameToHexCode, type MinecraftText } from "./tiptap/text";
 type TextOrEmpty = string | MinecraftText;
 
 export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
-	raw = raw.replace(/([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '"$1":');
+	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
@@ -12,7 +12,12 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 		parsed = JSON.parse(raw);
 	} catch (e) {
 		console.error("Failed to parse SNBT:", e);
+		console.error(raw)
 		return [""];
+	}
+
+	if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+		return [parsed as MinecraftText];
 	}
 
 	return parsed as TextOrEmpty[];
@@ -57,6 +62,7 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 		paragraphContent!.push(finalText);
 	}
 
+	baseDocument = fixBrokenNewLines(baseDocument)
 	return baseDocument;
 }
 
@@ -226,4 +232,60 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 	}
 
 	return finalText;
+}
+
+function fixBrokenNewLines(doc: any) {
+  const fixedContent = [];
+
+  for (const node of doc.content) {
+    if (node.type !== 'paragraph' || !node.content) {
+      // Non-paragraph nodes are copied as-is
+      fixedContent.push(node);
+      continue;
+    }
+
+    let currentParagraph = [];
+
+    for (const child of node.content) {
+      if (child.type !== 'text' || !child.text.includes('\n')) {
+        // No newline — add to current paragraph
+        currentParagraph.push(child);
+        continue;
+      }
+
+      // Text node contains newlines — split it
+      const lines = child.text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        if (i > 0) {
+          // Push previous paragraph and start a new one
+          fixedContent.push({
+            type: 'paragraph',
+            content: currentParagraph
+          });
+          currentParagraph = [];
+        }
+        // Only add non-empty text nodes
+        if (lines[i]) {
+          currentParagraph.push({
+            type: 'text',
+            text: lines[i],
+            ...(child.marks ? { marks: child.marks } : {})
+          });
+        }
+      }
+    }
+
+    // Add the last paragraph
+    if (currentParagraph.length > 0) {
+      fixedContent.push({
+        type: 'paragraph',
+        content: currentParagraph
+      });
+    }
+  }
+
+  return {
+    type: 'doc',
+    content: fixedContent
+  };
 }

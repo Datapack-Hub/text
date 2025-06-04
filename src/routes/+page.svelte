@@ -31,7 +31,7 @@
 
 	import tippy from "tippy.js";
 	import "tippy.js/dist/tippy.css";
-// optional
+	// optional
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
 	import { Editor, type JSONContent } from "@tiptap/core";
@@ -40,7 +40,7 @@
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-// Icons
+	// Icons
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";

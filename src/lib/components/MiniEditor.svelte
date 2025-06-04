@@ -2,7 +2,7 @@
 	import {
 		addTypeSpecificValues,
 		colorMap,
-		type MinecraftText
+		type MinecraftText,
 	} from "$lib/tiptap/text";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
@@ -25,7 +25,7 @@
 	import {
 		ClickEventMark,
 		HoverEventMark,
-		Obfuscation
+		Obfuscation,
 	} from "$lib/tiptap/extensions";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 

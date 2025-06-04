@@ -739,7 +739,7 @@
 	<div class="grid grid-cols-3 gap-2">
 	<button 
 		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "nbt"}}>
+		onclick={() => {customType = "translate"}}>
 		<IconTranslate class="text-2xl"/>
 		<span>Translate Key</span>
 	</button>
@@ -751,19 +751,19 @@
 	</button>
 	<button 
 		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "nbt"}}>
+		onclick={() => {customType = "score"}}>
 		<IconScore class="text-2xl"/>
 		<span>Score Value</span>
 	</button>
 	<button 
 		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "nbt"}}>
+		onclick={() => {customType = "selector"}}>
 		<IconSelector class="text-2xl"/>
 		<span>Selector</span>
 	</button>
 	<button 
 		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
-		onclick={() => {customType = "nbt"}}>
+		onclick={() => {customType = "keybind"}}>
 		<IconKeybind class="text-2xl"/>
 		<span>Keybind</span>
 	</button>

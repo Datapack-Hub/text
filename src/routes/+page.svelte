@@ -37,6 +37,8 @@
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
+
 	// Icons
 	import IconBold from "~icons/tabler/bold";
 	import IconTick from "~icons/tabler/check";
@@ -52,7 +54,7 @@
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
 	import IconDelete from "~icons/tabler/trash";
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
+	import IconEdit from "~icons/tabler/pencil";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -341,12 +343,7 @@
 		style="font-family: Lexend">
 		<div class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">
 			<img src="/dph.svg" class="h-5" alt="logo" />
-			<span class="ml-3 nomob"
-				>Minecraft Text Editor <span class="text-xs"
-					>(by <a href="https://datapackhub.net" class="underline"
-						>Datapack Hub</a
-					>)</span
-				></span>
+			<span class="ml-3 nomob">Minecraft Text Editor</span>
 		</div>
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
@@ -479,9 +476,7 @@
 					? 'bg-zinc-800'
 					: ''}"
 				use:tippy={{
-					content: editor.isActive("clickEvent")
-						? "Unset Click Event"
-						: "Add Click Event",
+					content: "Click Event",
 					placement: "bottom",
 				}}
 				onclick={() => {
@@ -493,6 +488,45 @@
 				}}>
 				<IconClickEvent />
 			</button>
+			{#if editor.isActive("clickEvent")}
+			<button
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				use:tippy={{
+					content: "Edit Click Event",
+					placement: "bottom",
+				}}
+				onclick={() => {
+					// cobble if you want to move this elsewhere then please do
+					const { from, to } = editor.state.selection;
+					let start = from, end = to;
+					const doc = editor.state.doc;
+
+					function sameClickEventMark(pos: number) {
+						const node = doc.nodeAt(pos);
+						return node?.marks?.find(m => m.type.name === "clickEvent");
+					}
+					const mark = sameClickEventMark(from);
+					if (!mark) return;
+
+					// Expand left
+					while (start > 0 && JSON.stringify(sameClickEventMark(start - 1)?.attrs) === JSON.stringify(mark.attrs)) {
+						start--;
+					}
+					// Expand right
+					while (end < doc.content.size && JSON.stringify(sameClickEventMark(end)?.attrs) === JSON.stringify(mark.attrs)) {
+						end++;
+					}
+
+					editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+					const { action, value } = mark.attrs;
+					clickEventType = action;
+					clickEventValue = value;
+					clickEventDialog.open();
+				}}>
+				<IconEdit />
+			</button>
+			{/if}
+
 			<button
 				onclick={() => {
 					if (editor.isActive("hoverEvent")) {
@@ -501,27 +535,30 @@
 						hoverEventDialog.open();
 					}
 				}}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="{editor.isActive("clickEvent") || editor.isActive("hoverEvent") ? "ml-2" : ""} p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
 					'hoverEvent',
 				)
 					? 'bg-zinc-800'
 					: ''}"
 				use:tippy={{
-					content: editor.isActive("hoverEvent")
-						? "Unset Hover Event"
-						: "Add Hover Event",
+					content: "Hover Event",
 					placement: "bottom",
 				}}>
 				<IconHoverEvent />
 			</button>
-
-			<!-- <label for="font">Custom Font:</label>
-        <input
-            class="bg-zinc-800 p-2 rounded-md"
-            type="text"
-            id="font"
-            bind:value={fontName}
-            placeholder="Enter font name" /> -->
+			{#if editor.isActive("hoverEvent")}
+			<button
+				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				use:tippy={{
+					content: "Edit Hover Event",
+					placement: "bottom",
+				}}
+				onclick={() => {
+					
+				}}>
+				<IconEdit />
+			</button>
+			{/if}
 		{/if}
 	</div>
 

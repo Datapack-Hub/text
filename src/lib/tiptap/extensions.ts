@@ -357,7 +357,7 @@ export const ScoreNode = Node.create<NodeOptions>({
 				"data-score-node": "true",
 				contenteditable: "false",
 				style: `
-          background-color: #555555;
+          background-color: #3c3c40;
           padding: 1px 5px;
           border-radius: 4px;
           font-size: 0.9em;
@@ -422,7 +422,7 @@ export const TranslateNode = Node.create<NodeOptions>({
 				"data-translate-node": "true",
 				contenteditable: "false",
 				style: `
-          background-color: #555555;
+          background-color: #3c3c40;
           padding: 1px 5px;
           border-radius: 4px;
           font-size: 0.9em;
@@ -487,7 +487,7 @@ export const StorageNBTNode = Node.create<NodeOptions>({
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #555555;
+            background-color: #3c3c40;
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;
@@ -552,7 +552,7 @@ export const EntityNBTNode = Node.create<NodeOptions>({
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #555555;
+            background-color: #3c3c40;
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;
@@ -617,7 +617,7 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #555555;
+            background-color: #3c3c40;
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;
@@ -680,7 +680,7 @@ export const KeybindNode = Node.create<NodeOptions>({
 				"data-keybind-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #555555;
+            background-color: #3c3c40;
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;
@@ -743,7 +743,7 @@ export const SelectorNode = Node.create<NodeOptions>({
 				"data-selector-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #555555;
+            background-color: #3c3c40;
             padding: 1px 5px;
             border-radius: 4px;
             font-size: 0.9em;

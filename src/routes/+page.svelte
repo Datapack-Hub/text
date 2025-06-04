@@ -1243,7 +1243,7 @@
 	</div>
 </Modal>
 
-<Modal title="Color Gradient" bind:this={gradientDialog} opened>
+<Modal title="Color Gradient" bind:this={gradientDialog}>
 	<div class="flex flex-col w-full space-y-2">
 		<p>Add colours to the gradient below:</p>
 		<div class="flex flex-col space-y-1">

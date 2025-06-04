@@ -5,6 +5,15 @@
 	border-color: transparent;
 }
 
+strong {
+	font-family: MinecraftBold;
+	font-weight: 100;
+}
+
+button {
+	cursor: pointer;
+}
+
 .mc {
 	font-family: Minecraft;
 }

@@ -56,6 +56,12 @@
 	import IconDelete from "~icons/tabler/trash";
 	import IconEdit from "~icons/tabler/pencil";
 
+	import IconNBT from "~icons/tabler/braces";
+	import IconTranslate from "~icons/tabler/language";
+	import IconScore from "~icons/tabler/123";
+	import IconSelector from "~icons/tabler/at";
+	import IconKeybind from "~icons/tabler/keyboard";
+
 	// TODO: convert to non-legacy mode
 	export let value = "";
 
@@ -89,7 +95,7 @@
 	let hoverEventEditor: MiniEditor;
 	let hoverEventDialog: Modal;
 
-	let customType = "-- Select one --";
+	let customType: string;
 	let customDialog: Modal;
 	let customValues: ExternalSources = {
 		score: {
@@ -369,8 +375,8 @@
 	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
 		{#if editor}
 			<button
-				onclick={customDialog.open}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				onclick={() => {customDialog.open(); customType = undefined;}}
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
 				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
 				<IconCustom />
 			</button>
@@ -379,7 +385,7 @@
 
 			<button
 				onclick={() => editor.chain().focus().toggleBold().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'bold',
 				)
 					? 'bg-zinc-800'
@@ -389,7 +395,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleItalic().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'italic',
 				)
 					? 'bg-zinc-800'
@@ -399,7 +405,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleStrike().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'strike',
 				)
 					? 'bg-zinc-800'
@@ -409,7 +415,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleUnderline().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'underline',
 				)
 					? 'bg-zinc-800'
@@ -419,7 +425,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'obfuscated',
 				)
 					? 'bg-zinc-800'
@@ -431,7 +437,7 @@
 			<div class="w-4"></div>
 
 			<button
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
 				style="color: {color}"
 				onclick={colorDialog.open}
 				use:tippy={{ content: "Custom Color", placement: "bottom" }}
@@ -443,7 +449,7 @@
 						content: toTitleCase(color.name.replace("_", " ")),
 						placement: "bottom",
 					}}
-					class="p-1 text-lg hover:bg-zinc-800 rounded-md {editor.isActive(
+					class="p-1 text-lg hover:bg-white/2 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -457,7 +463,7 @@
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
 					use:tippy={{ content: "Unset color", placement: "bottom" }}
-					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md"
+					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
 				</button>
@@ -466,7 +472,7 @@
 			<div class="w-4"></div>
 
 			<button
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'clickEvent',
 				)
 					? 'bg-zinc-800'
@@ -486,7 +492,7 @@
 			</button>
 			{#if editor.isActive("clickEvent")}
 			<button
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
 				use:tippy={{
 					content: "Edit Click Event",
 					placement: "bottom",
@@ -531,7 +537,7 @@
 						hoverEventDialog.open();
 					}
 				}}
-				class="{editor.isActive("clickEvent") || editor.isActive("hoverEvent") ? "ml-2" : ""} p-1 text-lg hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="{editor.isActive("clickEvent") || editor.isActive("hoverEvent") ? "ml-2" : ""} p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'hoverEvent',
 				)
 					? 'bg-zinc-800'
@@ -544,7 +550,7 @@
 			</button>
 			{#if editor.isActive("hoverEvent")}
 			<button
-				class="p-1 text-lg hover:bg-zinc-800 rounded-md font-medium"
+				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
 				use:tippy={{
 					content: "Edit Hover Event",
 					placement: "bottom",
@@ -727,8 +733,42 @@
 	</button>
 </Modal>
 
-<Modal title="Add Custom Source" bind:this={customDialog}>
-	<p>Source Type</p>
+<Modal title="Add Custom Source" bind:this={customDialog} opened>
+	<p>Select a source type to add</p>
+	{#if !customType}
+	<div class="grid grid-cols-3 gap-2">
+	<button 
+		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+		onclick={() => {customType = "nbt"}}>
+		<IconTranslate class="text-2xl"/>
+		<span>Translate Key</span>
+	</button>
+	<button 
+		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+		onclick={() => {customType = "nbt"}}>
+		<IconNBT class="text-2xl"/>
+		<span>NBT Value</span>
+	</button>
+	<button 
+		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+		onclick={() => {customType = "nbt"}}>
+		<IconScore class="text-2xl"/>
+		<span>Score Value</span>
+	</button>
+	<button 
+		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+		onclick={() => {customType = "nbt"}}>
+		<IconSelector class="text-2xl"/>
+		<span>Selector</span>
+	</button>
+	<button 
+		class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+		onclick={() => {customType = "nbt"}}>
+		<IconKeybind class="text-2xl"/>
+		<span>Keybind</span>
+	</button>
+	</div>
+	{:else}
 	<select bind:value={customType} class="bg-zinc-900 p-2 rounded-md">
 		<option value="translate">Translate Key</option>
 		<option value="score">Score Value</option>
@@ -736,6 +776,7 @@
 		<option value="selector">Selector</option>
 		<option value="keybind">Keybind</option>
 	</select>
+	{/if}
 
 	{#if customType === "translate"}
 		<p class="mt-2">Translate Key</p>

@@ -3,3 +3,9 @@
 	font-family: Minecraft;
 	src: url("/Minecraft.woff2") format("woff2");
 }
+
+@font-face {
+	font-display: swap;
+	font-family: MinecraftBold;
+	src: url("/MinecraftBold.otf");
+}

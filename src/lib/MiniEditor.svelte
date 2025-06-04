@@ -150,7 +150,7 @@
 		{#if editor}
 			<button
 				onclick={() => editor.chain().focus().toggleBold().run()}
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'bold',
 				)
 					? 'bg-zinc-800'
@@ -159,7 +159,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleItalic().run()}
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'italic',
 				)
 					? 'bg-zinc-800'
@@ -169,7 +169,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleStrike().run()}
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'strike',
 				)
 					? 'bg-zinc-800'
@@ -179,7 +179,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleUnderline().run()}
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'underline',
 				)
 					? 'bg-zinc-800'
@@ -188,7 +188,7 @@
 			</button>
 			<button
 				onclick={() => editor.chain().focus().toggleObfuscated().run()}
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium {editor.isActive(
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium {editor.isActive(
 					'obfuscated',
 				)
 					? 'bg-zinc-800'
@@ -202,7 +202,7 @@
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
 					title={color.name}
-					class="p-0.5 text-sm hover:bg-zinc-800 rounded-md {editor.isActive(
+					class="p-0.5 text-sm hover:bg-white/2 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -215,14 +215,14 @@
 			{#if editor.isActive("textStyle")}
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					class="p-1 text-lg hover:bg-zinc-800 text-zinc-500 rounded-md">
+					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md">
 					<IconHollow />
 				</button>
 			{/if}
 
 			<label
 				for="color"
-				class="p-0.5 text-sm hover:bg-zinc-800 rounded-md font-medium"
+				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium"
 				><IconColor /></label>
 			<input
 				type="color"

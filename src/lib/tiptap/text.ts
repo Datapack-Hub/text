@@ -171,6 +171,8 @@ export function addTypeSpecificValues(
 		case "entity_nbt":
 			current.nbt = c.attrs?.nbt;
 			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
 			current.interpret = c.attrs?.interpret || undefined;
 			break;
 		case "keybind":

@@ -619,7 +619,7 @@
 				<button
 					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 					onclick={() => {
-						navigator.clipboard.writeText(translateToNBT(editor.getJSON()));
+						navigator.clipboard.writeText(translateToNBT(editor.getJSON(), "standard", outputVersion));
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
 					}}
@@ -634,7 +634,14 @@
 				<code class="inline w-full overflow-auto max-h-56"
 					>{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion) : "Loading..."}
 				</code>
-				<span class="bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none">{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</span>
+				<button 
+				class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
+				use:tippy={{content:"Click to toggle",placement:"top"}}
+				onclick={() => {
+					const ov = outputVersion;
+					if (ov == "new") {outputVersion = "old"}
+					else {outputVersion = "new"}
+				}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 			</p>
 		</div>
 	</div>

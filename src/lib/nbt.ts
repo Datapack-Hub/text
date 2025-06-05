@@ -219,17 +219,27 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		});
 	}
 
-	if (text.hover_event) {
+	if (text.clickEvent) {
+		const cE = text.clickEvent;
+
+
+		const actionSource = cE.value
+
+		finalText.marks?.push({
+			type: "clickEvent",
+			attrs: {
+				action: cE.action,
+				value: actionSource,
+			},
+		});
+	}
+
+	if (text.hoverEvent) {
 		finalText.marks?.push({
 			type: "hoverEvent",
 			attrs: {
-				action: text.hover_event.action,
-				value: text.hover_event.value,
-				id: text.hover_event.id,
-				count: text.hover_event.count,
-				components: text.hover_event.components,
-				name: text.hover_event.name,
-				uuid: text.hover_event.uuid,
+				action: text.hoverEvent.action,
+				value: text.hoverEvent.value,
 			},
 		});
 	}

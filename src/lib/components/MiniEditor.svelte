@@ -21,6 +21,7 @@
 		ClickEventMark,
 		HoverEventMark,
 		Obfuscation,
+		ShadowColorMark
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
@@ -44,6 +45,7 @@
 				Obfuscation,
 				ClickEventMark,
 				HoverEventMark,
+				ShadowColorMark,
 				Placeholder.configure({
 					placeholder: placeholder,
 				}),

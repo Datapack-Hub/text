@@ -22,6 +22,7 @@
 		StorageNBTNode,
 		TranslateNode,
 		FixedTextStyle,
+		ShadowColorMark
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import MiniEditor from "$lib/components/MiniEditor.svelte";
@@ -59,7 +60,6 @@
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
-	import { ShadowColorMark } from "$lib/tiptap/extensions/marks/ShadowColorMark";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";

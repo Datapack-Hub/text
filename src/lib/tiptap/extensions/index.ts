@@ -92,4 +92,5 @@ export { SelectorNode } from "./nodes/SelectorNode";
 export { Obfuscation } from "./marks/ObfuscationMark";
 export { ClickEventMark } from "./marks/ClickEventMark";
 export { HoverEventMark } from "./marks/HoverEventMark";
+export { ShadowColorMark } from "./marks/ShadowColorMark";
 export { FixedTextStyle } from "./FixedTextStyle";

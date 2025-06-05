@@ -464,6 +464,14 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
+		<button 
+			class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-3 select-none"
+			use:tippy={{content:"Click to toggle",placement:"top"}}
+			onclick={() => {
+				const ov = outputVersion;
+				if (ov == "new") {outputVersion = "old"}
+				else {outputVersion = "new"}
+			}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"

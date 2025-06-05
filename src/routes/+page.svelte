@@ -126,6 +126,9 @@
 		},
 	};
 
+	let indentSize = 2;
+	let indent = false;
+
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor.commands.setContent(jsonContent);
@@ -207,7 +210,9 @@
 	function translateToNBT(
 		jsonContent: JSONContent,
 		exportType: string = "standard",
-		exportVersion: "new" | "old" = "new"
+		exportVersion: "new" | "old" = "new",
+		indent = false,
+		indentSize = 2
 	): string {
 		if(exportVersion == "new") {
 			return translate(jsonContent, exportType).replace(
@@ -269,10 +274,10 @@
 			doesContentExist = true;
 
 			if(data.length == 2) {
-				return JSON.stringify(data[1])
+				return JSON.stringify(data[1], null, indent ? indentSize : 0)
 			}
 
-			return JSON.stringify(data);
+			return JSON.stringify(data, null, indent ? indentSize : 0);
 		} else if (exportType == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
 
@@ -1143,7 +1148,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"/tellraw @s " + translateToNBT(editor.getJSON(), "standard", outputVersion),
+						"/tellraw @s " + translateToNBT(editor.getJSON(), "standard", outputVersion, indent, indentSize),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -1151,7 +1156,7 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>/tellraw @s {editor ? translateToNBT(editor.getJSON(), "standard", outputVersion): "Loading..."}
+				>/tellraw @s {editor ? translateToNBT(editor.getJSON(), "standard", outputVersion, indent, indentSize): "Loading..."}
 			</code>
 		</div>
 
@@ -1161,7 +1166,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${translateToNBT(editor.getJSON(), "item_lore", outputVersion)}]`,
+						`[lore=${translateToNBT(editor.getJSON(), "item_lore", outputVersion, indent, indentSize)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -1171,7 +1176,7 @@
 			{#if outputVersion == "new"}
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>[lore={editor
-					? translateToNBT(editor.getJSON(), "item_lore", outputVersion)
+					? translateToNBT(editor.getJSON(), "item_lore", outputVersion, indent, indentSize)
 					: "Loading..."}]
 			</code>
 			{:else}
@@ -1179,7 +1184,7 @@
 				>[lore={editor
 					? (() => {
 						try {
-							const arr = JSON.parse(translateToNBT(editor.getJSON(), "item_lore", outputVersion));
+							const arr: object[] = JSON.parse(translateToNBT(editor.getJSON(), "item_lore", outputVersion, indent, indentSize));
 							return `[${arr.map(obj => `'${JSON.stringify(obj)}'`).join(", ")}]`;
 						} catch (e) {
 							return "[]";
@@ -1202,9 +1207,24 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>{editor ? translate(editor.getJSON(), "standard", outputVersion) : "Loading..."}
+				><pre>{editor ? translate(editor.getJSON(), "standard", outputVersion) : "Loading..."}</pre>
 			</code>
 		</div>
+		<div class="flex items-center gap-2 mt-2">
+			<p>Indent?</p>
+			<button
+				class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+				onclick={() =>
+					(indent = !indent)}>
+				{#if indent}
+					<IconTick class="m-auto text-lg" />
+				{/if}
+			</button>
+		</div>
+		{#if indent}
+			<label for="indentSize">Indent Size:</label>
+			<input id="indentSize" type="number" class="bg-zinc-900 p-2 rounded-md w-fit" bind:value={indentSize} min="1" max="8" />
+		{/if}
 	</div>
 </Modal>
 

@@ -32,6 +32,7 @@ export type BaseMinecraftText = Pick<
 	| "obfuscated"
 >;
 
+// Note: this also includes old fields. I hate the way this is designed but it works.
 export type MinecraftText = {
 	translate?: string;
 	with?: string[];
@@ -82,6 +83,17 @@ export type MinecraftText = {
 		name?: BaseMinecraftText | BaseMinecraftText[];
 		uuid?: string | number[];
 	};
+
+	// Old ones
+	clickEvent?: {
+		action: string;
+		value: string;
+	}
+
+	hoverEvent?: {
+		action: string;
+		contents: any;
+	}
 };
 
 export type ExternalSources = {
@@ -140,78 +152,124 @@ export function addTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
 	includeInteractivity = true,
+	exportVersion: "new" | "old" = "new"
 ) {
-	switch (c.type) {
-		case "text":
-			current.text = c.text;
-			break;
-		case "score":
-			current.score = {
-				name: c.attrs?.name,
-				objective: c.attrs?.objective,
-			};
-			current.click_event = getMarkType(c, "clickEvent")?.attrs as {
-				action: string;
-				value: string;
-			};
-			current.hover_event = getMarkType(c, "hoverEvent")?.attrs as {
-				action: string;
-				contents: BaseMinecraftText;
-			};
-			break;
-		case "translate":
-			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
-				current.with = c.attrs?.params;
-			}
-			if (c.attrs?.fallback) {
-				current.fallback = c.attrs?.fallback;
-			}
-			break;
-		case "storage_nbt":
-		case "block_nbt":
-		case "entity_nbt":
-			current.nbt = c.attrs?.nbt;
-			current.storage = c.attrs?.storage;
-			current.block = c.attrs?.block;
-			current.entity = c.attrs?.entity;
-			current.interpret = c.attrs?.interpret || undefined;
-			break;
-		case "keybind":
-			current.keybind = c.attrs?.key;
-			break;
-		case "selector":
-			current.selector = c.attrs?.selector;
-			break;
-	}
-	if (includeInteractivity) {
-		if (getMarkType(c, "clickEvent")) {
-			const ce = getMarkType(c, "clickEvent")?.attrs;
-			current.click_event = { action: ce!.action };
-			switch (ce!.action) {
-				case "open_url":
-					current.click_event.url = ce!.value;
+	switch(exportVersion) {
+		case "new":
+			switch (c.type) {
+				case "text":
+					current.text = c.text;
 					break;
-				case "run_command":
-				case "suggest_command":
-					current.click_event.command = ce!.value;
+				case "score":
+					current.score = {
+						name: c.attrs?.name,
+						objective: c.attrs?.objective,
+					};
 					break;
-				case "copy_to_clipboard":
-					current.click_event.value = ce!.value;
+				case "translate":
+					current.translate = c.attrs?.key;
+					if (c.attrs?.params && c.attrs?.params.length != 0) {
+						current.with = c.attrs?.params;
+					}
+					if (c.attrs?.fallback) {
+						current.fallback = c.attrs?.fallback;
+					}
 					break;
-				case "change_page":
-					current.click_event.page = ce!.value;
+				case "storage_nbt":
+				case "block_nbt":
+				case "entity_nbt":
+					current.nbt = c.attrs?.nbt;
+					current.storage = c.attrs?.storage;
+					current.block = c.attrs?.block;
+					current.entity = c.attrs?.entity;
+					current.interpret = c.attrs?.interpret || undefined;
 					break;
-				case "open_dialog":
-					current.click_event.dialog = ce!.value;
+				case "keybind":
+					current.keybind = c.attrs?.key;
+					break;
+				case "selector":
+					current.selector = c.attrs?.selector;
 					break;
 			}
-		}
+			if (includeInteractivity) {
+				if (getMarkType(c, "clickEvent")) {
+					const ce = getMarkType(c, "clickEvent")?.attrs;
+					current.click_event = { action: ce!.action };
+					switch (ce!.action) {
+						case "open_url":
+							current.click_event.url = ce!.value;
+							break;
+						case "run_command":
+						case "suggest_command":
+							current.click_event.command = ce!.value;
+							break;
+						case "copy_to_clipboard":
+							current.click_event.value = ce!.value;
+							break;
+						case "change_page":
+							current.click_event.page = ce!.value;
+							break;
+						case "open_dialog":
+							current.click_event.dialog = ce!.value;
+							break;
+					}
+				}
 
-		if (getMarkType(c, "hoverEvent")) {
-			const ce = getMarkType(c, "hoverEvent")?.attrs;
-			current.hover_event = { action: ce!.action, value: ce!.value };
-		}
+				if (getMarkType(c, "hoverEvent")) {
+					const ce = getMarkType(c, "hoverEvent")?.attrs;
+					current.hover_event = { action: ce!.action, value: ce!.value };
+				}
+			}
+			break;
+		case "old":
+			switch (c.type) {
+				case "text":
+					current.text = c.text;
+					break;
+				case "score":
+					current.score = {
+						name: c.attrs?.name,
+						objective: c.attrs?.objective,
+					};
+					break;
+				case "translate":
+					current.translate = c.attrs?.key;
+					if (c.attrs?.params && c.attrs?.params.length != 0) {
+						current.with = c.attrs?.params;
+					}
+					if (c.attrs?.fallback) {
+						current.fallback = c.attrs?.fallback;
+					}
+					break;
+				case "storage_nbt":
+				case "block_nbt":
+				case "entity_nbt":
+					current.nbt = c.attrs?.nbt;
+					current.storage = c.attrs?.storage;
+					current.block = c.attrs?.block;
+					current.entity = c.attrs?.entity;
+					current.interpret = c.attrs?.interpret || undefined;
+					break;
+				case "keybind":
+					current.keybind = c.attrs?.key;
+					break;
+				case "selector":
+					current.selector = c.attrs?.selector;
+					break;
+			}
+			if (includeInteractivity) {
+				if (getMarkType(c, "clickEvent")) {
+					const ce = getMarkType(c, "clickEvent")?.attrs;
+					current.clickEvent = { action: ce!.action };
+					current.clickEvent.value = ce!.value;
+				}
+
+				if (getMarkType(c, "hoverEvent")) {
+					const ce = getMarkType(c, "hoverEvent")?.attrs;
+					current.hoverEvent = { action: ce!.action, contents: ce!.value };
+				}
+			}
+			break;
 	}
 
 	return current;

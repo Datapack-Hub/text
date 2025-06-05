@@ -68,7 +68,9 @@
 	let editor: Editor;
 	let color = "#ffffff";
 	let colorDialog: Modal;
+
 	let outputDialog: Modal;
+	let outputVersion: "new" | "old";
 
 	let doesContentExist: boolean = false;
 
@@ -202,9 +204,25 @@
 		);
 	}
 
+	function translateToNBT(
+		jsonContent: JSONContent,
+		exportType: string = "standard",
+		exportVersion: "new" | "old" = "new"
+	): string {
+		if(exportVersion == "new") {
+			return translate(jsonContent, exportType).replace(
+				/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+				(match) => match.replace(/"/g, ""),
+			);
+		} else {
+			return translate(jsonContent, exportType, "old")
+		}
+	}
+
 	function translate(
 		json: JSONContent,
 		exportType: string = "standard",
+		exportVersion: "new" | "old" = "new"
 	): string {
 		const paragraphs = json.content!;
 
@@ -230,7 +248,7 @@
 						current.shadow_color = parseInt(shadowColorMark.attrs?.shadowColor.replace(/^#/, ""), 16);
 					}
 
-					current = addTypeSpecificValues(current, c);
+					current = addTypeSpecificValues(current, c, true, exportVersion);
 
 					data.push(current);
 				});
@@ -308,16 +326,6 @@
 		} else {
 			return "[]";
 		}
-	}
-
-	function translateToNBT(
-		jsonContent: JSONContent,
-		exportType: string = "standard",
-	): string {
-		return translate(jsonContent, exportType).replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-			(match) => match.replace(/"/g, ""),
-		);
 	}
 
 	function customColorHandler() {
@@ -622,9 +630,12 @@
 						<IconCopy />
 					{/if}</button>
 			{/if}
-			<code class="inline-block w-full overflow-auto max-h-56"
-				>{editor ? translateToNBT(editor.getJSON()) : "Loading..."}
-			</code>
+			<p>
+				<code class="inline w-full overflow-auto max-h-56"
+					>{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion) : "Loading..."}
+				</code>
+				<span class="bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none">{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</span>
+			</p>
 		</div>
 	</div>
 </div>
@@ -1105,14 +1116,19 @@
 </Modal>
 
 <Modal title="More output formats" bind:this={outputDialog} big>
-	<div class="flex flex-col w-full">
+	<p>Select a Minecraft version:</p>
+	<select bind:value={outputVersion} class="bg-zinc-900 p-2 rounded-md w-fit">
+		<option value="new">1.21.5+</option>
+		<option value="old">Before 1.21.5</option>
+	</select>
+	<div class="flex flex-col w-full mt-2">
 		<p>For tellraw commands (send to chat):</p>
 		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
 			<button
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"/tellraw @s " + translateToNBT(editor.getJSON()),
+						"/tellraw @s " + translateToNBT(editor.getJSON(), "standard", outputVersion),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -1120,7 +1136,7 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>/tellraw @s {editor ? translateToNBT(editor.getJSON()) : "Loading..."}
+				>/tellraw @s {editor ? translateToNBT(editor.getJSON(), "standard", outputVersion): "Loading..."}
 			</code>
 		</div>
 
@@ -1130,18 +1146,33 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${translateToNBT(editor.getJSON(), "item_lore")}]`,
+						`[lore=${translateToNBT(editor.getJSON(), "item_lore", outputVersion)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
+			{#if outputVersion == "new"}
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>[lore={editor
-					? translateToNBT(editor.getJSON(), "item_lore")
+					? translateToNBT(editor.getJSON(), "item_lore", outputVersion)
 					: "Loading..."}]
 			</code>
+			{:else}
+			<code class="inline-block w-full overflow-auto max-h-56"
+				>[lore={editor
+					? (() => {
+						try {
+							const arr = JSON.parse(translateToNBT(editor.getJSON(), "item_lore", outputVersion));
+							return `[${arr.map(obj => `'${JSON.stringify(obj)}'`).join(", ")}]`;
+						} catch (e) {
+							return "[]";
+						}
+					})()
+					: "Loading..."}]
+			</code>
+			{/if}
 		</div>
 
 		<p class="mt-2">As JSON:</p>
@@ -1149,14 +1180,14 @@
 			<button
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
-					navigator.clipboard.writeText(translate(editor.getJSON()));
+					navigator.clipboard.writeText(translate(editor.getJSON(), "standard", outputVersion));
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>{editor ? translate(editor.getJSON()) : "Loading..."}
+				>{editor ? translate(editor.getJSON(), "standard", outputVersion) : "Loading..."}
 			</code>
 		</div>
 	</div>

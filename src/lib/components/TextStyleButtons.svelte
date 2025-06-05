@@ -7,13 +7,13 @@
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
 
-	const { editor } = $props();
+	const { editor, small = false } = $props();
 </script>
 
 <button
 	aria-label="bold"
 	onclick={() => editor.chain().focus().toggleBold().run()}
-	class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+	class="p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium {editor.isActive(
 		'bold',
 	)
 		? 'bg-zinc-800'
@@ -24,7 +24,7 @@
 <button
 	aria-label="italic"
 	onclick={() => editor.chain().focus().toggleItalic().run()}
-	class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+	class="p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium {editor.isActive(
 		'italic',
 	)
 		? 'bg-zinc-800'
@@ -35,7 +35,7 @@
 <button
 	aria-label="strikethrough"
 	onclick={() => editor.chain().focus().toggleStrike().run()}
-	class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+	class="p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium {editor.isActive(
 		'strike',
 	)
 		? 'bg-zinc-800'
@@ -46,7 +46,7 @@
 <button
 	aria-label="underline"
 	onclick={() => editor.chain().focus().toggleUnderline().run()}
-	class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+	class="p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium {editor.isActive(
 		'underline',
 	)
 		? 'bg-zinc-800'
@@ -57,7 +57,7 @@
 <button
 	aria-label="obfuscated"
 	onclick={() => editor.chain().focus().toggleObfuscated().run()}
-	class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+	class="p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium {editor.isActive(
 		'obfuscated',
 	)
 		? 'bg-zinc-800'

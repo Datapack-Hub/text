@@ -12,14 +12,9 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 
-	import IconBold from "~icons/tabler/bold";
-	import IconItalic from "~icons/tabler/italic";
 	import IconColor from "~icons/tabler/palette";
-	import IconObfuscate from "~icons/tabler/password";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconStrikethrough from "~icons/tabler/strikethrough";
-	import IconUnderline from "~icons/tabler/underline";
 	import { convertToTextOrEmpty, snbtToDocument } from "../nbt";
 
 	import {
@@ -31,8 +26,8 @@
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
-
 	export let output = "";
+	export let placeholder = "Write text here, and style it with the options above!";
 
 	let element: HTMLElement;
 	let editor: Editor;
@@ -50,7 +45,7 @@
 				ClickEventMark,
 				HoverEventMark,
 				Placeholder.configure({
-					placeholder: "Write text here, and style it with the options above!",
+					placeholder: placeholder,
 				}),
 			],
 			onTransaction: () => {
@@ -135,10 +130,10 @@
 	}
 </script>
 
-<div class="flex flex-col">
+<div class="flex flex-col w-full">
 	<div class="w-full p-2 bg-black/50 flex items-center flex-wrap rounded-t-md">
 		{#if editor}
-			<TextStyleButtons {editor} />
+			<TextStyleButtons {editor} small />
 
 			<div class="w-4"></div>
 

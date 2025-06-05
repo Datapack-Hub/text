@@ -243,6 +243,10 @@
 
 			doesContentExist = true;
 
+			if(data.length == 2) {
+				return JSON.stringify(data[1])
+			}
+
 			return JSON.stringify(data);
 		} else if (exportType == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
@@ -785,31 +789,33 @@
 			bind:value={customValues.translate.fallback} />
 
 		<p class="mt-2">Parameters</p>
+		<div class="w-full flex flex-col space-y-1">
 		{#each customValues.translate.params ?? [] as p, i}
-			<div class="flex items-center space-x-1">
-				<input
-					type="text"
-					class="bg-zinc-900 p-2 rounded-md flex-grow h-10"
-					placeholder="Parameter {i}"
-					bind:value={p} />
-				<button
-					onclick={() => {
-						customValues.translate.params.splice(i, 1);
-						customValues.translate.params = customValues.translate.params;
-					}}
-					class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 h-10 aspect-square flex items-center justify-center">
-					<IconDelete />
-				</button>
+			<div class="flex items-center space-x-1 w-full">
+				<MiniEditor placeholder="Parameter #{i+1}" bind:output={p} />
 			</div>
 		{/each}
-		<button
-			onclick={() => {
-				customValues.translate.params.push("");
-				customValues.translate.params = customValues.translate.params;
-			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
-			Add Parameter
-		</button>
+		</div>
+		<div class="flex items-center space-x-1">
+			<button
+				onclick={() => {
+					customValues.translate.params.push("");
+					customValues.translate.params = customValues.translate.params;
+				}}
+				class="bg-zinc-900 p-1 px-2 text-sm rounded-md w-fit cursor-pointer hover:bg-black/50">
+				Add Parameter
+			</button>
+			{#if customValues.translate.params.length != 0}
+			<button
+				onclick={() => {
+					customValues.translate.params.pop();
+					customValues.translate.params = customValues.translate.params;
+				}}
+				class="bg-zinc-900 p-1 px-2 text-sm rounded-md w-fit cursor-pointer hover:bg-black/50">
+				Remove Last Parameter
+			</button>
+			{/if}
+		</div>
 
 		<button
 			onclick={() => {
@@ -1143,7 +1149,7 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>{editor ? translate(editor.getJSON()) : "Loading..."}]
+				>{editor ? translate(editor.getJSON()) : "Loading..."}
 			</code>
 		</div>
 	</div>

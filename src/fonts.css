@@ -2,14 +2,14 @@
 	font-display: swap;
 	font-family: Minecraft;
 	font-weight: 400;
-	src: url("/Minecraft.woff2") format("woff2");
+	src: url("/Minecraft.tff");
 }
 
 @font-face {
 	font-display: swap;
 	font-family: MinecraftBold;
 	font-weight: 600;
-	src: url("/MinecraftBold.otf");
+	src: url("/MinecraftBold.ttf");
 }
 
 /* lexend-regular - latin */

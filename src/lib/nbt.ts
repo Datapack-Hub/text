@@ -234,12 +234,22 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		});
 	}
 
+	if (text.hover_event) {
+		finalText.marks?.push({
+			type: "hoverEvent",
+			attrs: {
+				action: text.hover_event.action,
+				value: text.hover_event.value,
+			},
+		});
+	}
+
 	if (text.hoverEvent) {
 		finalText.marks?.push({
 			type: "hoverEvent",
 			attrs: {
 				action: text.hoverEvent.action,
-				value: text.hoverEvent.value,
+				value: text.hoverEvent.contents,
 			},
 		});
 	}

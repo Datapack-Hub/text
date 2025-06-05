@@ -21,7 +21,7 @@
 		ClickEventMark,
 		HoverEventMark,
 		Obfuscation,
-	} from "$lib/tiptap/extensions";
+	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
 	// TODO: convert to non-legacy mode

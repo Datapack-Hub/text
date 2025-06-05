@@ -47,7 +47,7 @@ export interface SelectorAttributes {
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
-		obfuscated: {
+		marks: {
 			setObfuscated: () => ReturnType;
 			toggleObfuscated: () => ReturnType;
 			unsetObfuscated: () => ReturnType;
@@ -55,6 +55,8 @@ declare module "@tiptap/core" {
 			unsetClickEvent: () => ReturnType;
 			setHoverEvent: (attributes: HoverEventAttributes) => ReturnType;
 			unsetHoverEvent: () => ReturnType;
+			setShadowColor: (shadowColor: string) => ReturnType;
+			unsetShadowColor: () => ReturnType;
 		};
 		scoreNode: {
 			insertScore: (attrs: ScoreAttributes) => ReturnType;

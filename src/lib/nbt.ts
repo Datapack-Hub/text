@@ -151,6 +151,16 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		});
 	}
 
+	if (text.shadow_color) {
+		const hex = "#" + text.shadow_color.toString(16).padStart(6, "0");
+		finalText.marks?.push({
+			type: "shadowColor",
+			attrs: {
+				shadowColor: hex,
+			},
+		});
+	}
+
 	if (text.bold) {
 		finalText.marks?.push({
 			type: "bold",

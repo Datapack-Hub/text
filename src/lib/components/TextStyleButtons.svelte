@@ -6,8 +6,10 @@
 	import IconObfuscate from "~icons/tabler/password";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
+	import IconShadow from "~icons/tabler/shadow";
 
 	const { editor, small = false } = $props();
+	let shadowColorValue = $state("#ffffff");
 </script>
 
 <button
@@ -65,3 +67,26 @@
 	use:tippy={{ content: "Obfuscated", placement: "bottom" }}>
 	<IconObfuscate />
 </button>
+{#if editor.isActive("shadowColor")}
+<button 
+	aria-label="shadow_color"
+	class="cursor-pointer p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium bg-zinc-800"
+	onclick={() => editor.chain().focus().unsetShadowColor().run()}
+	use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
+	<IconShadow />
+</button>
+{:else}
+<label 
+	for="shadow_color"
+	aria-label="shadow_color"
+	class="cursor-pointer p-1 {small ? "text-sm" : "text-lg"} hover:bg-white/2 rounded-md font-medium"
+	use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
+	<IconShadow />
+</label>
+<input 
+	type="color" 
+	id="shadow_color" 
+	class="w-0" 
+	bind:value={shadowColorValue} 
+	onchange={() => editor.chain().focus().setShadowColor(shadowColorValue).run()} />
+{/if}

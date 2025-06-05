@@ -59,6 +59,7 @@
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
+	import { ShadowColorMark } from "$lib/tiptap/extensions/marks/ShadowColorMark";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -164,6 +165,7 @@
 				Obfuscation,
 				ClickEventMark,
 				HoverEventMark,
+				ShadowColorMark,
 				ScoreNode,
 				TranslateNode,
 				BlockNBTNode,
@@ -222,6 +224,11 @@
 						underlined: trueMarkOrUndefined(c, "underline"),
 						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 					};
+
+					const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
+					if (shadowColorMark) {
+						current.shadow_color = parseInt(shadowColorMark.attrs?.shadowColor.replace(/^#/, ""), 16);
+					}
 
 					current = addTypeSpecificValues(current, c);
 

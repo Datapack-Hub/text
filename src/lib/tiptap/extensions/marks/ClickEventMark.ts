@@ -1,5 +1,6 @@
 import { Mark, mergeAttributes } from "@tiptap/core";
-import type { ClickEventAttributes } from "./extensions";
+
+import { type ClickEventAttributes } from "..";
 
 export const ClickEventMark = Mark.create({
 	name: "clickEvent",

@@ -55,6 +55,7 @@ export type MinecraftText = {
 	selector?: string;
 
 	color?: string;
+	shadow_color?: number | number[];
 	font?: string;
 	bold?: boolean;
 	italic?: boolean;

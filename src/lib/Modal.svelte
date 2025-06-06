@@ -1,12 +1,15 @@
 <script lang="ts">
 	import IconClose from "~icons/tabler/x";
-	import { onMount } from "svelte";
 
-	export let opened = false;
-	export let title = "Modal";
-	export let small = false;
-	export let nopad = false;
-	export let big = false;
+	let {
+		opened = $bindable(false),
+		title = $bindable("Modal"),
+		small = $bindable(false),
+		nopad = $bindable(false),
+		big = $bindable(false),
+		children,
+		key,
+	} = $props();
 
 	export function open() {
 		opened = true;
@@ -20,19 +23,22 @@
 		if (event.key === "Escape" && opened) {
 			close();
 		}
-	}
 
-	onMount(() => {
-		window.addEventListener("keydown", handleKeydown);
-	});
+		if (event.shiftKey && event.ctrlKey && event.key === key) {
+			event.preventDefault();
+			open();
+		}
+	}
 </script>
+
+<svelte:window on:keydown={handleKeydown} />
 
 <div class="absolute {opened ? '' : 'hidden'}">
 	<div
 		class="fixed top-0 left-0 w-screen h-screen bg-black/65 flex flex-col items-center text-zinc-100 overflow-auto"
 		style="font-family: Lexend">
 		<div
-			on:click={() => close()}
+			onclick={() => close()}
 			class="fixed top-0 left-0 w-screen h-screen"
 			style="z-index: 40; background: transparent;"
 			aria-hidden="true"
@@ -45,13 +51,13 @@
 				: ''} m-auto py-4">
 			<div class="rounded-t-lg p-4 bg-zinc-900 flex items-center">
 				<span class="font-bold text-lg flex-grow">{title}</span>
-				<button aria-label="close" on:click={close}><IconClose /></button>
+				<button aria-label="close" onclick={close}><IconClose /></button>
 			</div>
 			<div
 				class="rounded-b-lg {nopad
 					? ''
 					: 'p-4'} bg-zinc-800 flex flex-col space-y-1">
-				<slot />
+				{@render children()}
 			</div>
 		</div>
 	</div>

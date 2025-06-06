@@ -1,11 +1,15 @@
 <script lang="ts">
 	import Modal from "$lib/Modal.svelte";
 
-    let { clickEventDialog = $bindable(), clickEventType = $bindable(), editor, clickEventValue = $bindable() } = $props();
-
+	let {
+		clickEventDialog = $bindable(),
+		clickEventType = $bindable(),
+		editor,
+		clickEventValue = $bindable(),
+	} = $props();
 </script>
 
-<Modal title="Click Event" bind:this={clickEventDialog}>
+<Modal title="Click Event" bind:this={clickEventDialog} key="T">
 	<p>Event Type</p>
 	<select bind:value={clickEventType} class="bg-zinc-900 p-2 rounded-md">
 		<option value="open_url">Open URL</option>

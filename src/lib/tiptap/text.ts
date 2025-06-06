@@ -357,10 +357,7 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 	editor.chain().focus().setTextSelection({ from, to }).run();
 }
 
-export function optimise(
-	arr: StringyMCText[]
-): StringyMCText[] {
-
+export function optimise(arr: StringyMCText[]): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
 	// 1: If a MinecraftText has no style, turn it to a string

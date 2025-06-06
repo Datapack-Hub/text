@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Modal from "$lib/Modal.svelte";
 	import IconTick from "~icons/tabler/check";
-    import IconScore from "~icons/tabler/123";
+	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
@@ -9,9 +9,14 @@
 	import type { ExternalSources } from "$lib/tiptap/text";
 	import MiniEditor from "../MiniEditor.svelte";
 
-    let { customDialog = $bindable(), outputVersion = $bindable(), editor, customType = $bindable() } = $props();
+	let {
+		customDialog = $bindable(),
+		outputVersion = $bindable(),
+		editor,
+		customType = $bindable(),
+	} = $props();
 
-    let customValues: ExternalSources = $state({
+	let customValues: ExternalSources = $state({
 		score: {
 			objective: "",
 			name: "",
@@ -36,10 +41,9 @@
 			selector: "",
 		},
 	});
-
 </script>
 
-<Modal title="Add Custom Source" bind:this={customDialog}>
+<Modal title="Add Custom Source" bind:this={customDialog} key="W">
 	<p>Select a source type to add</p>
 	{#if !customType}
 		<div class="grid grid-cols-3 gap-2">
@@ -113,7 +117,9 @@
 		<div class="w-full flex flex-col space-y-1">
 			{#each customValues.translate.params ?? [] as p, i}
 				<div class="flex items-center space-x-1 w-full">
-					<MiniEditor placeholder="Parameter #{i + 1}" bind:output={customValues.translate.params[i]} />
+					<MiniEditor
+						placeholder="Parameter #{i + 1}"
+						bind:output={customValues.translate.params[i]} />
 				</div>
 			{/each}
 		</div>

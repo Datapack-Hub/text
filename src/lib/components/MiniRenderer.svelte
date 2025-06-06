@@ -16,7 +16,7 @@
 		TranslateNode,
 		ShadowColorMark,
 		ClickEventMark,
-		HoverEventMark
+		HoverEventMark,
 	} from "$lib/tiptap/extensions/index";
 
 	let { value } = $props();
@@ -41,7 +41,7 @@
 				SelectorNode,
 				StorageNBTNode,
 				TranslateNode,
-				ShadowColorMark
+				ShadowColorMark,
 			],
 			content: value,
 		}).setEditable(false);

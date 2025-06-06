@@ -13,11 +13,11 @@
 	} = $props();
 </script>
 
-<Modal title="Color Gradient" bind:this={gradientDialog}>
+<Modal title="Color Gradient" bind:this={gradientDialog} key="G">
 	<div class="flex flex-col w-full space-y-2">
 		<p>Add colours to the gradient below:</p>
 		<div class="flex flex-col space-y-1">
-			{#each gradientSteps ?? [] as _,i}
+			{#each gradientSteps ?? [] as _, i}
 				<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
 					<div class="flex-grow">
 						<ColorPicker

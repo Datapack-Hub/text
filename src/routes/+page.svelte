@@ -2,12 +2,10 @@
 	import { dev } from "$app/environment";
 	import {
 		addTypeSpecificValues,
-		applyGradient,
 		colorMap,
 		defaultColorLUT,
 		optimise,
 		trueMarkOrUndefined,
-		type ExternalSources,
 		type MinecraftText,
 		type StringyMCText,
 	} from "$lib/tiptap/text";
@@ -16,15 +14,15 @@
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
+		FixedTextStyle,
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
 		ScoreNode,
 		SelectorNode,
+		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		FixedTextStyle,
-		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import MiniEditor from "$lib/components/MiniEditor.svelte";
@@ -54,13 +52,15 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconDelete from "~icons/tabler/trash";
+	import IconKeybinds from "~icons/tabler/keyboard";
 
-	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
-	import ExportModal from "$lib/components/modals/ExportModal.svelte";
-	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
+	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
+	import ExportModal from "$lib/components/modals/ExportModal.svelte";
+	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
+	import Key from "$lib/components/Key.svelte";
+	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -92,6 +92,8 @@
 	// Dialogs
 	let gradientDialog: Modal;
 	let gradientSteps: string[] = ["#ffffff"];
+
+	let keybindDialog: Modal;
 
 	let clickEventType = "";
 	let clickEventValue = "";
@@ -165,6 +167,9 @@
 			},
 			onUpdate: ({ editor }) => {
 				value = JSON.stringify(editor.getJSON());
+				editor.getText() === ""
+					? (doesContentExist = false)
+					: (doesContentExist = true);
 				debounce(saveContent, 1000)();
 			},
 		});
@@ -254,14 +259,11 @@
 			});
 
 			if (data.length === 1 && data[0] === "") {
-				doesContentExist = false;
 				if (Math.random() < 0.002) {
 					return "🤓 <- james is waiting for you to type something";
 				}
 				return "waiting for input...";
 			}
-
-			doesContentExist = true;
 
 			if (data.length == 2) {
 				return indent
@@ -453,7 +455,15 @@
 		clickEventValue = value;
 		clickEventDialog.open();
 	}
+
+	function clearMarksHandler(event: KeyboardEvent) {
+		if (event.ctrlKey && event.shiftKey && event.key === "X") {
+			editor.commands.unsetAllMarks();
+		}
+	}
 </script>
+
+<svelte:window onkeydown={clearMarksHandler} />
 
 <div class="flex flex-col h-screen">
 	<div
@@ -621,6 +631,15 @@
 					<IconEdit />
 				</button>
 			{/if}
+
+			<div class="flex-grow"></div>
+			<button
+				onclick={keybindDialog.open}
+				use:tippy={{
+					content: "Keybinds",
+					placement: "bottom",
+				}}
+				aria-label="Keybinds"><IconKeybinds /></button>
 		{/if}
 	</div>
 
@@ -684,7 +703,7 @@
 	bind:clickEventValue
 	{editor} />
 
-<Modal title="Hover Event" bind:this={hoverEventDialog}>
+<Modal title="Hover Event" bind:this={hoverEventDialog} key="H">
 	<p>Text to show</p>
 	<MiniEditor bind:this={hoverEventEditor} bind:output={hoverEventValue} />
 	<button
@@ -701,13 +720,9 @@
 	</button>
 </Modal>
 
-<CustomSourceModal
-	bind:customDialog
-	bind:customType
-	{editor}
-	{outputVersion} />
+<CustomSourceModal bind:customDialog bind:customType {editor} {outputVersion} />
 
-<Modal title="Custom Color" bind:this={colorDialog} small nopad>
+<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
 	<div class="flex flex-col w-full py-4">
 		<ColorPicker
 			bind:hex={color}
@@ -728,7 +743,7 @@
 	</div>
 </Modal>
 
-<Modal title="Load a snapshot" bind:this={loadDialog}>
+<Modal title="Load a snapshot" bind:this={loadDialog} key="L">
 	<div class="flex flex-col space-y-2 w-full">
 		{#if snapshots.length == 0}
 			<p>You have not saved anything yet!</p>
@@ -769,7 +784,7 @@
 	{translateToNBT}
 	{translate} />
 
-<Modal title="Import from NBT" bind:this={importDialog} big>
+<Modal title="Import from NBT" bind:this={importDialog} big key="I">
 	<div class="flex flex-col w-full space-y-2">
 		<p>
 			Paste your text components below to import them into the editor. This will
@@ -788,8 +803,6 @@
 	</div>
 </Modal>
 
-<ColorGradientModal 
-	{editor}
-	bind:gradientSteps
-	bind:gradientDialog
-/>
+<KeybindModal bind:keybindDialog />
+
+<ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />

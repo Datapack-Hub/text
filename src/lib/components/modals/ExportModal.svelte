@@ -2,12 +2,19 @@
 	import Modal from "$lib/Modal.svelte";
 	import IconCopy from "~icons/tabler/copy";
 	import IconTick from "~icons/tabler/check";
-
-    let { outputDialog = $bindable(), outputVersion = $bindable(), editor, recentlyCopied, indent, indentSize, translate, translateToNBT } = $props();
-
+	let {
+		outputDialog = $bindable(),
+		outputVersion = $bindable(),
+		editor,
+		recentlyCopied,
+		indent,
+		indentSize,
+		translate,
+		translateToNBT,
+	} = $props();
 </script>
 
-<Modal title="More output formats" bind:this={outputDialog} big>
+<Modal title="More output formats" bind:this={outputDialog} big key="E">
 	<p>Select a Minecraft version:</p>
 	<select bind:value={outputVersion} class="bg-zinc-900 p-2 rounded-md w-fit">
 		<option value="new">1.21.5+</option>
@@ -20,7 +27,8 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"/tellraw @s " + translateToNBT(editor.getJSON(), "standard", outputVersion),
+						"/tellraw @s " +
+							translateToNBT(editor.getJSON(), "standard", outputVersion),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -28,7 +36,9 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				>/tellraw @s {editor ? translateToNBT(editor.getJSON(), "standard", outputVersion): "Loading..."}
+				>/tellraw @s {editor
+					? translateToNBT(editor.getJSON(), "standard", outputVersion)
+					: "Loading..."}
 			</code>
 		</div>
 
@@ -46,18 +56,17 @@
 				<IconCopy />
 			</button>
 			{#if outputVersion == "new"}
-			<code class="inline-block w-full overflow-auto max-h-56"
-				>[lore={editor
-					? translateToNBT(editor.getJSON(), "item_lore", outputVersion)
-					: "Loading..."}]
-			</code>
+				<code class="inline-block w-full overflow-auto max-h-56"
+					>[lore={editor
+						? translateToNBT(editor.getJSON(), "item_lore", outputVersion)
+						: "Loading..."}]
+				</code>
 			{:else}
-			<code class="inline-block w-full overflow-auto max-h-56"
-				>[lore={editor
-					? 
-					`'${translate(editor.getJSON(), "item_lore", false, 0, outputVersion)}'`
-					: "Loading..."}]
-			</code>
+				<code class="inline-block w-full overflow-auto max-h-56"
+					>[lore={editor
+						? `'${translate(editor.getJSON(), "item_lore", false, 0, outputVersion)}'`
+						: "Loading..."}]
+				</code>
 			{/if}
 		</div>
 
@@ -66,14 +75,30 @@
 			<button
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
-					navigator.clipboard.writeText(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion));
+					navigator.clipboard.writeText(
+						translate(
+							editor.getJSON(),
+							"standard",
+							indent,
+							indentSize,
+							outputVersion,
+						),
+					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
-				><pre>{editor ? translate(editor.getJSON(), "standard", indent, indentSize, outputVersion) : "Loading..."}</pre>
+				><pre>{editor
+						? translate(
+								editor.getJSON(),
+								"standard",
+								indent,
+								indentSize,
+								outputVersion,
+							)
+						: "Loading..."}</pre>
 			</code>
 		</div>
 
@@ -81,18 +106,21 @@
 			<p>Indent?</p>
 			<button
 				class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
-				onclick={() =>
-					(indent = !indent)}>
+				onclick={() => (indent = !indent)}>
 				{#if indent}
 					<IconTick class="m-auto text-lg" />
 				{/if}
 			</button>
 		</div>
-		{#if indent}			
+		{#if indent}
 			<label for="indentSize" class="mt-2">Indent Size:</label>
-			<input type="number" id="indentSize" max="8" min="1" bind:value={indentSize} class="bg-zinc-900 p-2 rounded-md w-fit" />
+			<input
+				type="number"
+				id="indentSize"
+				max="8"
+				min="1"
+				bind:value={indentSize}
+				class="bg-zinc-900 p-2 rounded-md w-fit" />
 		{/if}
-
-
 	</div>
 </Modal>

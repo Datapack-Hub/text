@@ -22,10 +22,10 @@ export const Obfuscation = Mark.create({
 
 	addKeyboardShortcuts() {
 		return {
-			"Mod-Shift-o": () => {
+			"Mod-o": () => {
 				return this.editor.commands.toggleObfuscated();
-			}
-		}
+			},
+		};
 	},
 
 	addCommands() {

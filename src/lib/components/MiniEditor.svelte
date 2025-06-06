@@ -21,14 +21,15 @@
 		ClickEventMark,
 		HoverEventMark,
 		Obfuscation,
-		ShadowColorMark
+		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
 	export let output = "";
-	export let placeholder = "Write text here, and style it with the options above!";
+	export let placeholder =
+		"Write text here, and style it with the options above!";
 
 	let element: HTMLElement;
 	let editor: Editor;

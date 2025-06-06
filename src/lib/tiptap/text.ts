@@ -32,6 +32,8 @@ export type BaseMinecraftText = Pick<
 	| "obfuscated"
 >;
 
+export type StringyMCText = string | MinecraftText;
+
 // Note: this also includes old fields. I hate the way this is designed but it works.
 export type MinecraftText = {
 	translate?: string;
@@ -88,12 +90,12 @@ export type MinecraftText = {
 	clickEvent?: {
 		action: string;
 		value: string;
-	}
+	};
 
 	hoverEvent?: {
 		action: string;
 		contents: any;
-	}
+	};
 
 	extra?: MinecraftText[];
 
@@ -137,7 +139,7 @@ const styleProps = [
 	"click_event",
 	"hover_event",
 	"clickEvent",
-	"hoverEvent"
+	"hoverEvent",
 ];
 
 export function trueMarkOrUndefined(
@@ -155,7 +157,7 @@ export function defaultColorLUT(color: string): string | undefined {
 	return colorMap.find((e) => e.value === color)?.name || color;
 }
 
-export function colorNameToHexCode(color: string): string | undefined {
+export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
@@ -170,127 +172,142 @@ export function addTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
 	includeInteractivity = true,
-	exportVersion: "new" | "old" = "new"
+	exportVersion: "new" | "old" = "new",
 ) {
-	switch(exportVersion) {
+	switch (exportVersion) {
 		case "new":
-			switch (c.type) {
-				case "text":
-					current.text = c.text;
-					break;
-				case "score":
-					current.score = {
-						name: c.attrs?.name,
-						objective: c.attrs?.objective,
-					};
-					break;
-				case "translate":
-					current.translate = c.attrs?.key;
-					if (c.attrs?.params && c.attrs?.params.length != 0) {
-						current.with = c.attrs?.params;
-					}
-					if (c.attrs?.fallback) {
-						current.fallback = c.attrs?.fallback;
-					}
-					break;
-				case "storage_nbt":
-				case "block_nbt":
-				case "entity_nbt":
-					current.nbt = c.attrs?.nbt;
-					current.storage = c.attrs?.storage;
-					current.block = c.attrs?.block;
-					current.entity = c.attrs?.entity;
-					current.interpret = c.attrs?.interpret || undefined;
-					break;
-				case "keybind":
-					current.keybind = c.attrs?.key;
-					break;
-				case "selector":
-					current.selector = c.attrs?.selector;
-					break;
-			}
-			if (includeInteractivity) {
-				if (getMarkType(c, "clickEvent")) {
-					const ce = getMarkType(c, "clickEvent")?.attrs;
-					current.click_event = { action: ce!.action };
-					switch (ce!.action) {
-						case "open_url":
-							current.click_event.url = ce!.value;
-							break;
-						case "run_command":
-						case "suggest_command":
-							current.click_event.command = ce!.value;
-							break;
-						case "copy_to_clipboard":
-							current.click_event.value = ce!.value;
-							break;
-						case "change_page":
-							current.click_event.page = ce!.value;
-							break;
-						case "open_dialog":
-							current.click_event.dialog = ce!.value;
-							break;
-					}
-				}
-
-				if (getMarkType(c, "hoverEvent")) {
-					const ce = getMarkType(c, "hoverEvent")?.attrs;
-					current.hover_event = { action: ce!.action, value: ce!.value };
-				}
-			}
+			newApplyTypeSpecificValues(current, c, includeInteractivity);
 			break;
 		case "old":
-			switch (c.type) {
-				case "text":
-					current.text = c.text;
-					break;
-				case "score":
-					current.score = {
-						name: c.attrs?.name,
-						objective: c.attrs?.objective,
-					};
-					break;
-				case "translate":
-					current.translate = c.attrs?.key;
-					if (c.attrs?.params && c.attrs?.params.length != 0) {
-						current.with = c.attrs?.params;
-					}
-					if (c.attrs?.fallback) {
-						current.fallback = c.attrs?.fallback;
-					}
-					break;
-				case "storage_nbt":
-				case "block_nbt":
-				case "entity_nbt":
-					current.nbt = c.attrs?.nbt;
-					current.storage = c.attrs?.storage;
-					current.block = c.attrs?.block;
-					current.entity = c.attrs?.entity;
-					current.interpret = c.attrs?.interpret || undefined;
-					break;
-				case "keybind":
-					current.keybind = c.attrs?.key;
-					break;
-				case "selector":
-					current.selector = c.attrs?.selector;
-					break;
-			}
-			if (includeInteractivity) {
-				if (getMarkType(c, "clickEvent")) {
-					const ce = getMarkType(c, "clickEvent")?.attrs;
-					current.clickEvent = { action: ce!.action };
-					current.clickEvent.value = ce!.value;
-				}
-
-				if (getMarkType(c, "hoverEvent")) {
-					const ce = getMarkType(c, "hoverEvent")?.attrs;
-					current.hoverEvent = { action: ce!.action, contents: ce!.value };
-				}
-			}
+			oldApplyTypeSpecificValues(current, c, includeInteractivity);
 			break;
 	}
 
 	return current;
+}
+
+function newApplyTypeSpecificValues(
+	current: MinecraftText,
+	c: JSONContent,
+	includeInteractivity = true,
+) {
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
+			break;
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
+			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+	if (includeInteractivity) {
+		if (getMarkType(c, "clickEvent")) {
+			const ce = getMarkType(c, "clickEvent")?.attrs;
+			current.click_event = { action: ce!.action };
+			switch (ce!.action) {
+				case "open_url":
+					current.click_event.url = ce!.value;
+					break;
+				case "run_command":
+				case "suggest_command":
+					current.click_event.command = ce!.value;
+					break;
+				case "copy_to_clipboard":
+					current.click_event.value = ce!.value;
+					break;
+				case "change_page":
+					current.click_event.page = ce!.value;
+					break;
+				case "open_dialog":
+					current.click_event.dialog = ce!.value;
+					break;
+			}
+		}
+
+		if (getMarkType(c, "hoverEvent")) {
+			const ce = getMarkType(c, "hoverEvent")?.attrs;
+			current.hover_event = { action: ce!.action, value: ce!.value };
+		}
+	}
+}
+
+function oldApplyTypeSpecificValues(
+	current: MinecraftText,
+	c: JSONContent,
+	includeInteractivity = true,
+) {
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
+			break;
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
+			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+	if (includeInteractivity) {
+		if (getMarkType(c, "clickEvent")) {
+			const ce = getMarkType(c, "clickEvent")?.attrs;
+			current.clickEvent = { action: ce!.action, value: ce!.value };
+		}
+
+		if (getMarkType(c, "hoverEvent")) {
+			const ce = getMarkType(c, "hoverEvent")?.attrs;
+			current.hoverEvent = { action: ce!.action, contents: ce!.value };
+		}
+	}
 }
 
 export function applyGradient(editor: Editor, gradientColors: string[]) {
@@ -341,19 +358,15 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 }
 
 export function optimise(
-	arr: (MinecraftText | string) | (MinecraftText | string)[]
-): ((MinecraftText | string) | (MinecraftText | string)[]) {
-	// 0: If arr is NOT an array, then just return arr
-	if (!Array.isArray(arr)) {
-		return arr
-	}
+	arr: StringyMCText[]
+): StringyMCText[] {
 
-	let out: (MinecraftText | string)[] = []
+	let out: StringyMCText[] = [];
 
 	// 1: If a MinecraftText has no style, turn it to a string
-	arr.forEach(comp => {
+	arr.forEach((comp) => {
 		if (typeof comp == "string") {
-			return out.push(comp)
+			return out.push(comp);
 		}
 
 		for (const key in comp) {
@@ -367,7 +380,7 @@ export function optimise(
 		} else {
 			out.push(comp);
 		}
-	})
+	});
 
 	// 2: Merge elements with any similar properties
 	for (let i = 0; i < out.length - 1; i++) {
@@ -378,11 +391,7 @@ export function optimise(
 		let count = 1;
 		let j = i + 1;
 
-		while (
-			j < out.length &&
-			typeof out[j] === "object" &&
-			out[j] !== null
-		) {
+		while (j < out.length && typeof out[j] === "object" && out[j] !== null) {
 			const next = out[j] as MinecraftText;
 			const currShared: string[] = [];
 
@@ -424,13 +433,9 @@ export function optimise(
 	}
 
 	// 3: if the first item in the array is "", and the second one is a string, remove the first one
-	if (
-		out.length >= 2 &&
-		out[0] === "" &&
-		typeof out[1] === "string"
-	) {
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") {
 		out.shift();
 	}
 
-	return out
+	return out;
 }

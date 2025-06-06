@@ -1,9 +1,11 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorNameToHexCode, type MinecraftText } from "./tiptap/text";
+import {
+	defaultColorReverseLUT,
+	type MinecraftText,
+	type StringyMCText,
+} from "./tiptap/text";
 
-type TextOrEmpty = string | MinecraftText;
-
-export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
+export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
 	let parsed: MinecraftText[] | MinecraftText | string;
@@ -19,34 +21,34 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 		return [parsed as MinecraftText];
 	}
 
-	return parsed as TextOrEmpty[];
+	return parsed as StringyMCText[];
 }
 
-function processTextComponent(text: TextOrEmpty, baseDocument: JSONContent) {
-	console.log("processing text component", text)
+function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
+	console.log("processing text component", text);
 	if (typeof text === "string") {
 		if (text === "") {
-			return
+			return;
 		}
 
 		baseDocument.content?.push({
 			type: "paragraph",
-			content:[
+			content: [
 				{
 					type: "text",
-					text: text
-				}
-			]
+					text: text,
+				},
+			],
 		});
-		baseDocument = baseDocument
-		console.log("pushed empty text '", text, "' to the doc")
-		return
+		baseDocument = baseDocument;
+		console.log("pushed empty text '", text, "' to the doc");
+		return;
 	}
-	
+
 	// Extra property
-	if(text.extra) {
-		console.log("oh noes!! this text component contains extwa pwopertie!! >:3")
-		text.extra!.forEach(txt => {
+	if (text.extra) {
+		console.log("oh noes!! this text component contains extwa pwopertie!! >:3");
+		text.extra!.forEach((txt) => {
 			Object.assign(txt, {
 				bold: txt.bold ?? text.bold,
 				italic: txt.italic ?? text.italic,
@@ -60,9 +62,9 @@ function processTextComponent(text: TextOrEmpty, baseDocument: JSONContent) {
 				hover_event: txt.hover_event ?? text.hover_event,
 				hoverEvent: txt.hoverEvent ?? text.hoverEvent,
 			});
-			console.log("about to process text component", txt)
-			processTextComponent(txt, baseDocument)
-		})
+			console.log("about to process text component", txt);
+			processTextComponent(txt, baseDocument);
+		});
 	} else {
 		let finalText = mapPropertiesToType(text);
 		finalText = applyStyling(text, finalText);
@@ -78,7 +80,7 @@ function processTextComponent(text: TextOrEmpty, baseDocument: JSONContent) {
 	}
 }
 
-export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
+export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 	// requote keys
 
 	let baseDocument: JSONContent = {
@@ -92,7 +94,7 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 	};
 
 	for (const text of raw) {
-		processTextComponent(text, baseDocument)
+		processTextComponent(text, baseDocument);
 	}
 
 	baseDocument = fixBrokenNewLines(baseDocument);
@@ -181,7 +183,7 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		finalText.marks?.push({
 			type: "textStyle",
 			attrs: {
-				color: colorNameToHexCode(text.color),
+				color: defaultColorReverseLUT(text.color),
 			},
 		});
 	}
@@ -257,8 +259,7 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 	if (text.clickEvent) {
 		const cE = text.clickEvent;
 
-
-		const actionSource = cE.value
+		const actionSource = cE.value;
 
 		finalText.marks?.push({
 			type: "clickEvent",

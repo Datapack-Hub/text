@@ -20,6 +20,14 @@ export const Obfuscation = Mark.create({
 		};
 	},
 
+	addKeyboardShortcuts() {
+		return {
+			"Mod-Shift-o": () => {
+				return this.editor.commands.toggleObfuscated();
+			}
+		}
+	},
+
 	addCommands() {
 		return {
 			setObfuscated:

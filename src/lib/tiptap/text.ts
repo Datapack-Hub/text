@@ -94,6 +94,10 @@ export type MinecraftText = {
 		action: string;
 		contents: any;
 	}
+
+	extra?: MinecraftText[];
+
+	[key: string]: any;
 };
 
 export type ExternalSources = {
@@ -121,6 +125,20 @@ export type ExternalSources = {
 		selector: string;
 	};
 };
+
+const styleProps = [
+	"color",
+	"font",
+	"bold",
+	"italic",
+	"underlined",
+	"strikethrough",
+	"obfuscated",
+	"click_event",
+	"hover_event",
+	"clickEvent",
+	"hoverEvent"
+];
 
 export function trueMarkOrUndefined(
 	content: JSONContent,
@@ -320,4 +338,90 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 		}
 	}
 	editor.chain().focus().setTextSelection({ from, to }).run();
+}
+
+export function optimise(
+	arr: (MinecraftText | string) | (MinecraftText | string)[]
+): ((MinecraftText | string) | (MinecraftText | string)[]) {
+	// 0: If arr is NOT an array, then just return arr
+	if (!Array.isArray(arr)) {
+		return arr
+	}
+
+	let out: (MinecraftText | string)[] = []
+
+	// 1: If a MinecraftText has no style, turn it to a string
+	arr.forEach(comp => {
+		if (typeof comp == "string") {
+			return out.push(comp)
+		}
+
+		for (const key in comp) {
+			if (comp[key] === undefined) {
+				delete comp[key];
+			}
+		}
+
+		if (Object.keys(comp).length === 1) {
+			out.push(comp.text!);
+		} else {
+			out.push(comp);
+		}
+	})
+
+	// 2: Merge elements with any similar properties
+	for (let i = 0; i < out.length - 1; i++) {
+		const curr = out[i];
+		if (typeof curr !== "object" || curr === null) continue;
+
+		let sharedProps: string[] = [];
+		let count = 1;
+		let j = i + 1;
+
+		while (
+			j < out.length &&
+			typeof out[j] === "object" &&
+			out[j] !== null
+		) {
+			const next = out[j] as MinecraftText;
+			const currShared: string[] = [];
+
+			for (const prop of styleProps) {
+				if (
+					curr[prop] !== undefined &&
+					next[prop] !== undefined &&
+					JSON.stringify(curr[prop]) === JSON.stringify(next[prop])
+				) {
+					currShared.push(prop);
+				}
+			}
+
+			if (currShared.length > 0) {
+				sharedProps = currShared;
+				count++;
+				j++;
+			} else {
+				break;
+			}
+		}
+
+		if (count > 1 && sharedProps.length > 0) {
+			const base: MinecraftText = {};
+			for (const prop of sharedProps) {
+				base[prop] = (out[i] as MinecraftText)[prop];
+			}
+			base.extra = [];
+			for (let k = i; k < i + count; k++) {
+				const comp = { ...(out[k] as MinecraftText) };
+				for (const prop of sharedProps) {
+					delete comp[prop];
+				}
+				base.extra.push(comp);
+			}
+			out.splice(i, count, base);
+			i = i;
+		}
+	}
+
+	return out
 }

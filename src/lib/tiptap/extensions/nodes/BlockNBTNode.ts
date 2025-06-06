@@ -46,6 +46,7 @@ export const BlockNBTNode = Node.create<NodeOptions>({
             display: inline-flex;
             align-items: center;
             gap: 4px 6px;
+			z-index:9;
             `,
 			}),
 			["span", {}, `NBT: ${nbt}, ${block}`],

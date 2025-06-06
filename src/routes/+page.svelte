@@ -5,6 +5,7 @@
 		applyGradient,
 		colorMap,
 		defaultColorLUT,
+		optimise,
 		trueMarkOrUndefined,
 		type ExternalSources,
 		type MinecraftText,
@@ -272,6 +273,8 @@
 				return JSON.stringify(data[1])
 			}
 
+			data = optimise(data)
+
 			return JSON.stringify(data);
 		} else if (exportType == "item_lore") {
 			let data: ((MinecraftText | string)[] | (MinecraftText | string))[] = [];
@@ -321,6 +324,8 @@
 					data.push(currentLine);
 				}
 			});
+
+			data = optimise(data)
 
 			return JSON.stringify(data);
 		} else {

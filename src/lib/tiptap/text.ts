@@ -423,5 +423,14 @@ export function optimise(
 		}
 	}
 
+	// 3: if the first item in the array is "", and the second one is a string, remove the first one
+	if (
+		out.length >= 2 &&
+		out[0] === "" &&
+		typeof out[1] === "string"
+	) {
+		out.shift();
+	}
+
 	return out
 }

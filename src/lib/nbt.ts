@@ -22,6 +22,62 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 	return parsed as TextOrEmpty[];
 }
 
+function processTextComponent(text: TextOrEmpty, baseDocument: JSONContent) {
+	console.log("processing text component", text)
+	if (typeof text === "string") {
+		if (text === "") {
+			return
+		}
+
+		baseDocument.content?.push({
+			type: "paragraph",
+			content:[
+				{
+					type: "text",
+					text: text
+				}
+			]
+		});
+		baseDocument = baseDocument
+		console.log("pushed empty text '", text, "' to the doc")
+		return
+	}
+	
+	// Extra property
+	if(text.extra) {
+		console.log("oh noes!! this text component contains extwa pwopertie!! >:3")
+		text.extra!.forEach(txt => {
+			Object.assign(txt, {
+				bold: txt.bold ?? text.bold,
+				italic: txt.italic ?? text.italic,
+				underlined: txt.underlined ?? text.underlined,
+				obfuscated: txt.obfuscated ?? text.obfuscated,
+				strikethrough: txt.strikethrough ?? text.strikethrough,
+				color: txt.color ?? text.color,
+				shadow_color: txt.shadow_color ?? text.shadow_color,
+				click_event: txt.click_event ?? text.click_event,
+				clickEvent: txt.clickEvent ?? text.clickEvent,
+				hover_event: txt.hover_event ?? text.hover_event,
+				hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+			});
+			console.log("about to process text component", txt)
+			processTextComponent(txt, baseDocument)
+		})
+	} else {
+		let finalText = mapPropertiesToType(text);
+		finalText = applyStyling(text, finalText);
+
+		let paragraphContent = baseDocument.content?.at(-1)?.content;
+
+		if (!paragraphContent) {
+			baseDocument.content!.at(-1)!.content = [];
+			paragraphContent = baseDocument.content!.at(-1)!.content;
+		}
+
+		paragraphContent!.push(finalText);
+	}
+}
+
 export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 	// requote keys
 
@@ -36,28 +92,7 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 	};
 
 	for (const text of raw) {
-		if (typeof text === "string") {
-			if (text === "") {
-				continue;
-			}
-
-			baseDocument.content?.push({
-				type: "paragraph",
-			});
-			continue;
-		}
-
-		let finalText = mapPropertiesToType(text);
-		finalText = applyStyling(text, finalText);
-
-		let paragraphContent = baseDocument.content?.at(-1)?.content;
-
-		if (!paragraphContent) {
-			baseDocument.content!.at(-1)!.content = [];
-			paragraphContent = baseDocument.content!.at(-1)!.content;
-		}
-
-		paragraphContent!.push(finalText);
+		processTextComponent(text, baseDocument)
 	}
 
 	baseDocument = fixBrokenNewLines(baseDocument);

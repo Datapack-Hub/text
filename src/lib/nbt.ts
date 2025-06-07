@@ -23,7 +23,6 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 }
 
 function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
-	console.log("processing text component", text);
 	if (typeof text === "string") {
 		if (text === "") {
 			return;
@@ -39,29 +38,46 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			],
 		});
 		baseDocument = baseDocument;
-		console.log("pushed empty text '", text, "' to the doc");
 		return;
 	}
 
 	// Extra property
 	if (text.extra) {
-		console.log("oh noes!! this text component contains extwa pwopertie!! >:3");
 		text.extra!.forEach((txt) => {
-			Object.assign(txt, {
-				bold: txt.bold,
-				italic: txt.italic,
-				underlined: txt.underlined,
-				obfuscated: txt.obfuscated,
-				strikethrough: txt.strikethrough,
-				color: txt.color ,
-				shadow_color: txt.shadow_color,
-				click_event: txt.click_event,
-				clickEvent: txt.clickEvent,
-				hover_event: txt.hover_event,
-				hoverEvent: txt.hoverEvent,
-			});
-			console.log("about to process text component", txt);
-			processTextComponent(txt, baseDocument);
+			if(typeof(txt) == "object") {
+				Object.assign(txt, {
+					bold: txt.bold ?? text.bold,
+					italic: txt.italic ?? text.italic,
+					underlined: txt.underlined ?? text.underlined,
+					obfuscated: txt.obfuscated ?? text.obfuscated,
+					strikethrough: txt.strikethrough ?? text.strikethrough,
+					color: txt.color ?? text.color ,
+					shadow_color: txt.shadow_color ?? text.shadow_color,
+					click_event: txt.click_event ?? text.click_event,
+					clickEvent: txt.clickEvent ?? text.clickEvent,
+					hover_event: txt.hover_event ?? text.hover_event,
+					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+				});
+				processTextComponent(txt, baseDocument);
+			} else {
+				let newComponent = {
+					text: txt
+				}
+				Object.assign(newComponent, {
+					bold: text.bold,
+					italic: text.italic,
+					underlined: text.underlined,
+					obfuscated: text.obfuscated,
+					strikethrough: text.strikethrough,
+					color: text.color ,
+					shadow_color: text.shadow_color,
+					click_event: text.click_event,
+					clickEvent: text.clickEvent,
+					hover_event: text.hover_event,
+					hoverEvent: text.hoverEvent,
+				});
+				processTextComponent(newComponent, baseDocument);
+			}
 		});
 	} else {
 		let finalText = mapPropertiesToType(text);

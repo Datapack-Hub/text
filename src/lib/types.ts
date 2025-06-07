@@ -9,7 +9,7 @@ export type BaseMinecraftText = Pick<
 	| "strikethrough"
 	| "obfuscated"
 >;
-export type StringyMCText = string | MinecraftText;
+export type StringyMCText = string | (MinecraftText & OldMinecraftText);
 export type MinecraftText = {
 	translate?: string;
 	with?: string[];
@@ -61,7 +61,7 @@ export type MinecraftText = {
 		uuid?: string | number[];
 	};
 
-	extra?: (MinecraftText & OldMinecraftText)[];
+	extra?: StringyMCText[];
 };
 export type OldMinecraftText = Omit<
 	MinecraftText,

@@ -56,6 +56,7 @@
 	import ExportModal from "$lib/components/modals/ExportModal.svelte";
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
+	import { page } from "$app/stores";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -490,7 +491,7 @@
 	</div>
 
 	<div>
-		{#if dev}
+		{#if $page.url.searchParams.has('dev')}
 			<code class="inline-block p-3 overflow-x-scroll"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
@@ -535,8 +536,10 @@
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 				</p>
 			</div>
-			<p class="font-lexend text-xs text-white/60 mt-3">{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
-			<p class="font-lexend text-xs text-white/60 mt-1">{editor ? JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion)).length : 0} components</p>
+			<div class="flex items-center space-x-3 mt-2 select-none">
+				<p class="font-lexend text-xs text-white/60">{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
+				<p class="font-lexend text-xs text-white/60">{editor ? JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion)).length : 0} components</p>
+			</div>
 		</div>
 	</div>
 </div>

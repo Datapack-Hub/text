@@ -384,6 +384,34 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 	// 2: Merge elements with any similar properties
 	for (let i = 0; i < out.length - 1; i++) {
 		const curr = out[i];
+		const next = out[i + 1];
+
+		// whitespace merge to prev component
+		if (
+			typeof curr === "object" &&
+			curr !== null &&
+			"text" in curr &&
+			typeof curr.text === "string" &&
+			typeof next === "string" &&
+			(next.trim() === "" || next.trim() === "\n")
+		) {
+			curr.text += next;
+			out.splice(i + 1, 1);
+			i--; // for next iteration
+			continue;
+		}
+
+		// merge consecutive strings
+		if (
+			typeof curr === "string" &&
+			typeof next === "string"
+		) {
+			out[i] = curr + next;
+			out.splice(i + 1, 1);
+			i--; // for next iteration
+			continue;
+		}
+
 		if (typeof curr !== "object" || curr === null) continue;
 
 		let sharedProps: string[] = [];

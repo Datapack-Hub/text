@@ -415,25 +415,23 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 	return out;
 }
 
+/**
+ * Converts the JSON content of the editor to an NBT string.
+ */
 export function translateToNBT(
 	jsonContent: JSONContent,
 	exportType: string = "standard",
 	exportVersion: "new" | "old" = "new",
 ): string {
-	if (exportVersion == "new") {
-		// nbt doesnt need indenting
-		return translate(jsonContent, exportType, false, 0).replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-			(match) => match.replace(/"/g, ""),
-		);
-	} else {
-		return translate(jsonContent, exportType, false, 0, "old").replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-			(match) => match.replace(/"/g, ""),
-		);
-	}
+	return translate(jsonContent, exportType, false, 0, exportVersion).replace(
+		/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+		(match) => match.replace(/"/g, ""),
+	);
 }
 
+/**
+ * Converts the JSON content of the editor to a Minecraft JSON string.
+ */
 export function translate(
 	json: JSONContent,
 	exportType: string = "standard",
@@ -441,17 +439,15 @@ export function translate(
 	indentSize: number,
 	exportVersion: "new" | "old" = "new",
 ): string {
-	const paragraphs = json.content!;
+	const paragraphs = json.content ?? [];
 
-	if (exportType == "standard") {
-		let data: StringyMCText[] = [""];
+	if (exportType === "standard") {
+		let data: StringyMCText[] = [];
 
-		paragraphs.forEach((p, i) => {
-			const content = p.content || [];
-			let current: MinecraftText;
-
-			content.forEach((c) => {
-				current = {
+		for (const [i, p] of paragraphs.entries()) {
+			const content = p.content ?? [];
+			for (const c of content) {
+				let current: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),
 					italic: trueMarkOrUndefined(c, "italic"),
@@ -469,43 +465,38 @@ export function translate(
 				}
 
 				current = addTypeSpecificValues(current, c, true, exportVersion);
-
 				data.push(current);
-			});
-
-			if (i < paragraphs.length - 1) {
-				data.push("\n");
 			}
-		});
-
-		if (data.length === 1 && data[0] === "") {
-			if (Math.random() < 0.002) {
-				return "🤓 <- james is waiting for you to type something";
-			}
-			return "waiting for input...";
+			if (i < paragraphs.length - 1) data.push("\n");
 		}
 
-		if (data.length == 2) {
-			return indent
-				? JSON.stringify(data[1], null, indentSize)
-				: JSON.stringify(data[1]);
+		if (data.length === 0) {
+			return Math.random() < 0.002
+				? "🤓 <- james is waiting for you to type something"
+				: "waiting for input...";
 		}
 
 		data = optimise(data);
 
+		if (data.length === 1) {
+			return indent
+				? JSON.stringify(data[0], null, indentSize)
+				: JSON.stringify(data[0]);
+		}
+
 		return indent
 			? JSON.stringify(data, null, indentSize)
 			: JSON.stringify(data);
-	} else if (exportType == "item_lore") {
+
+	} else if (exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
-		paragraphs.forEach((p) => {
-			const content = p.content || [];
+		for (const p of paragraphs) {
+			const content = p.content ?? [];
 			let currentLine: StringyMCText[] = [];
-			let currentComponent: MinecraftText;
 
-			content.forEach((c, i) => {
-				currentComponent = {
+			for (const [i, c] of content.entries()) {
+				let currentComponent: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),
 					italic: trueMarkOrUndefined(c, "italic"),
@@ -514,51 +505,31 @@ export function translate(
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 				};
 
-				// For lore: default behaviour is to be purple and italic
-				// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
-				// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
+				// For lore: default is purple and italic, so override if needed
 				if (i === 0) {
 					if (currentComponent.color || currentComponent.italic) {
-						currentLine.push({
-							italic: false,
-							color: "white",
-						});
+						currentLine.push({ italic: false, color: "white" });
 					} else {
-						if (!currentComponent.color) {
-							currentComponent.color = "white";
-						}
-
-						if (!currentComponent.italic) {
-							currentComponent.italic = false;
-						}
+						currentComponent.color ??= "white";
+						currentComponent.italic ??= false;
 					}
 				}
 
 				currentComponent = addTypeSpecificValues(currentComponent, c, false);
 				currentLine.push(currentComponent);
-			});
-
-			if (currentLine.length == 2) {
-				data.push(currentLine[1]);
-			} else {
-				data.push(currentLine);
 			}
-		});
+
+			data.push(currentLine.length === 2 ? currentLine[1] : currentLine);
+		}
 
 		if (Array.isArray(data)) {
-			data = data.map((d) => {
-				if (Array.isArray(d)) {
-					return optimise(d);
-				} else {
-					return d;
-				}
-			});
+			data = data.map((d) => Array.isArray(d) ? optimise(d) : d);
 		}
 
 		return indent
 			? JSON.stringify(data, null, indentSize)
 			: JSON.stringify(data);
-	} else {
-		return "[]";
 	}
+
+	return "[]";
 }

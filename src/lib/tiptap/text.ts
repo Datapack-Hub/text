@@ -362,107 +362,55 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 export function optimise(arr: StringyMCText[]): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
-	// 1: If a MinecraftText has no style, turn it to a string
-	arr.forEach((comp) => {
-		if (typeof comp == "string") {
-			return out.push(comp);
-		}
-
-		for (const key in comp) {
-			if (comp[key] === undefined) {
-				delete comp[key];
-			}
-		}
-
-		if (Object.keys(comp).length === 1) {
-			out.push(comp.text!);
-		} else {
+	// 1: Remove undefineds, flatten MinecraftText with only text
+	for (const comp of arr) {
+		if (typeof comp === "string") {
 			out.push(comp);
+			continue;
 		}
-	});
+		Object.keys(comp).forEach(k => comp[k] === undefined && delete comp[k]);
+		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
+	}
 
-	// 2: Merge elements with any similar properties
+	// 2: Merge adjacent strings and whitespace, group objects with shared style
 	for (let i = 0; i < out.length - 1; i++) {
-		const curr = out[i];
-		const next = out[i + 1];
+		const curr = out[i], next = out[i + 1];
 
-		// whitespace merge to prev component
-		if (
-			typeof curr === "object" &&
-			curr !== null &&
-			"text" in curr &&
-			typeof curr.text === "string" &&
-			typeof next === "string" &&
-			(next.trim() === "" || next.trim() === "\n")
-		) {
+		// Merge whitespace to prev component
+		if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
 			curr.text += next;
-			out.splice(i + 1, 1);
-			i--; // for next iteration
+			out.splice(i + 1, 1); i--;
 			continue;
 		}
-
-		// merge consecutive strings
-		if (
-			typeof curr === "string" &&
-			typeof next === "string"
-		) {
+		// Merge consecutive strings
+		if (typeof curr === "string" && typeof next === "string") {
 			out[i] = curr + next;
-			out.splice(i + 1, 1);
-			i--; // for next iteration
+			out.splice(i + 1, 1); i--;
 			continue;
 		}
-
-		if (typeof curr !== "object" || curr === null) continue;
-
-		let sharedProps: string[] = [];
-		let count = 1;
-		let j = i + 1;
-
-		while (j < out.length && typeof out[j] === "object" && out[j] !== null) {
-			const next = out[j] as MinecraftText;
-			const currShared: string[] = [];
-
-			for (const prop of styleProps) {
-				if (
-					curr[prop] !== undefined &&
-					next[prop] !== undefined &&
-					JSON.stringify(curr[prop]) === JSON.stringify(next[prop])
-				) {
-					currShared.push(prop);
-				}
-			}
-
-			if (currShared.length > 0) {
-				sharedProps = currShared;
-				count++;
-				j++;
-			} else {
-				break;
-			}
+		// Group objects with shared style
+		if (typeof curr !== "object" || !curr) continue;
+		let shared: string[] = [], count = 1, j = i + 1;
+		while (j < out.length && typeof out[j] === "object" && out[j]) {
+			const n = out[j] as MinecraftText;
+			const s = styleProps.filter(p => curr[p] !== undefined && JSON.stringify(curr[p]) === JSON.stringify(n[p]));
+			if (s.length) { shared = s; count++; j++; } else break;
 		}
-
-		if (count > 1 && sharedProps.length > 0) {
+		if (count > 1 && shared.length) {
 			const base: MinecraftText = {};
-			for (const prop of sharedProps) {
-				base[prop] = (out[i] as MinecraftText)[prop];
-			}
+			shared.forEach(p => base[p] = (out[i] as MinecraftText)[p]);
 			base.extra = [];
 			for (let k = i; k < i + count; k++) {
-				const comp = { ...(out[k] as MinecraftText) };
-				for (const prop of sharedProps) {
-					delete comp[prop];
-				}
-				base.extra.push(comp);
+				const c = { ...(out[k] as MinecraftText) };
+				shared.forEach(p => delete c[p]);
+				base.extra.push(c);
 			}
 			out.splice(i, count, base);
-			i = i;
 		}
 	}
 
-	// 3: if the first item in the array is "", and the second one is a string, remove the first one
-	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") {
-		out.shift();
-	}
+	// 3: Remove leading empty string if followed by a string
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
 
 	return out;
 }

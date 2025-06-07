@@ -17,7 +17,7 @@
 	onclick={() => editor.chain().focus().toggleBold().run()}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/2 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
 		'bold',
 	)
 		? 'bg-zinc-800'
@@ -30,7 +30,7 @@
 	onclick={() => editor.chain().focus().toggleItalic().run()}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/2 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
 		'italic',
 	)
 		? 'bg-zinc-800'
@@ -43,7 +43,7 @@
 	onclick={() => editor.chain().focus().toggleStrike().run()}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/2 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
 		'strike',
 	)
 		? 'bg-zinc-800'
@@ -56,7 +56,7 @@
 	onclick={() => editor.chain().focus().toggleUnderline().run()}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/2 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
 		'underline',
 	)
 		? 'bg-zinc-800'
@@ -69,7 +69,7 @@
 	onclick={() => editor.chain().focus().toggleObfuscated().run()}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/2 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
 		'obfuscated',
 	)
 		? 'bg-zinc-800'
@@ -82,7 +82,7 @@
 		aria-label="shadow_color"
 		class="cursor-pointer p-1 {small
 			? 'text-sm'
-			: 'text-lg'} hover:bg-white/2 rounded-md font-medium bg-zinc-800"
+			: 'text-lg'} hover:bg-white/3 rounded-md font-medium bg-zinc-800"
 		onclick={() => editor.chain().focus().unsetShadowColor().run()}
 		use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
 		<IconShadow />
@@ -93,7 +93,7 @@
 		aria-label="shadow_color"
 		class="cursor-pointer p-1 {small
 			? 'text-sm'
-			: 'text-lg'} hover:bg-white/2 rounded-md font-medium"
+			: 'text-lg'} hover:bg-white/3 rounded-md font-medium"
 		use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
 		<IconShadow />
 	</label>

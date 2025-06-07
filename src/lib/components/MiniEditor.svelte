@@ -141,7 +141,7 @@
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
 					title={color.name}
-					class="p-0.5 text-sm hover:bg-white/2 rounded-md {editor.isActive(
+					class="p-0.5 text-sm hover:bg-white/3 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -155,14 +155,14 @@
 				<button
 					aria-label="unset color"
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md">
+					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md">
 					<IconHollow />
 				</button>
 			{/if}
 
 			<label
 				for="color"
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium"
+				class="p-0.5 text-sm hover:bg-white/3 rounded-md font-medium"
 				><IconColor /></label>
 			<input
 				type="color"

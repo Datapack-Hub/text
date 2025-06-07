@@ -60,3 +60,7 @@ button {
 .nomob {
 	@apply hidden md:inline;
 }
+
+.toolbar-btn {
+	@apply p-1 text-lg hover:bg-white/3 rounded-md font-medium;
+}

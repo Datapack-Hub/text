@@ -314,23 +314,23 @@
 	<div
 		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
 		style="font-family: Lexend">
-		<div class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer">
+		<div class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer">
 			<img src="/dph.svg" class="h-5" alt="logo" />
 			<span class="ml-3 nomob">Minecraft Text Editor</span>
 		</div>
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			onclick={importDialog.open}>Import</button>
 		{#if doesContentExist}
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 				onclick={outputDialog.open}>Export</button>
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
 		<button
 			class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-3 select-none"
@@ -346,11 +346,11 @@
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			>Discord</a>
 		<a
 			href="https://datapack.wiki/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/2 cursor-pointer"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			>Datapack Wiki</a>
 	</div>
 
@@ -361,7 +361,7 @@
 					customDialog.open();
 					customType = undefined;
 				}}
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+				class="toolbar-btn"
 				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
 				<IconCustom />
 			</button>
@@ -373,13 +373,13 @@
 			<div class="w-4"></div>
 
 			<button
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+				class="toolbar-btn"
 				style="color: {color}"
 				onclick={colorDialog.open}
 				use:tippy={{ content: "Custom Color", placement: "bottom" }}
 				><IconColor /></button>
 			<button
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+				class="toolbar-btn"
 				onclick={gradientDialog.open}
 				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
 				><IconGradient /></button>
@@ -391,7 +391,7 @@
 						content: toTitleCase(color.name.replace("_", " ")),
 						placement: "bottom",
 					}}
-					class="p-1 text-lg hover:bg-white/2 rounded-md {editor.isActive(
+					class="p-1 text-lg hover:bg-white/3 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -405,7 +405,7 @@
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
 					use:tippy={{ content: "Unset color", placement: "bottom" }}
-					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md"
+					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
 				</button>
@@ -414,7 +414,7 @@
 			<div class="w-4"></div>
 
 			<button
-				class="p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+				class="toolbar-btn {editor.isActive(
 					'clickEvent',
 				)
 					? 'bg-zinc-800'
@@ -434,7 +434,7 @@
 			</button>
 			{#if editor.isActive("clickEvent")}
 				<button
-					class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+					class="toolbar-btn"
 					use:tippy={{
 						content: "Edit Click Event",
 						placement: "bottom",
@@ -454,7 +454,7 @@
 				}}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
 					? 'ml-2'
-					: ''} p-1 text-lg hover:bg-white/2 rounded-md font-medium {editor.isActive(
+					: ''} toolbar-btn {editor.isActive(
 					'hoverEvent',
 				)
 					? 'bg-zinc-800'
@@ -467,7 +467,7 @@
 			</button>
 			{#if editor.isActive("hoverEvent")}
 				<button
-					class="p-1 text-lg hover:bg-white/2 rounded-md font-medium"
+					class="toolbar-btn"
 					use:tippy={{
 						content: "Edit Hover Event",
 						placement: "bottom",
@@ -478,7 +478,9 @@
 			{/if}
 
 			<div class="flex-grow"></div>
+
 			<button
+				class="toolbar-btn nomob"
 				onclick={keybindDialog.open}
 				use:tippy={{
 					content: "Keybinds",
@@ -605,13 +607,13 @@
 				</div>
 				<div class="flex bg-zinc-950 rounded-b-md w-fit">
 					<button
-						class="hover:bg-white/2 py-2 px-3"
+						class="hover:bg-white/3 py-2 px-3"
 						onclick={() => {
 							editor.commands.setContent(snapshot);
 							editor.commands.focus();
 						}}>Load</button>
 					<button
-						class="hover:bg-white/2 py-2 px-3"
+						class="hover:bg-white/3 py-2 px-3"
 						onclick={() => {
 							snapshots = snapshots.filter(
 								(_, index) => index !== snapshots.indexOf(snapshot),

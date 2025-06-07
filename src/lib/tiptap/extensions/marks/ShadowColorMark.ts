@@ -7,8 +7,9 @@ export const ShadowColorMark = Mark.create({
 		return {
 			shadowColor: {
 				default: null,
-				parseHTML: element => element.getAttribute("data-shadow-color") || null,
-				renderHTML: attributes => {
+				parseHTML: (element) =>
+					element.getAttribute("data-shadow-color") || null,
+				renderHTML: (attributes) => {
 					if (!attributes.shadowColor) {
 						return {};
 					}
@@ -22,7 +23,7 @@ export const ShadowColorMark = Mark.create({
 		return [
 			{
 				tag: "span[data-shadow-color]",
-				getAttrs: element => {
+				getAttrs: (element) => {
 					if (typeof element === "string") {
 						return false;
 					}
@@ -45,7 +46,7 @@ export const ShadowColorMark = Mark.create({
 				{
 					style: `text-shadow: 2px 2px 0 ${shadowColor};`,
 				},
-				HTMLAttributes
+				HTMLAttributes,
 			),
 			0,
 		];

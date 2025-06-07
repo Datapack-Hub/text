@@ -1,9 +1,6 @@
 <script lang="ts">
-	import {
-		addTypeSpecificValues,
-		colorMap,
-		type MinecraftText,
-	} from "$lib/tiptap/text";
+	import { addTypeSpecificValues, colorMap } from "$lib/tiptap/text";
+	import { type MinecraftText } from "$lib/types";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -21,14 +18,15 @@
 		ClickEventMark,
 		HoverEventMark,
 		Obfuscation,
-		ShadowColorMark
+		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
 	export let output = "";
-	export let placeholder = "Write text here, and style it with the options above!";
+	export let placeholder =
+		"Write text here, and style it with the options above!";
 
 	let element: HTMLElement;
 	let editor: Editor;
@@ -143,7 +141,7 @@
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
 					title={color.name}
-					class="p-0.5 text-sm hover:bg-white/2 rounded-md {editor.isActive(
+					class="p-0.5 text-sm hover:bg-white/3 rounded-md {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -157,14 +155,14 @@
 				<button
 					aria-label="unset color"
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					class="p-1 text-lg hover:bg-white/2 text-zinc-500 rounded-md">
+					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md">
 					<IconHollow />
 				</button>
 			{/if}
 
 			<label
 				for="color"
-				class="p-0.5 text-sm hover:bg-white/2 rounded-md font-medium"
+				class="p-0.5 text-sm hover:bg-white/3 rounded-md font-medium"
 				><IconColor /></label>
 			<input
 				type="color"

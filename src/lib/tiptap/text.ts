@@ -1,3 +1,9 @@
+import type {
+	MCTextKey,
+	MinecraftText,
+	OldMinecraftText,
+	StringyMCText,
+} from "$lib/types";
 import { Editor, type JSONContent } from "@tiptap/core";
 import { generateGradient } from "typescript-color-gradient";
 
@@ -20,108 +26,25 @@ export const colorMap = [
 	{ name: "black", value: "#000000" },
 ];
 
-export type BaseMinecraftText = Pick<
-	MinecraftText,
-	| "text"
-	| "color"
-	| "font"
-	| "bold"
-	| "italic"
-	| "underlined"
-	| "strikethrough"
-	| "obfuscated"
->;
+const styleProps = [
+	"color",
+	"font",
+	"bold",
+	"italic",
+	"underlined",
+	"strikethrough",
+	"obfuscated",
+	"click_event",
+	"hover_event",
+	"clickEvent",
+	"hoverEvent",
+];
 
-// Note: this also includes old fields. I hate the way this is designed but it works.
-export type MinecraftText = {
-	translate?: string;
-	with?: string[];
-	fallback?: string;
-
-	text?: string;
-
-	score?: {
-		name: string;
-		objective: string;
-	};
-
-	nbt?: string;
-	interpret?: string;
-	storage?: string;
-	block?: string;
-	entity?: string;
-
-	keybind?: string;
-
-	selector?: string;
-
-	color?: string;
-	shadow_color?: number | number[];
-	font?: string;
-	bold?: boolean;
-	italic?: boolean;
-	underlined?: boolean;
-	strikethrough?: boolean;
-	obfuscated?: boolean;
-	click_event?: {
-		action: string;
-		url?: string;
-		command?: string;
-		value?: string;
-		page?: string;
-		dialog?: string;
-	};
-	hover_event?: {
-		action: string;
-
-		value?: BaseMinecraftText | BaseMinecraftText[];
-
-		id?: string;
-		count?: number;
-		components?: {}[];
-
-		name?: BaseMinecraftText | BaseMinecraftText[];
-		uuid?: string | number[];
-	};
-
-	// Old ones
-	clickEvent?: {
-		action: string;
-		value: string;
-	}
-
-	hoverEvent?: {
-		action: string;
-		contents: any;
-	}
-};
-
-export type ExternalSources = {
-	score: {
-		objective: string;
-		name: string;
-	};
-	translate: {
-		key: string;
-		params: string[];
-		fallback?: string;
-	};
-	nbt: {
-		sourceType: string;
-		storage: string;
-		entity: string;
-		block: string;
-		path: string;
-		interpret: boolean;
-	};
-	keybind: {
-		key: string;
-	};
-	selector: {
-		selector: string;
-	};
-};
-
+/** 
+ * @param content the node to check
+ * @param mark the mark to check
+ * @returns the mark if true, undefined otherwise
+ */
 export function trueMarkOrUndefined(
 	content: JSONContent,
 	mark: string,
@@ -130,6 +53,12 @@ export function trueMarkOrUndefined(
 	return value === true ? value : undefined;
 }
 
+/**
+ * A color value LUT
+ * 
+ * @param color the hex code
+ * @returns the color name
+ */
 export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
@@ -137,144 +66,202 @@ export function defaultColorLUT(color: string): string | undefined {
 	return colorMap.find((e) => e.value === color)?.name || color;
 }
 
-export function colorNameToHexCode(color: string): string | undefined {
+/**
+ * A color name LUT
+ * 
+ * @param color the color name you want to find
+ * @returns the hex code for the color
+ */
+export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
 	return colorMap.find((e) => e.name === color)?.value || color;
 }
 
-export function getMarkType(c: JSONContent, type: string) {
+/**
+ * Checks the type of the mark against `type`
+ * 
+ * @param c the node you want to examine
+ * @param type type to check
+ * @returns true if it matches
+ */
+export function isMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
+/**
+ * Applies the specific properties for a type of source or provider
+ * 
+ * @param current current text component
+ * @param c the current editor JSON
+ * @param includeInteractivity should it have click and hover events
+ * @param exportVersion the version to export to
+ * @returns the current component with new properties
+ */
 export function addTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
 	includeInteractivity = true,
-	exportVersion: "new" | "old" = "new"
+	exportVersion: "new" | "old" = "new",
 ) {
-	switch(exportVersion) {
+	switch (exportVersion) {
 		case "new":
-			switch (c.type) {
-				case "text":
-					current.text = c.text;
-					break;
-				case "score":
-					current.score = {
-						name: c.attrs?.name,
-						objective: c.attrs?.objective,
-					};
-					break;
-				case "translate":
-					current.translate = c.attrs?.key;
-					if (c.attrs?.params && c.attrs?.params.length != 0) {
-						current.with = c.attrs?.params;
-					}
-					if (c.attrs?.fallback) {
-						current.fallback = c.attrs?.fallback;
-					}
-					break;
-				case "storage_nbt":
-				case "block_nbt":
-				case "entity_nbt":
-					current.nbt = c.attrs?.nbt;
-					current.storage = c.attrs?.storage;
-					current.block = c.attrs?.block;
-					current.entity = c.attrs?.entity;
-					current.interpret = c.attrs?.interpret || undefined;
-					break;
-				case "keybind":
-					current.keybind = c.attrs?.key;
-					break;
-				case "selector":
-					current.selector = c.attrs?.selector;
-					break;
-			}
-			if (includeInteractivity) {
-				if (getMarkType(c, "clickEvent")) {
-					const ce = getMarkType(c, "clickEvent")?.attrs;
-					current.click_event = { action: ce!.action };
-					switch (ce!.action) {
-						case "open_url":
-							current.click_event.url = ce!.value;
-							break;
-						case "run_command":
-						case "suggest_command":
-							current.click_event.command = ce!.value;
-							break;
-						case "copy_to_clipboard":
-							current.click_event.value = ce!.value;
-							break;
-						case "change_page":
-							current.click_event.page = ce!.value;
-							break;
-						case "open_dialog":
-							current.click_event.dialog = ce!.value;
-							break;
-					}
-				}
-
-				if (getMarkType(c, "hoverEvent")) {
-					const ce = getMarkType(c, "hoverEvent")?.attrs;
-					current.hover_event = { action: ce!.action, value: ce!.value };
-				}
-			}
+			newApplyTypeSpecificValues(current, c, includeInteractivity);
 			break;
 		case "old":
-			switch (c.type) {
-				case "text":
-					current.text = c.text;
-					break;
-				case "score":
-					current.score = {
-						name: c.attrs?.name,
-						objective: c.attrs?.objective,
-					};
-					break;
-				case "translate":
-					current.translate = c.attrs?.key;
-					if (c.attrs?.params && c.attrs?.params.length != 0) {
-						current.with = c.attrs?.params;
-					}
-					if (c.attrs?.fallback) {
-						current.fallback = c.attrs?.fallback;
-					}
-					break;
-				case "storage_nbt":
-				case "block_nbt":
-				case "entity_nbt":
-					current.nbt = c.attrs?.nbt;
-					current.storage = c.attrs?.storage;
-					current.block = c.attrs?.block;
-					current.entity = c.attrs?.entity;
-					current.interpret = c.attrs?.interpret || undefined;
-					break;
-				case "keybind":
-					current.keybind = c.attrs?.key;
-					break;
-				case "selector":
-					current.selector = c.attrs?.selector;
-					break;
-			}
-			if (includeInteractivity) {
-				if (getMarkType(c, "clickEvent")) {
-					const ce = getMarkType(c, "clickEvent")?.attrs;
-					current.clickEvent = { action: ce!.action };
-					current.clickEvent.value = ce!.value;
-				}
-
-				if (getMarkType(c, "hoverEvent")) {
-					const ce = getMarkType(c, "hoverEvent")?.attrs;
-					current.hoverEvent = { action: ce!.action, contents: ce!.value };
-				}
-			}
+			oldApplyTypeSpecificValues(current, c, includeInteractivity);
 			break;
 	}
 
 	return current;
 }
 
+/**
+ * Applies all of the properties to a minecraft string
+ * 
+ * @param current your current minecraft text
+ * @param c the content
+ * @param includeInteractivity if it should have interactive events or not
+ */
+function newApplyTypeSpecificValues(
+	current: MinecraftText,
+	c: JSONContent,
+	includeInteractivity = true,
+) {
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
+			break;
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
+			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+	if (includeInteractivity) {
+		if (isMarkType(c, "clickEvent")) {
+			const ce = isMarkType(c, "clickEvent")?.attrs;
+			current.click_event = { action: ce!.action };
+			switch (ce!.action) {
+				case "open_url":
+					current.click_event.url = ce!.value;
+					break;
+				case "run_command":
+				case "suggest_command":
+					current.click_event.command = ce!.value;
+					break;
+				case "copy_to_clipboard":
+					current.click_event.value = ce!.value;
+					break;
+				case "change_page":
+					current.click_event.page = ce!.value;
+					break;
+				case "open_dialog":
+					current.click_event.dialog = ce!.value;
+					break;
+			}
+		}
+
+		if (isMarkType(c, "hoverEvent")) {
+			const ce = isMarkType(c, "hoverEvent")?.attrs;
+			current.hover_event = { action: ce!.action, value: ce!.value };
+		}
+	}
+}
+
+/**
+ * Applies all of the properties to an (old) minecraft string
+ * 
+ * @param current your current (old) minecraft text
+ * @param c the content
+ * @param includeInteractivity if it should have interactive events or not
+ */
+function oldApplyTypeSpecificValues(
+	current: OldMinecraftText,
+	c: JSONContent,
+	includeInteractivity = true,
+) {
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
+			break;
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
+			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+	if (includeInteractivity) {
+		if (isMarkType(c, "clickEvent")) {
+			const ce = isMarkType(c, "clickEvent")?.attrs;
+			current.clickEvent = { action: ce!.action, value: ce!.value };
+		}
+
+		if (isMarkType(c, "hoverEvent")) {
+			const ce = isMarkType(c, "hoverEvent")?.attrs;
+			current.hoverEvent = { action: ce!.action, contents: ce!.value };
+		}
+	}
+}
+
+/**
+ * Applies a gradient to a selection in an editor
+ * 
+ * @param editor the editor you want to apply it to
+ * @param gradientColors the colors you want to use
+ * @returns 
+ */
 export function applyGradient(editor: Editor, gradientColors: string[]) {
 	const { from, to } = editor.state.selection;
 	if (from === to) return;
@@ -304,20 +291,262 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 	const gradientArray = generateGradient(gradientColors, total);
 
+	let chain = editor.chain();
+
 	// Remove color from selection first
-	editor.chain().focus().setTextSelection({ from, to }).unsetColor().run();
+	chain.focus().setTextSelection({ from, to }).unsetColor();
 
 	let charIndex = 0;
 	for (const { pos, len } of textPositions) {
 		for (let i = 0; i < len; i++) {
 			const color = gradientArray[charIndex];
-			editor
-				.chain()
+			chain
 				.setTextSelection({ from: pos + i, to: pos + i + 1 })
-				.setColor(color)
-				.run();
+				.setColor(color);
 			charIndex++;
 		}
 	}
-	editor.chain().focus().setTextSelection({ from, to }).run();
+	chain.focus().setTextSelection({ from, to });
+
+	chain.run();
+}
+
+/**
+ * Optimises the final outputted component string to reduce characters
+ * 
+ * @param arr An array of strings or text components
+ * @returns 
+ */
+export function optimise(arr: StringyMCText[]): StringyMCText[] {
+	let out: StringyMCText[] = [];
+
+	// 1: Remove undefineds, flatten MinecraftText with only text
+	for (const comp of arr) {
+		if (typeof comp === "string") {
+			out.push(comp);
+			continue;
+		}
+		if ("text" in comp) {
+			Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
+		}
+		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
+	}
+
+	// 2: Merge adjacent strings and whitespace, group objects with shared style
+	for (let i = 0; i < out.length - 1; i++) {
+		const curr = out[i], next = out[i + 1];
+
+		// Merge whitespace to prev component
+		if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
+			curr.text += next;
+			out.splice(i + 1, 1); i--;
+			continue;
+		}
+		// Merge consecutive strings
+		if (typeof curr === "string" && typeof next === "string") {
+			out[i] = curr + next;
+			out.splice(i + 1, 1); i--;
+			continue;
+		}
+
+		// Find shared style/interactivity properties between consecutive objects
+		if (
+			typeof curr === "object" &&
+			typeof next === "object"
+		) {
+			const shared: Record<string, any> = {};
+			for (const prop of styleProps) {
+				const p = prop as MCTextKey
+				if (
+					curr[p] !== undefined &&
+					next[p] !== undefined &&
+					curr[p] === next[p]
+				) {
+					shared[prop] = curr[p];
+				}
+			}
+			// Merge all properties in styleProps that are identical across the group
+			const allProps = [...styleProps];
+			const sharedAll: Record<string, any> = {};
+			for (const prop of allProps) {
+				const p = prop as MCTextKey
+				if (
+					curr[p] !== undefined &&
+					next[p] !== undefined &&
+					(
+						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+							? JSON.stringify(curr[p]) === JSON.stringify(next[p])
+							: curr[p] === next[p]
+					)
+				) {
+					sharedAll[p] = curr[p];
+				}
+			}
+			if (Object.keys(sharedAll).length > 0) {
+				// Find how many consecutive objects share these properties
+				let j = i;
+				let group = [curr];
+
+				while (
+					j + 1 < out.length &&
+					typeof out[j + 1] === "object" &&
+					Object.keys(sharedAll).every(
+						(prop) =>
+							out[j + 1][prop as keyof StringyMCText] !== undefined &&
+							(
+								prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
+									JSON.stringify(sharedAll[prop])
+								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
+					)
+				) {
+					group.push(out[j + 1] as MinecraftText);
+					j++;
+				}
+				if (group.length > 1) {
+					// Remove shared properties from each group member for "extra"
+					const extras = group.map(comp => {
+						const c = { ...comp };
+						for (const prop of Object.keys(sharedAll)) {
+							delete c[prop as MCTextKey];
+						}
+						return c;
+					});
+					// Create merged component
+					const merged = { ...sharedAll, extra: extras };
+					out.splice(i, group.length, merged);
+					i--; // recheck at this position
+					continue;
+				}
+			}
+		}
+	}
+
+	// 3: Remove leading empty string if followed by a string
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
+
+	return out;
+}
+
+/**
+ * Converts the JSON content of the editor to an NBT string.
+ */
+export function convert(
+	jsonContent: JSONContent,
+	exportType: string = "standard",
+	exportVersion: "new" | "old" = "new",
+): string {
+	let out = translate(jsonContent, exportType, false, 0, exportVersion)
+	if (exportVersion == "new") { // only remove strings 
+		out = out.replace(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			(match) => match.replace(/"/g, ""),
+		);
+	}
+	return out;
+}
+
+/**
+ * Converts the JSON content of the editor to a Minecraft JSON string.
+ */
+export function translate(
+	json: JSONContent,
+	exportType: string = "standard",
+	indent: boolean,
+	indentSize: number,
+	exportVersion: "new" | "old" = "new",
+): string {
+	const paragraphs = json.content ?? [];
+
+	if (exportType === "standard") {
+		let data: StringyMCText[] = [];
+
+		for (const [i, p] of paragraphs.entries()) {
+			const content = p.content ?? [];
+			for (const c of content) {
+				let current: MinecraftText = {
+					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+					bold: trueMarkOrUndefined(c, "bold"),
+					italic: trueMarkOrUndefined(c, "italic"),
+					strikethrough: trueMarkOrUndefined(c, "strike"),
+					underlined: trueMarkOrUndefined(c, "underline"),
+					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+				};
+
+				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
+				if (shadowColorMark) {
+					current.shadow_color = parseInt(
+						shadowColorMark.attrs?.shadowColor.replace(/^#/, ""),
+						16,
+					);
+				}
+
+				current = addTypeSpecificValues(current, c, true, exportVersion);
+				data.push(current);
+			}
+			if (i < paragraphs.length - 1) data.push("\n");
+		}
+
+		if (data.length === 0) {
+			return Math.random() < 0.002
+				? "🤓 <- james is waiting for you to type something"
+				: "waiting for input...";
+		}
+
+		data = optimise(data);
+
+		if (data.length === 1) {
+			return indent
+				? JSON.stringify(data[0], null, indentSize)
+				: JSON.stringify(data[0]);
+		}
+
+		return indent
+			? JSON.stringify(data, null, indentSize)
+			: JSON.stringify(data);
+
+	} else if (exportType === "item_lore") {
+		let data: (StringyMCText[] | StringyMCText)[] = [];
+
+		for (const p of paragraphs) {
+			const content = p.content ?? [];
+			let currentLine: StringyMCText[] = [];
+
+			for (const [i, c] of content.entries()) {
+				let currentComponent: MinecraftText = {
+					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+					bold: trueMarkOrUndefined(c, "bold"),
+					italic: trueMarkOrUndefined(c, "italic"),
+					strikethrough: trueMarkOrUndefined(c, "strike"),
+					underlined: trueMarkOrUndefined(c, "underline"),
+					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+				};
+
+				// For lore: default is purple and italic, so override if needed
+				if (i === 0) {
+					if (currentComponent.color || currentComponent.italic) {
+						currentLine.push({ italic: false, color: "white" });
+					} else {
+						currentComponent.color ??= "white";
+						currentComponent.italic ??= false;
+					}
+				}
+
+				currentComponent = addTypeSpecificValues(currentComponent, c, false);
+				currentLine.push(currentComponent);
+			}
+
+			data.push(currentLine.length === 2 ? currentLine[1] : currentLine);
+		}
+
+		if (Array.isArray(data)) {
+			data = data.map((d) => Array.isArray(d) ? optimise(d) : d);
+		}
+
+		return indent
+			? JSON.stringify(data, null, indentSize)
+			: JSON.stringify(data);
+	}
+
+	return "[]";
 }

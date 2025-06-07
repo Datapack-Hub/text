@@ -5,6 +5,11 @@
 	border-color: transparent;
 }
 
+@theme {
+	--font-lexend: Lexend, sans-serif;
+	--font-minecraft: Minecraft, sans-serif;
+}
+
 strong {
 	font-family: MinecraftBold;
 	font-weight: 100;
@@ -12,10 +17,6 @@ strong {
 
 button {
 	cursor: pointer;
-}
-
-.mc {
-	font-family: Minecraft;
 }
 
 .tiptap {
@@ -38,12 +39,14 @@ button {
 	border-bottom: solid #ff5555 2px;
 	padding-top: 4px;
 	padding-bottom: 2px;
+	z-index: 10;
 }
 
 .hoverEvent {
 	background-color: #3c3c40;
 	border-bottom: solid #ffff55 2px;
 	padding-top: 4px;
+	z-index: 10;
 }
 
 .obfuscated {
@@ -56,4 +59,8 @@ button {
 
 .nomob {
 	@apply hidden md:inline;
+}
+
+.toolbar-btn {
+	@apply p-1 text-lg hover:bg-white/3 rounded-md font-medium;
 }

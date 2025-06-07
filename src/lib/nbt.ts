@@ -1,9 +1,9 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorNameToHexCode, type MinecraftText } from "./tiptap/text";
+import { defaultColorReverseLUT } from "./tiptap/text";
+import { type MinecraftText, type OldMinecraftText } from "./types";
+import { type StringyMCText } from "./types";
 
-type TextOrEmpty = string | MinecraftText;
-
-export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
+export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
 	let parsed: MinecraftText[] | MinecraftText | string;
@@ -19,10 +19,82 @@ export function convertToTextOrEmpty(raw: string): TextOrEmpty[] {
 		return [parsed as MinecraftText];
 	}
 
-	return parsed as TextOrEmpty[];
+	return parsed as StringyMCText[];
 }
 
-export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
+function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
+	if (typeof text === "string") {
+		if (text === "") {
+			return;
+		}
+
+		baseDocument.content?.push({
+			type: "paragraph",
+			content: [
+				{
+					type: "text",
+					text: text,
+				},
+			],
+		});
+		baseDocument = baseDocument;
+		return;
+	}
+
+	// Extra property
+	if (text.extra) {
+		text.extra!.forEach((txt) => {
+			if(typeof(txt) == "object") {
+				Object.assign(txt, {
+					bold: txt.bold ?? text.bold,
+					italic: txt.italic ?? text.italic,
+					underlined: txt.underlined ?? text.underlined,
+					obfuscated: txt.obfuscated ?? text.obfuscated,
+					strikethrough: txt.strikethrough ?? text.strikethrough,
+					color: txt.color ?? text.color ,
+					shadow_color: txt.shadow_color ?? text.shadow_color,
+					click_event: txt.click_event ?? text.click_event,
+					clickEvent: txt.clickEvent ?? text.clickEvent,
+					hover_event: txt.hover_event ?? text.hover_event,
+					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+				});
+				processTextComponent(txt, baseDocument);
+			} else {
+				let newComponent = {
+					text: txt
+				}
+				Object.assign(newComponent, {
+					bold: text.bold,
+					italic: text.italic,
+					underlined: text.underlined,
+					obfuscated: text.obfuscated,
+					strikethrough: text.strikethrough,
+					color: text.color ,
+					shadow_color: text.shadow_color,
+					click_event: text.click_event,
+					clickEvent: text.clickEvent,
+					hover_event: text.hover_event,
+					hoverEvent: text.hoverEvent,
+				});
+				processTextComponent(newComponent, baseDocument);
+			}
+		});
+	} else {
+		let finalText = mapPropertiesToType(text);
+		finalText = applyStyling(text, finalText);
+
+		let paragraphContent = baseDocument.content?.at(-1)?.content;
+
+		if (!paragraphContent) {
+			baseDocument.content!.at(-1)!.content = [];
+			paragraphContent = baseDocument.content!.at(-1)!.content;
+		}
+
+		paragraphContent!.push(finalText);
+	}
+}
+
+export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 	// requote keys
 
 	let baseDocument: JSONContent = {
@@ -36,28 +108,7 @@ export function snbtToDocument(raw: TextOrEmpty[]): JSONContent {
 	};
 
 	for (const text of raw) {
-		if (typeof text === "string") {
-			if (text === "") {
-				continue;
-			}
-
-			baseDocument.content?.push({
-				type: "paragraph",
-			});
-			continue;
-		}
-
-		let finalText = mapPropertiesToType(text);
-		finalText = applyStyling(text, finalText);
-
-		let paragraphContent = baseDocument.content?.at(-1)?.content;
-
-		if (!paragraphContent) {
-			baseDocument.content!.at(-1)!.content = [];
-			paragraphContent = baseDocument.content!.at(-1)!.content;
-		}
-
-		paragraphContent!.push(finalText);
+		processTextComponent(text, baseDocument);
 	}
 
 	baseDocument = fixBrokenNewLines(baseDocument);
@@ -137,7 +188,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 	return finalText;
 }
 
-function applyStyling(text: MinecraftText, finalText: JSONContent) {
+function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONContent) {
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}
@@ -146,7 +197,7 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 		finalText.marks?.push({
 			type: "textStyle",
 			attrs: {
-				color: colorNameToHexCode(text.color),
+				color: defaultColorReverseLUT(text.color),
 			},
 		});
 	}
@@ -222,8 +273,7 @@ function applyStyling(text: MinecraftText, finalText: JSONContent) {
 	if (text.clickEvent) {
 		const cE = text.clickEvent;
 
-
-		const actionSource = cE.value
+		const actionSource = cE.value;
 
 		finalText.marks?.push({
 			type: "clickEvent",

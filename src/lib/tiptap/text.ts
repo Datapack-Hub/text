@@ -388,24 +388,55 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 			out.splice(i + 1, 1); i--;
 			continue;
 		}
-		// Group objects with shared style
-		if (typeof curr !== "object" || !curr) continue;
-		let shared: string[] = [], count = 1, j = i + 1;
-		while (j < out.length && typeof out[j] === "object" && out[j]) {
-			const n = out[j] as MinecraftText;
-			const s = styleProps.filter(p => curr[p] !== undefined && JSON.stringify(curr[p]) === JSON.stringify(n[p]));
-			if (s.length) { shared = s; count++; j++; } else break;
-		}
-		if (count > 1 && shared.length) {
-			const base: MinecraftText = {};
-			shared.forEach(p => base[p] = (out[i] as MinecraftText)[p]);
-			base.extra = [];
-			for (let k = i; k < i + count; k++) {
-				const c = { ...(out[k] as MinecraftText) };
-				shared.forEach(p => delete c[p]);
-				base.extra.push(c);
+
+		// Find shared style/interactivity properties between consecutive objects
+		if (
+			typeof curr === "object" &&
+			typeof next === "object"
+		) {
+			const shared: Record<string, any> = {};
+			for (const prop of styleProps) {
+				if (
+					curr[prop] !== undefined &&
+					next[prop] !== undefined &&
+					curr[prop] === next[prop]
+				) {
+					shared[prop] = curr[prop];
+				}
 			}
-			out.splice(i, count, base);
+			// Only merge if at least one shared style/interactivity property exists
+			if (Object.keys(shared).length > 0) {
+				// Find how many consecutive objects share these properties
+				let j = i;
+				let group = [curr];
+				while (
+					j + 1 < out.length &&
+					typeof out[j + 1] === "object" &&
+					Object.keys(shared).every(
+						prop =>
+							out[j + 1][prop] !== undefined &&
+							out[j + 1][prop] === shared[prop]
+					)
+				) {
+					group.push(out[j + 1]);
+					j++;
+				}
+				if (group.length > 1) {
+					// Remove shared properties from each group member for "extra"
+					const extras = group.map(comp => {
+						const c = { ...comp };
+						for (const prop of Object.keys(shared)) {
+							delete c[prop];
+						}
+						return c;
+					});
+					// Create merged component
+					const merged = { ...shared, extra: extras };
+					out.splice(i, group.length, merged);
+					i--; // recheck at this position
+					continue;
+				}
+			}
 		}
 	}
 

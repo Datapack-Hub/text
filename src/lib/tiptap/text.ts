@@ -339,22 +339,24 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 	const gradientArray = generateGradient(gradientColors, total);
 
+	let chain = editor.chain()
+
 	// Remove color from selection first
-	editor.chain().focus().setTextSelection({ from, to }).unsetColor().run();
+	chain.focus().setTextSelection({ from, to }).unsetColor();
 
 	let charIndex = 0;
 	for (const { pos, len } of textPositions) {
 		for (let i = 0; i < len; i++) {
 			const color = gradientArray[charIndex];
-			editor
-				.chain()
+			chain
 				.setTextSelection({ from: pos + i, to: pos + i + 1 })
-				.setColor(color)
-				.run();
+				.setColor(color);
 			charIndex++;
 		}
 	}
-	editor.chain().focus().setTextSelection({ from, to }).run();
+	chain.focus().setTextSelection({ from, to });
+
+	chain.run()
 }
 
 export function optimise(arr: StringyMCText[]): StringyMCText[] {

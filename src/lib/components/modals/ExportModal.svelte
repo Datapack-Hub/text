@@ -2,6 +2,7 @@
 	import Modal from "$lib/Modal.svelte";
 	import IconCopy from "~icons/tabler/copy";
 	import IconTick from "~icons/tabler/check";
+	import { translate, translateToNBT } from "$lib/tiptap/text";
 	let {
 		outputDialog = $bindable(),
 		outputVersion = $bindable(),
@@ -9,8 +10,6 @@
 		recentlyCopied,
 		indent,
 		indentSize,
-		translate,
-		translateToNBT,
 	} = $props();
 </script>
 

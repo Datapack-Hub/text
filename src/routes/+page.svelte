@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { dev } from "$app/environment";
 	import {
-		addTypeSpecificValues,
 		colorMap,
-		defaultColorLUT,
-		optimise,
-		trueMarkOrUndefined,
-		type MinecraftText,
-		type StringyMCText,
+		translate,
+		translateToNBT
 	} from "$lib/tiptap/text";
 
 	import {
@@ -32,35 +28,34 @@
 
 	import tippy from "tippy.js";
 	import "tippy.js/dist/tippy.css";
-	// optional
+// optional
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
-	import { Editor, type JSONContent } from "@tiptap/core";
+	import { Editor } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-	// Icons
+// Icons
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
 	import IconClickEvent from "~icons/tabler/hand-finger";
+	import IconKeybinds from "~icons/tabler/keyboard";
 	import IconColor from "~icons/tabler/palette";
 	import IconEdit from "~icons/tabler/pencil";
 	import IconCustom from "~icons/tabler/plus";
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconKeybinds from "~icons/tabler/keyboard";
 
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
 	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
 	import ExportModal from "$lib/components/modals/ExportModal.svelte";
-	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
-	import Key from "$lib/components/Key.svelte";
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
+	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -186,161 +181,6 @@
 			/\w\S*/g,
 			(text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
 		);
-	}
-
-	function translateToNBT(
-		jsonContent: JSONContent,
-		exportType: string = "standard",
-		exportVersion: "new" | "old" = "new",
-	): string {
-		if (exportVersion == "new") {
-			// nbt doesnt need indenting
-			return translate(jsonContent, exportType, false, indentSize).replace(
-				/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-				(match) => match.replace(/"/g, ""),
-			);
-		} else {
-			return translate(
-				jsonContent,
-				exportType,
-				false,
-				indentSize,
-				"old",
-			).replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) =>
-				match.replace(/"/g, ""),
-			);
-		}
-	}
-
-	function translate(
-		json: JSONContent,
-		exportType: string = "standard",
-		indent: boolean,
-		indentSize: number,
-		exportVersion: "new" | "old" = "new",
-	): string {
-		const paragraphs = json.content!;
-
-		if (exportType == "standard") {
-			let data: StringyMCText[] = [""];
-
-			paragraphs.forEach((p, i) => {
-				const content = p.content || [];
-				let current: MinecraftText;
-
-				content.forEach((c) => {
-					current = {
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-					};
-
-					const shadowColorMark = c.marks?.find(
-						(m) => m.type === "shadowColor",
-					);
-					if (shadowColorMark) {
-						current.shadow_color = parseInt(
-							shadowColorMark.attrs?.shadowColor.replace(/^#/, ""),
-							16,
-						);
-					}
-
-					current = addTypeSpecificValues(current, c, true, exportVersion);
-
-					data.push(current);
-				});
-
-				if (i < paragraphs.length - 1) {
-					data.push("\n");
-				}
-			});
-
-			if (data.length === 1 && data[0] === "") {
-				if (Math.random() < 0.002) {
-					return "🤓 <- james is waiting for you to type something";
-				}
-				return "waiting for input...";
-			}
-
-			if (data.length == 2) {
-				return indent
-					? JSON.stringify(data[1], null, indentSize)
-					: JSON.stringify(data[1]);
-			}
-
-			data = optimise(data);
-
-			return indent
-				? JSON.stringify(data[1], null, indentSize)
-				: JSON.stringify(data[1]);
-		} else if (exportType == "item_lore") {
-			let data: (StringyMCText[] | StringyMCText)[] = [];
-
-			paragraphs.forEach((p) => {
-				const content = p.content || [];
-				let currentLine: StringyMCText[] = [];
-				let currentComponent: MinecraftText;
-
-				content.forEach((c, i) => {
-					currentComponent = {
-						color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-						bold: trueMarkOrUndefined(c, "bold"),
-						italic: trueMarkOrUndefined(c, "italic"),
-						strikethrough: trueMarkOrUndefined(c, "strike"),
-						underlined: trueMarkOrUndefined(c, "underline"),
-						obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-					};
-
-					// For lore: default behaviour is to be purple and italic
-					// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
-					// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
-					if (i === 0) {
-						if (currentComponent.color || currentComponent.italic) {
-							currentLine.push({
-								italic: false,
-								color: "white",
-							});
-						} else {
-							if (!currentComponent.color) {
-								currentComponent.color = "white";
-							}
-
-							if (!currentComponent.italic) {
-								currentComponent.italic = false;
-							}
-						}
-					}
-
-					currentComponent = addTypeSpecificValues(currentComponent, c, false);
-					currentLine.push(currentComponent);
-				});
-
-				if (currentLine.length == 2) {
-					data.push(currentLine[1]);
-				} else {
-					data.push(currentLine);
-				}
-			});
-
-			if (Array.isArray(data)) {
-				data = data.map((d) => {
-					if (Array.isArray(d)) {
-						return optimise(d);
-					} else {
-						return d;
-					}
-				});
-			}
-
-			return indent
-				? JSON.stringify(data, null, indentSize)
-				: JSON.stringify(data);
-		} else {
-			return "[]";
-		}
 	}
 
 	function customColorHandler() {
@@ -657,42 +497,46 @@
 					: "Loading..."}</code>
 			<br />
 		{/if}
-		<div class="flex items-start bg-zinc-950 p-3 space-x-3">
-			{#if doesContentExist}
-				<button
-					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
-					onclick={() => {
-						navigator.clipboard.writeText(
-							translateToNBT(editor.getJSON(), "standard", outputVersion),
-						);
-						recentlyCopied = true;
-						setTimeout(() => (recentlyCopied = false), 2000);
-					}}
-					use:tippy={{ content: "Copy" }}>
-					{#if recentlyCopied}
-						<IconTick />
-					{:else}
-						<IconCopy />
-					{/if}</button>
-			{/if}
-			<p>
-				<code class="inline w-full overflow-auto max-h-56"
-					>{editor
-						? translateToNBT(editor.getJSON(), "standard", outputVersion)
-						: "Loading..."}
-				</code>
-				<button
-					class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-					use:tippy={{ content: "Click to toggle", placement: "top" }}
-					onclick={() => {
-						const ov = outputVersion;
-						if (ov == "new") {
-							outputVersion = "old";
-						} else {
-							outputVersion = "new";
-						}
-					}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
-			</p>
+		<div class="bg-zinc-950 p-3">
+			<div class="flex items-start gap-3">
+				{#if doesContentExist}
+					<button
+						class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+						onclick={() => {
+							navigator.clipboard.writeText(
+								translateToNBT(editor.getJSON(), "standard", outputVersion),
+							);
+							recentlyCopied = true;
+							setTimeout(() => (recentlyCopied = false), 2000);
+						}}
+						use:tippy={{ content: "Copy" }}>
+						{#if recentlyCopied}
+							<IconTick />
+						{:else}
+							<IconCopy />
+						{/if}</button>
+				{/if}
+				<p>
+					<code class="inline w-full overflow-auto max-h-56"
+						>{editor
+							? translateToNBT(editor.getJSON(), "standard", outputVersion)
+							: "Loading..."}
+					</code>
+					<button
+						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
+						use:tippy={{ content: "Click to toggle", placement: "top" }}
+						onclick={() => {
+							const ov = outputVersion;
+							if (ov == "new") {
+								outputVersion = "old";
+							} else {
+								outputVersion = "new";
+							}
+						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
+				</p>
+			</div>
+			<p class="font-lexend text-xs text-white/60 mt-3">{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
+			<p class="font-lexend text-xs text-white/60 mt-1">{editor ? JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion)).length : 0} components</p>
 		</div>
 	</div>
 </div>
@@ -780,9 +624,7 @@
 	{editor}
 	{indent}
 	{indentSize}
-	{recentlyCopied}
-	{translateToNBT}
-	{translate} />
+	{recentlyCopied} />
 
 <Modal title="Import from NBT" bind:this={importDialog} big key="I">
 	<div class="flex flex-col w-full space-y-2">
@@ -791,7 +633,7 @@
 			clear the current contents of the editor!
 		</p>
 		<input
-			class="flex items-start bg-zinc-950 p-3 rounded-lg mc"
+			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
 			placeholder="Paste NBT text components here"
 			bind:value={importText} />
 

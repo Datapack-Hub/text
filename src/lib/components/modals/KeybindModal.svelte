@@ -26,7 +26,7 @@
 	];
 </script>
 
-<Modal title="Keybinds" bind:this={keybindDialog} opened big key="K">
+<Modal title="Keybinds" bind:this={keybindDialog} big key="K">
 	<div class="grid grid-cols-2">
 		{#each keysAndActions as { keys, action }}
 			<div class="flex gap-2 items-center mb-2">

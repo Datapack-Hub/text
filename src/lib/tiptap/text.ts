@@ -438,3 +438,151 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 
 	return out;
 }
+
+export function translateToNBT(
+	jsonContent: JSONContent,
+	exportType: string = "standard",
+	exportVersion: "new" | "old" = "new",
+): string {
+	if (exportVersion == "new") {
+		// nbt doesnt need indenting
+		return translate(jsonContent, exportType, false, 0).replace(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			(match) => match.replace(/"/g, ""),
+		);
+	} else {
+		return translate(jsonContent, exportType, false, 0, "old").replace(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			(match) => match.replace(/"/g, ""),
+		);
+	}
+}
+
+export function translate(
+	json: JSONContent,
+	exportType: string = "standard",
+	indent: boolean,
+	indentSize: number,
+	exportVersion: "new" | "old" = "new",
+): string {
+	const paragraphs = json.content!;
+
+	if (exportType == "standard") {
+		let data: StringyMCText[] = [""];
+
+		paragraphs.forEach((p, i) => {
+			const content = p.content || [];
+			let current: MinecraftText;
+
+			content.forEach((c) => {
+				current = {
+					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+					bold: trueMarkOrUndefined(c, "bold"),
+					italic: trueMarkOrUndefined(c, "italic"),
+					strikethrough: trueMarkOrUndefined(c, "strike"),
+					underlined: trueMarkOrUndefined(c, "underline"),
+					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+				};
+
+				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
+				if (shadowColorMark) {
+					current.shadow_color = parseInt(
+						shadowColorMark.attrs?.shadowColor.replace(/^#/, ""),
+						16,
+					);
+				}
+
+				current = addTypeSpecificValues(current, c, true, exportVersion);
+
+				data.push(current);
+			});
+
+			if (i < paragraphs.length - 1) {
+				data.push("\n");
+			}
+		});
+
+		if (data.length === 1 && data[0] === "") {
+			if (Math.random() < 0.002) {
+				return "🤓 <- james is waiting for you to type something";
+			}
+			return "waiting for input...";
+		}
+
+		if (data.length == 2) {
+			return indent
+				? JSON.stringify(data[1], null, indentSize)
+				: JSON.stringify(data[1]);
+		}
+
+		data = optimise(data);
+
+		return indent
+			? JSON.stringify(data, null, indentSize)
+			: JSON.stringify(data);
+	} else if (exportType == "item_lore") {
+		let data: (StringyMCText[] | StringyMCText)[] = [];
+
+		paragraphs.forEach((p) => {
+			const content = p.content || [];
+			let currentLine: StringyMCText[] = [];
+			let currentComponent: MinecraftText;
+
+			content.forEach((c, i) => {
+				currentComponent = {
+					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+					bold: trueMarkOrUndefined(c, "bold"),
+					italic: trueMarkOrUndefined(c, "italic"),
+					strikethrough: trueMarkOrUndefined(c, "strike"),
+					underlined: trueMarkOrUndefined(c, "underline"),
+					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+				};
+
+				// For lore: default behaviour is to be purple and italic
+				// If the first element in the line has colour or italic on, then create an element before it to override the default of the rest of the array
+				// If the first element of the array doesn't have colour/italic, then set it to white/false, to override the default of the rest of the array
+				if (i === 0) {
+					if (currentComponent.color || currentComponent.italic) {
+						currentLine.push({
+							italic: false,
+							color: "white",
+						});
+					} else {
+						if (!currentComponent.color) {
+							currentComponent.color = "white";
+						}
+
+						if (!currentComponent.italic) {
+							currentComponent.italic = false;
+						}
+					}
+				}
+
+				currentComponent = addTypeSpecificValues(currentComponent, c, false);
+				currentLine.push(currentComponent);
+			});
+
+			if (currentLine.length == 2) {
+				data.push(currentLine[1]);
+			} else {
+				data.push(currentLine);
+			}
+		});
+
+		if (Array.isArray(data)) {
+			data = data.map((d) => {
+				if (Array.isArray(d)) {
+					return optimise(d);
+				} else {
+					return d;
+				}
+			});
+		}
+
+		return indent
+			? JSON.stringify(data, null, indentSize)
+			: JSON.stringify(data);
+	} else {
+		return "[]";
+	}
+}

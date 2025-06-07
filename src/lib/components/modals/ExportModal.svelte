@@ -2,7 +2,7 @@
 	import Modal from "$lib/Modal.svelte";
 	import IconCopy from "~icons/tabler/copy";
 	import IconTick from "~icons/tabler/check";
-	import { translate, translateToNBT } from "$lib/tiptap/text";
+	import { translate, convert } from "$lib/tiptap/text";
 	let {
 		outputDialog = $bindable(),
 		outputVersion = $bindable(),
@@ -27,7 +27,7 @@
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"/tellraw @s " +
-							translateToNBT(editor.getJSON(), "standard", outputVersion),
+							convert(editor.getJSON(), "standard", outputVersion),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -36,7 +36,7 @@
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>/tellraw @s {editor
-					? translateToNBT(editor.getJSON(), "standard", outputVersion)
+					? convert(editor.getJSON(), "standard", outputVersion)
 					: "Loading..."}
 			</code>
 		</div>
@@ -47,7 +47,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${translateToNBT(editor.getJSON(), "item_lore", outputVersion)}]`,
+						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -57,7 +57,7 @@
 			{#if outputVersion == "new"}
 				<code class="inline-block w-full overflow-auto max-h-56"
 					>[lore={editor
-						? translateToNBT(editor.getJSON(), "item_lore", outputVersion)
+						? convert(editor.getJSON(), "item_lore", outputVersion)
 						: "Loading..."}]
 				</code>
 			{:else}

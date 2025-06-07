@@ -429,21 +429,25 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 /**
  * Converts the JSON content of the editor to an NBT string.
  */
-export function translateToNBT(
+export function convert(
 	jsonContent: JSONContent,
 	exportType: string = "standard",
 	exportVersion: "new" | "old" = "new",
 ): string {
-	return translate(jsonContent, exportType, false, 0, exportVersion).replace(
-		/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-		(match) => match.replace(/"/g, ""),
-	);
+	let out = translate(jsonContent, exportType, false, 0, exportVersion)
+	if (exportVersion == "new") { // only remove strings 
+		out = out.replace(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			(match) => match.replace(/"/g, ""),
+		);
+	}
+	return out;
 }
 
 /**
  * Converts the JSON content of the editor to a Minecraft JSON string.
  */
-export function translate(
+function translate(
 	json: JSONContent,
 	exportType: string = "standard",
 	indent: boolean,

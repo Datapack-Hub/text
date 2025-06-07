@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { dev } from "$app/environment";
-	import { colorMap, translate, translateToNBT } from "$lib/tiptap/text";
+	import { colorMap, translate, convert } from "$lib/tiptap/text";
 
 	import {
 		BlockNBTNode,
@@ -509,7 +509,7 @@
 						class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 						onclick={() => {
 							navigator.clipboard.writeText(
-								translateToNBT(editor.getJSON(), "standard", outputVersion),
+								convert(editor.getJSON(), "standard", outputVersion),
 							);
 							recentlyCopied = true;
 							setTimeout(() => (recentlyCopied = false), 2000);
@@ -524,7 +524,7 @@
 				<p>
 					<code class="inline w-full overflow-auto max-h-56"
 						>{editor
-							? translateToNBT(editor.getJSON(), "standard", outputVersion)
+							? convert(editor.getJSON(), "standard", outputVersion)
 							: "Loading..."}
 					</code>
 					<button
@@ -541,7 +541,7 @@
 				</p>
 			</div>
 			<div class="flex items-center space-x-3 mt-2 select-none">
-				<p class="font-lexend text-xs text-white/60">{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
+				<p class="font-lexend text-xs text-white/60">{editor ? convert(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
 				{#if doesContentExist}
 					<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
 				{/if}

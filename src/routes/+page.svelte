@@ -45,6 +45,8 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
+	import IconUndo from "~icons/tabler/arrow-back-up";
+	import IconRedo from "~icons/tabler/arrow-forward-up";
 
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
@@ -476,6 +478,23 @@
 					<IconEdit />
 				</button>
 			{/if}
+
+			<button
+				class="ml-2 toolbar-btn"
+				onclick={() => editor.chain().undo().run()}
+				use:tippy={{
+					content: "Undo",
+					placement: "bottom",
+				}}
+				aria-label="Undo"><IconUndo /></button>
+			<button
+				class="toolbar-btn"
+				onclick={() => editor.chain().undo().run()}
+				use:tippy={{
+					content: "Redo",
+					placement: "bottom",
+				}}
+				aria-label="Redo"><IconRedo /></button>
 
 			<div class="flex-grow"></div>
 

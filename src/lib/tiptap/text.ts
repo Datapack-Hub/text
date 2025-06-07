@@ -404,18 +404,37 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 					shared[prop] = curr[prop];
 				}
 			}
-			// Only merge if at least one shared style/interactivity property exists
-			if (Object.keys(shared).length > 0) {
+			// Merge all properties in styleProps that are identical across the group
+			const allProps = [...styleProps];
+			const sharedAll: Record<string, any> = {};
+			for (const prop of allProps) {
+				if (
+					curr[prop] !== undefined &&
+					next[prop] !== undefined &&
+					(
+						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+							? JSON.stringify(curr[prop]) === JSON.stringify(next[prop])
+							: curr[prop] === next[prop]
+					)
+				) {
+					sharedAll[prop] = curr[prop];
+				}
+			}
+			if (Object.keys(sharedAll).length > 0) {
 				// Find how many consecutive objects share these properties
 				let j = i;
 				let group = [curr];
 				while (
 					j + 1 < out.length &&
 					typeof out[j + 1] === "object" &&
-					Object.keys(shared).every(
+					Object.keys(sharedAll).every(
 						prop =>
 							out[j + 1][prop] !== undefined &&
-							out[j + 1][prop] === shared[prop]
+							(
+								prop === "hover_event"
+									? JSON.stringify(out[j + 1][prop]) === JSON.stringify(sharedAll[prop])
+									: out[j + 1][prop] === sharedAll[prop]
+							)
 					)
 				) {
 					group.push(out[j + 1]);
@@ -425,13 +444,13 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 					// Remove shared properties from each group member for "extra"
 					const extras = group.map(comp => {
 						const c = { ...comp };
-						for (const prop of Object.keys(shared)) {
+						for (const prop of Object.keys(sharedAll)) {
 							delete c[prop];
 						}
 						return c;
 					});
 					// Create merged component
-					const merged = { ...shared, extra: extras };
+					const merged = { ...sharedAll, extra: extras };
 					out.splice(i, group.length, merged);
 					i--; // recheck at this position
 					continue;

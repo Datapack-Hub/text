@@ -391,7 +391,8 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 					Object.keys(sharedAll).every(
 						(prop) =>
 							out[j + 1][prop as keyof StringyMCText] !== undefined &&
-							(prop === "hover_event"
+							(
+								prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
 								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
 									JSON.stringify(sharedAll[prop])
 								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),

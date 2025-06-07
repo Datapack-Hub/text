@@ -326,7 +326,9 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 			out.push(comp);
 			continue;
 		}
-		Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
+		if ("text" in comp) {
+			Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
+		}
 		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
 	}
 

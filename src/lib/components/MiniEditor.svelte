@@ -1,9 +1,6 @@
 <script lang="ts">
-	import {
-		addTypeSpecificValues,
-		colorMap,
-		type MinecraftText,
-	} from "$lib/tiptap/text";
+	import { addTypeSpecificValues, colorMap } from "$lib/tiptap/text";
+	import { type MinecraftText } from "$lib/types";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";

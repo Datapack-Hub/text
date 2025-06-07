@@ -1,3 +1,9 @@
+import type {
+	MCTextKey,
+	MinecraftText,
+	OldMinecraftText,
+	StringyMCText,
+} from "$lib/types";
 import { Editor, type JSONContent } from "@tiptap/core";
 import { generateGradient } from "typescript-color-gradient";
 
@@ -20,114 +26,6 @@ export const colorMap = [
 	{ name: "black", value: "#000000" },
 ];
 
-export type BaseMinecraftText = Pick<
-	MinecraftText,
-	| "text"
-	| "color"
-	| "font"
-	| "bold"
-	| "italic"
-	| "underlined"
-	| "strikethrough"
-	| "obfuscated"
->;
-
-export type StringyMCText = string | MinecraftText;
-
-// Note: this also includes old fields. I hate the way this is designed but it works.
-export type MinecraftText = {
-	translate?: string;
-	with?: string[];
-	fallback?: string;
-
-	text?: string;
-
-	score?: {
-		name: string;
-		objective: string;
-	};
-
-	nbt?: string;
-	interpret?: string;
-	storage?: string;
-	block?: string;
-	entity?: string;
-
-	keybind?: string;
-
-	selector?: string;
-
-	color?: string;
-	shadow_color?: number | number[];
-	font?: string;
-	bold?: boolean;
-	italic?: boolean;
-	underlined?: boolean;
-	strikethrough?: boolean;
-	obfuscated?: boolean;
-	click_event?: {
-		action: string;
-		url?: string;
-		command?: string;
-		value?: string;
-		page?: string;
-		dialog?: string;
-	};
-	hover_event?: {
-		action: string;
-
-		value?: BaseMinecraftText | BaseMinecraftText[];
-
-		id?: string;
-		count?: number;
-		components?: {}[];
-
-		name?: BaseMinecraftText | BaseMinecraftText[];
-		uuid?: string | number[];
-	};
-
-	// Old ones
-	clickEvent?: {
-		action: string;
-		value: string;
-	};
-
-	hoverEvent?: {
-		action: string;
-		contents: any;
-	};
-
-	extra?: MinecraftText[];
-
-	[key: string]: any;
-};
-
-export type ExternalSources = {
-	score: {
-		objective: string;
-		name: string;
-	};
-	translate: {
-		key: string;
-		params: string[];
-		fallback?: string;
-	};
-	nbt: {
-		sourceType: string;
-		storage: string;
-		entity: string;
-		block: string;
-		path: string;
-		interpret: boolean;
-	};
-	keybind: {
-		key: string;
-	};
-	selector: {
-		selector: string;
-	};
-};
-
 const styleProps = [
 	"color",
 	"font",
@@ -142,6 +40,11 @@ const styleProps = [
 	"hoverEvent",
 ];
 
+/** 
+ * @param content the node to check
+ * @param mark the mark to check
+ * @returns the mark if true, undefined otherwise
+ */
 export function trueMarkOrUndefined(
 	content: JSONContent,
 	mark: string,
@@ -150,6 +53,12 @@ export function trueMarkOrUndefined(
 	return value === true ? value : undefined;
 }
 
+/**
+ * A color value LUT
+ * 
+ * @param color the hex code
+ * @returns the color name
+ */
 export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
@@ -157,6 +66,12 @@ export function defaultColorLUT(color: string): string | undefined {
 	return colorMap.find((e) => e.value === color)?.name || color;
 }
 
+/**
+ * A color name LUT
+ * 
+ * @param color the color name you want to find
+ * @returns the hex code for the color
+ */
 export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
@@ -164,10 +79,26 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 	return colorMap.find((e) => e.name === color)?.value || color;
 }
 
-export function getMarkType(c: JSONContent, type: string) {
+/**
+ * Checks the type of the mark against `type`
+ * 
+ * @param c the node you want to examine
+ * @param type type to check
+ * @returns true if it matches
+ */
+export function isMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
+/**
+ * Applies the specific properties for a type of source or provider
+ * 
+ * @param current current text component
+ * @param c the current editor JSON
+ * @param includeInteractivity should it have click and hover events
+ * @param exportVersion the version to export to
+ * @returns the current component with new properties
+ */
 export function addTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
@@ -186,6 +117,13 @@ export function addTypeSpecificValues(
 	return current;
 }
 
+/**
+ * Applies all of the properties to a minecraft string
+ * 
+ * @param current your current minecraft text
+ * @param c the content
+ * @param includeInteractivity if it should have interactive events or not
+ */
 function newApplyTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
@@ -227,8 +165,8 @@ function newApplyTypeSpecificValues(
 			break;
 	}
 	if (includeInteractivity) {
-		if (getMarkType(c, "clickEvent")) {
-			const ce = getMarkType(c, "clickEvent")?.attrs;
+		if (isMarkType(c, "clickEvent")) {
+			const ce = isMarkType(c, "clickEvent")?.attrs;
 			current.click_event = { action: ce!.action };
 			switch (ce!.action) {
 				case "open_url":
@@ -250,15 +188,22 @@ function newApplyTypeSpecificValues(
 			}
 		}
 
-		if (getMarkType(c, "hoverEvent")) {
-			const ce = getMarkType(c, "hoverEvent")?.attrs;
+		if (isMarkType(c, "hoverEvent")) {
+			const ce = isMarkType(c, "hoverEvent")?.attrs;
 			current.hover_event = { action: ce!.action, value: ce!.value };
 		}
 	}
 }
 
+/**
+ * Applies all of the properties to an (old) minecraft string
+ * 
+ * @param current your current (old) minecraft text
+ * @param c the content
+ * @param includeInteractivity if it should have interactive events or not
+ */
 function oldApplyTypeSpecificValues(
-	current: MinecraftText,
+	current: OldMinecraftText,
 	c: JSONContent,
 	includeInteractivity = true,
 ) {
@@ -298,18 +243,25 @@ function oldApplyTypeSpecificValues(
 			break;
 	}
 	if (includeInteractivity) {
-		if (getMarkType(c, "clickEvent")) {
-			const ce = getMarkType(c, "clickEvent")?.attrs;
+		if (isMarkType(c, "clickEvent")) {
+			const ce = isMarkType(c, "clickEvent")?.attrs;
 			current.clickEvent = { action: ce!.action, value: ce!.value };
 		}
 
-		if (getMarkType(c, "hoverEvent")) {
-			const ce = getMarkType(c, "hoverEvent")?.attrs;
+		if (isMarkType(c, "hoverEvent")) {
+			const ce = isMarkType(c, "hoverEvent")?.attrs;
 			current.hoverEvent = { action: ce!.action, contents: ce!.value };
 		}
 	}
 }
 
+/**
+ * Applies a gradient to a selection in an editor
+ * 
+ * @param editor the editor you want to apply it to
+ * @param gradientColors the colors you want to use
+ * @returns 
+ */
 export function applyGradient(editor: Editor, gradientColors: string[]) {
 	const { from, to } = editor.state.selection;
 	if (from === to) return;
@@ -339,7 +291,7 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 	const gradientArray = generateGradient(gradientColors, total);
 
-	let chain = editor.chain()
+	let chain = editor.chain();
 
 	// Remove color from selection first
 	chain.focus().setTextSelection({ from, to }).unsetColor();
@@ -356,9 +308,15 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 	}
 	chain.focus().setTextSelection({ from, to });
 
-	chain.run()
+	chain.run();
 }
 
+/**
+ * Optimises the final outputted component string to reduce characters
+ * 
+ * @param arr An array of strings or text components
+ * @returns 
+ */
 export function optimise(arr: StringyMCText[]): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
@@ -368,7 +326,7 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 			out.push(comp);
 			continue;
 		}
-		Object.keys(comp).forEach(k => comp[k] === undefined && delete comp[k]);
+		Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
 		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
 	}
 
@@ -396,48 +354,50 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 		) {
 			const shared: Record<string, any> = {};
 			for (const prop of styleProps) {
+				const p = prop as MCTextKey
 				if (
-					curr[prop] !== undefined &&
-					next[prop] !== undefined &&
-					curr[prop] === next[prop]
+					curr[p] !== undefined &&
+					next[p] !== undefined &&
+					curr[p] === next[p]
 				) {
-					shared[prop] = curr[prop];
+					shared[prop] = curr[p];
 				}
 			}
 			// Merge all properties in styleProps that are identical across the group
 			const allProps = [...styleProps];
 			const sharedAll: Record<string, any> = {};
 			for (const prop of allProps) {
+				const p = prop as MCTextKey
 				if (
-					curr[prop] !== undefined &&
-					next[prop] !== undefined &&
+					curr[p] !== undefined &&
+					next[p] !== undefined &&
 					(
 						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
-							? JSON.stringify(curr[prop]) === JSON.stringify(next[prop])
-							: curr[prop] === next[prop]
+							? JSON.stringify(curr[p]) === JSON.stringify(next[p])
+							: curr[p] === next[p]
 					)
 				) {
-					sharedAll[prop] = curr[prop];
+					sharedAll[p] = curr[p];
 				}
 			}
 			if (Object.keys(sharedAll).length > 0) {
 				// Find how many consecutive objects share these properties
 				let j = i;
 				let group = [curr];
+
 				while (
 					j + 1 < out.length &&
 					typeof out[j + 1] === "object" &&
 					Object.keys(sharedAll).every(
-						prop =>
-							out[j + 1][prop] !== undefined &&
-							(
-								prop === "hover_event"
-									? JSON.stringify(out[j + 1][prop]) === JSON.stringify(sharedAll[prop])
-									: out[j + 1][prop] === sharedAll[prop]
-							)
+						(prop) =>
+							out[j + 1][prop as keyof StringyMCText] !== undefined &&
+							(prop === "hover_event"
+								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
+									JSON.stringify(sharedAll[prop])
+								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
 					)
 				) {
-					group.push(out[j + 1]);
+					group.push(out[j + 1] as MinecraftText);
 					j++;
 				}
 				if (group.length > 1) {
@@ -445,7 +405,7 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 					const extras = group.map(comp => {
 						const c = { ...comp };
 						for (const prop of Object.keys(sharedAll)) {
-							delete c[prop];
+							delete c[prop as MCTextKey];
 						}
 						return c;
 					});

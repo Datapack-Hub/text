@@ -1,9 +1,7 @@
 import type { JSONContent } from "@tiptap/core";
-import {
-	defaultColorReverseLUT,
-	type MinecraftText,
-	type StringyMCText,
-} from "./tiptap/text";
+import { defaultColorReverseLUT } from "./tiptap/text";
+import { type MinecraftText, type OldMinecraftText } from "./types";
+import { type StringyMCText } from "./types";
 
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
@@ -50,17 +48,17 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 		console.log("oh noes!! this text component contains extwa pwopertie!! >:3");
 		text.extra!.forEach((txt) => {
 			Object.assign(txt, {
-				bold: txt.bold ?? text.bold,
-				italic: txt.italic ?? text.italic,
-				underlined: txt.underlined ?? text.underlined,
-				obfuscated: txt.obfuscated ?? text.obfuscated,
-				strikethrough: txt.strikethrough ?? text.strikethrough,
-				color: txt.color ?? text.color,
-				shadow_color: txt.shadow_color ?? text.shadow_color,
-				click_event: txt.click_event ?? text.click_event,
-				clickEvent: txt.clickEvent ?? text.clickEvent,
-				hover_event: txt.hover_event ?? text.hover_event,
-				hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+				bold: txt.bold,
+				italic: txt.italic,
+				underlined: txt.underlined,
+				obfuscated: txt.obfuscated,
+				strikethrough: txt.strikethrough,
+				color: txt.color ,
+				shadow_color: txt.shadow_color,
+				click_event: txt.click_event,
+				clickEvent: txt.clickEvent,
+				hover_event: txt.hover_event,
+				hoverEvent: txt.hoverEvent,
 			});
 			console.log("about to process text component", txt);
 			processTextComponent(txt, baseDocument);
@@ -174,7 +172,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 	return finalText;
 }
 
-function applyStyling(text: MinecraftText, finalText: JSONContent) {
+function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONContent) {
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}

@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { dev } from "$app/environment";
-	import {
-		colorMap,
-		translate,
-		translateToNBT
-	} from "$lib/tiptap/text";
+	import { colorMap, translate, translateToNBT } from "$lib/tiptap/text";
 
 	import {
 		BlockNBTNode,
@@ -28,7 +24,7 @@
 
 	import tippy from "tippy.js";
 	import "tippy.js/dist/tippy.css";
-// optional
+	// optional
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
 	import { Editor } from "@tiptap/core";
@@ -37,7 +33,7 @@
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-// Icons
+	// Icons
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
@@ -160,12 +156,12 @@
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
-			},
-			onUpdate: ({ editor }) => {
-				value = JSON.stringify(editor.getJSON());
 				editor.getText() === ""
 					? (doesContentExist = false)
 					: (doesContentExist = true);
+			},
+			onUpdate: ({ editor }) => {
+				value = JSON.stringify(editor.getJSON());
 				debounce(saveContent, 1000)();
 			},
 		});
@@ -301,6 +297,14 @@
 		if (event.ctrlKey && event.shiftKey && event.key === "X") {
 			editor.commands.unsetAllMarks();
 		}
+	}
+
+	function getTextComponentCount() {
+		const components = JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion))
+		if(Array.isArray(components)) {
+			return components.length
+		}
+		return 1
 	}
 </script>
 
@@ -538,7 +542,9 @@
 			</div>
 			<div class="flex items-center space-x-3 mt-2 select-none">
 				<p class="font-lexend text-xs text-white/60">{editor ? translateToNBT(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
-				<p class="font-lexend text-xs text-white/60">{editor ? JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion)).length : 0} components</p>
+				{#if doesContentExist}
+					<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
+				{/if}
 			</div>
 		</div>
 	</div>

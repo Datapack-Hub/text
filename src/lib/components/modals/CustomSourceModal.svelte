@@ -6,7 +6,7 @@
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
-	import type { ExternalSources } from "$lib/tiptap/text";
+	import type { ExternalSources } from "$lib/types";
 	import MiniEditor from "../MiniEditor.svelte";
 
 	let {

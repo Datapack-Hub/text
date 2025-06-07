@@ -101,6 +101,9 @@
 	let customType: string | undefined;
 	let customDialog: Modal;
 
+	let indentSize = 2;
+	let indent = false;
+
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor.commands.setContent(jsonContent);

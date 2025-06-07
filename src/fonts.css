@@ -9,7 +9,7 @@
 	font-display: swap;
 	font-family: MinecraftBold;
 	font-weight: 600;
-	src: url("/MinecraftBold.otf");
+	src: url("/MinecraftBold.woff2") format("woff2");
 }
 
 /* lexend-regular - latin */

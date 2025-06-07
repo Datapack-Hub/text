@@ -447,7 +447,7 @@ export function convert(
 /**
  * Converts the JSON content of the editor to a Minecraft JSON string.
  */
-function translate(
+export function translate(
 	json: JSONContent,
 	exportType: string = "standard",
 	indent: boolean,

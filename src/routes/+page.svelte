@@ -502,28 +502,25 @@
 					: "Loading..."}</code>
 			<br />
 		{/if}
-		<div class="bg-zinc-950 p-3">
-			<div class="flex items-start gap-3">
-				{#if doesContentExist}
-					<button
-						class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
-						onclick={() => {
-							navigator.clipboard.writeText(
-								convert(editor.getJSON(), "standard", outputVersion),
-							);
-							recentlyCopied = true;
-							setTimeout(() => (recentlyCopied = false), 2000);
-						}}
-						use:tippy={{ content: "Copy" }}>
-						{#if recentlyCopied}
-							<IconTick />
-						{:else}
-							<IconCopy />
-						{/if}</button>
-				{/if}
+		<div class="bg-zinc-950 p-3 max-h-56 overflow-auto">
+			<div class="flex max-w-screen items-start space-x-2">
+				<button
+					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+					onclick={() => {
+						navigator.clipboard.writeText(
+							convert(editor.getJSON(), "standard", outputVersion),
+						);
+						recentlyCopied = true;
+						setTimeout(() => (recentlyCopied = false), 2000);
+					}}
+					use:tippy={{ content: "Copy" }}>
+					{#if recentlyCopied}
+						<IconTick />
+					{:else}
+						<IconCopy />
+					{/if}</button>
 				<p>
-					<code class="inline w-full overflow-auto max-h-56"
-						>{editor
+					<code class="inline wrap-anywhere">{editor
 							? convert(editor.getJSON(), "standard", outputVersion)
 							: "Loading..."}
 					</code>
@@ -540,12 +537,12 @@
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 				</p>
 			</div>
+			{#if doesContentExist}
 			<div class="flex items-center space-x-3 mt-2 select-none">
 				<p class="font-lexend text-xs text-white/60">{editor ? convert(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
-				{#if doesContentExist}
-					<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
-				{/if}
+				<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
 			</div>
+			{/if}
 		</div>
 	</div>
 </div>

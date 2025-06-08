@@ -103,4 +103,4 @@ export type ExternalSources = {
 	};
 };
 
-export type MCTextKey = keyof MinecraftText;
+export type MCTextKey = keyof MinecraftText

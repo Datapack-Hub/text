@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { colorMap, convert, translate } from "$lib/tiptap/text";
+	import { dev } from "$app/environment";
+	import { colorMap, translate, convert } from "$lib/tiptap/text";
 
 	import {
 		BlockNBTNode,
@@ -33,8 +34,6 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 	// Icons
-	import IconUndo from "~icons/tabler/arrow-back-up";
-	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
@@ -46,15 +45,16 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconColors from "~icons/tabler/chevron-right";
+	import IconUndo from "~icons/tabler/arrow-back-up";
+	import IconRedo from "~icons/tabler/arrow-forward-up";
 
-	import { page } from "$app/stores";
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
 	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
 	import ExportModal from "$lib/components/modals/ExportModal.svelte";
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
+	import { page } from "$app/stores";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -68,7 +68,6 @@
 	let outputVersion: "new" | "old";
 
 	let doesContentExist: boolean = false;
-	let colorsVisible = false;
 
 	let indent = false;
 	let indentSize = 2;
@@ -303,19 +302,11 @@
 	}
 
 	function getTextComponentCount() {
-		const components = JSON.parse(
-			translate(
-				editor.getJSON(),
-				"standard",
-				indent,
-				indentSize,
-				outputVersion,
-			),
-		);
-		if (Array.isArray(components)) {
-			return components.length;
+		const components = JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion))
+		if(Array.isArray(components)) {
+			return components.length
 		}
-		return 1;
+		return 1
 	}
 </script>
 
@@ -344,7 +335,7 @@
 			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
 		<button
-			class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-3 select-none hidden md:block"
+			class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-3 select-none"
 			use:tippy={{ content: "Click to toggle", placement: "top" }}
 			onclick={() => {
 				const ov = outputVersion;
@@ -365,7 +356,7 @@
 			>Datapack Wiki</a>
 	</div>
 
-	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap gap-1">
+	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
 		{#if editor}
 			<button
 				onclick={() => {
@@ -377,11 +368,11 @@
 				<IconCustom />
 			</button>
 
-			<div class="h-4 w-px bg-white/50 mx-2"></div>
+			<div class="w-4"></div>
 
 			<TextStyleButtons {editor} />
 
-			<div class="h-4 w-px bg-white/50 mx-2"></div>
+			<div class="w-4"></div>
 
 			<button
 				class="toolbar-btn"
@@ -394,31 +385,24 @@
 				onclick={gradientDialog.open}
 				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
 				><IconGradient /></button>
-			<button
-				use:tippy={{ content: "Show default colors", placement: "bottom" }}
-				onclick={() => (colorsVisible = !colorsVisible)}
-				class="toolbar-btn {colorsVisible ? 'rotate-180 bg-white/3' : ''}"
-				><IconColors /></button>
-			{#if colorsVisible}
-				{#each colorMap as color}
-					<button
-						aria-label="set color to {color.name}"
-						onclick={() => editor.chain().focus().setColor(color.value).run()}
-						use:tippy={{
-							content: toTitleCase(color.name.replace("_", " ")),
-							placement: "bottom",
-						}}
-						class="p-1 text-lg hover:bg-white/3 rounded-md {editor.isActive(
-							'textStyle',
-							{ color: color.value },
-						)
-							? 'bg-zinc-800'
-							: ''}"
-						style="color: {color.value};">
-						<IconSquare />
-					</button>
-				{/each}
-			{/if}
+			{#each colorMap as color}
+				<button
+					aria-label="set color to {color.name}"
+					onclick={() => editor.chain().focus().setColor(color.value).run()}
+					use:tippy={{
+						content: toTitleCase(color.name.replace("_", " ")),
+						placement: "bottom",
+					}}
+					class="p-1 text-lg hover:bg-white/3 rounded-md {editor.isActive(
+						'textStyle',
+						{ color: color.value },
+					)
+						? 'bg-zinc-800'
+						: ''}"
+					style="color: {color.value};">
+					<IconSquare />
+				</button>
+			{/each}
 			{#if editor.isActive("textStyle")}
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
@@ -429,10 +413,14 @@
 				</button>
 			{/if}
 
-			<div class="h-4 w-px bg-white/50 mx-2"></div>
+			<div class="w-4"></div>
 
 			<button
-				class="toolbar-btn {editor.isActive('clickEvent') ? 'bg-zinc-800' : ''}"
+				class="toolbar-btn {editor.isActive(
+					'clickEvent',
+				)
+					? 'bg-zinc-800'
+					: ''}"
 				use:tippy={{
 					content: "Click Event",
 					placement: "bottom",
@@ -468,7 +456,9 @@
 				}}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
 					? 'ml-2'
-					: ''} toolbar-btn {editor.isActive('hoverEvent')
+					: ''} toolbar-btn {editor.isActive(
+					'hoverEvent',
+				)
 					? 'bg-zinc-800'
 					: ''}"
 				use:tippy={{
@@ -526,7 +516,7 @@
 	</div>
 
 	<div>
-		{#if $page.url.searchParams.has("dev")}
+		{#if $page.url.searchParams.has('dev')}
 			<code class="inline-block p-3 overflow-x-scroll"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
@@ -551,8 +541,7 @@
 						<IconCopy />
 					{/if}</button>
 				<p>
-					<code class="inline break-all"
-						>{editor
+					<code class="inline wrap-anywhere">{editor
 							? convert(editor.getJSON(), "standard", outputVersion)
 							: "Loading..."}
 					</code>
@@ -570,16 +559,10 @@
 				</p>
 			</div>
 			{#if doesContentExist}
-				<div class="flex items-center space-x-3 mt-2 select-none">
-					<p class="font-lexend text-xs text-white/60">
-						{editor
-							? convert(editor.getJSON(), "standard", outputVersion).length
-							: 0} characters
-					</p>
-					<p class="font-lexend text-xs text-white/60">
-						{getTextComponentCount()} components
-					</p>
-				</div>
+			<div class="flex items-center space-x-3 mt-2 select-none">
+				<p class="font-lexend text-xs text-white/60">{editor ? convert(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
+				<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
+			</div>
 			{/if}
 		</div>
 	</div>

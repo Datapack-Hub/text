@@ -34,6 +34,7 @@ const styleProps = [
 	"underlined",
 	"strikethrough",
 	"obfuscated",
+	"shadow_color",
 	"click_event",
 	"hover_event",
 	"clickEvent",
@@ -317,8 +318,12 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
  * @param arr An array of strings or text components
  * @returns 
  */
-export function optimise(arr: StringyMCText[]): StringyMCText[] {
-	let out: StringyMCText[] = [""];
+export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
+	let out: StringyMCText[] = [];
+
+	if (!lore) {
+		out.push("")
+	}
 
 	// 1: Remove undefineds, flatten MinecraftText with only text
 	for (const comp of arr) {
@@ -405,15 +410,23 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 				}
 				if (group.length > 1) {
 					// Remove shared properties from each group member for "extra"
-					const extras = group.map(comp => {
+					let extras = group.map(comp => {
 						const c = { ...comp };
 						for (const prop of Object.keys(sharedAll)) {
 							delete c[prop as MCTextKey];
 						}
 						return c;
 					});
-					// Create merged component
-					const merged = { ...sharedAll, extra: extras };
+
+					// Optimise extra
+					extras = optimise(extras)
+					const first = extras.shift()
+					let merged;
+					if (typeof first == "string") {
+						merged = { ...sharedAll, text: first, extra: extras };
+					} else {
+						merged = { ...sharedAll, ...first, extra: extras };
+					}
 					out.splice(i, group.length, merged);
 					i--; // recheck at this position
 					continue;
@@ -437,6 +450,11 @@ export function optimise(arr: StringyMCText[]): StringyMCText[] {
 		)
 	) {
 		out.shift();
+	}
+
+	// 5: If it is item lore then override 
+	if (lore) {
+		out.unshift({italic: false, color: "white", text: ""})
 	}
 
 	return out;
@@ -536,25 +554,15 @@ export function translate(
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
 				};
 
-				// For lore: default is purple and italic, so override if needed
-				if (i === 0) {
-					if (currentComponent.color || currentComponent.italic) {
-						currentLine.push({ italic: false, color: "white" });
-					} else {
-						currentComponent.color ??= "white";
-						currentComponent.italic ??= false;
-					}
-				}
-
 				currentComponent = addTypeSpecificValues(currentComponent, c, false);
 				currentLine.push(currentComponent);
 			}
 
-			data.push(currentLine.length === 2 ? currentLine[1] : currentLine);
+			data.push(currentLine);
 		}
 
 		if (Array.isArray(data)) {
-			data = data.map((d) => Array.isArray(d) ? optimise(d) : d);
+			data = data.map((d) => Array.isArray(d) ? optimise(d, true) : d);
 		}
 
 		return indent

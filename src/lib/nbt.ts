@@ -41,6 +41,18 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 		return;
 	}
 
+	let finalText = mapPropertiesToType(text);
+	finalText = applyStyling(text, finalText);
+
+	let paragraphContent = baseDocument.content?.at(-1)?.content;
+
+	if (!paragraphContent) {
+		baseDocument.content!.at(-1)!.content = [];
+		paragraphContent = baseDocument.content!.at(-1)!.content;
+	}
+
+	paragraphContent!.push(finalText);
+
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
@@ -79,18 +91,6 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 				processTextComponent(newComponent, baseDocument);
 			}
 		});
-	} else {
-		let finalText = mapPropertiesToType(text);
-		finalText = applyStyling(text, finalText);
-
-		let paragraphContent = baseDocument.content?.at(-1)?.content;
-
-		if (!paragraphContent) {
-			baseDocument.content!.at(-1)!.content = [];
-			paragraphContent = baseDocument.content!.at(-1)!.content;
-		}
-
-		paragraphContent!.push(finalText);
 	}
 }
 

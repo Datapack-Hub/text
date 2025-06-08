@@ -450,14 +450,17 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string")
 		out.shift();
 
-	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
+	// 4: If out[0] is a blank string, out[1] is a string, or an object without any style properties, then remove out[0]
 	if (
 		out.length >= 2 &&
-		(typeof out[1] === "string" ||
-			(typeof out[1] === "object" &&
-				!styleProps.some(
-					(prop) => out[1][prop as keyof StringyMCText] !== undefined,
-				)))
+		out[0] == "" &&
+		(
+			typeof out[1] === "string" ||
+			(
+				typeof out[1] === "object" &&
+				!styleProps.some(prop => out[1][prop as MCTextKey] !== undefined)
+			)
+		)
 	) {
 		out.shift();
 	}

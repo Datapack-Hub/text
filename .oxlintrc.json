@@ -1,0 +1,10 @@
+{
+	"rules": {
+		"no-self-assign": "off"
+	},
+	"categories": {
+		"perf": "warn",
+		"suspicious": "warn",
+		"correctness": "warn"
+	}
+}

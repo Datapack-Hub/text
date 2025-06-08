@@ -107,153 +107,115 @@ export function addTypeSpecificValues(
 	includeInteractivity = true,
 	exportVersion: "new" | "old" = "new",
 ) {
-	switch (exportVersion) {
-		case "new":
-			newApplyTypeSpecificValues(current, c, includeInteractivity);
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
 			break;
-		case "old":
-			oldApplyTypeSpecificValues(current, c, includeInteractivity);
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
 			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+
+	if (includeInteractivity) {		
+		switch (exportVersion) {
+			case "new":
+				newApplyInteractiveValues(current, c);
+				break;
+			case "old":
+				oldApplyInteractiveValues(current, c);
+				break;
+		}
 	}
 
 	return current;
 }
 
 /**
- * Applies all of the properties to a minecraft string
+ * Applies the interactive values for the 1.21.5+ format
  *
  * @param current your current minecraft text
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function newApplyTypeSpecificValues(
+function newApplyInteractiveValues(
 	current: MinecraftText,
 	c: JSONContent,
-	includeInteractivity = true,
 ) {
-	switch (c.type) {
-		case "text":
-			current.text = c.text;
-			break;
-		case "score":
-			current.score = {
-				name: c.attrs?.name,
-				objective: c.attrs?.objective,
-			};
-			break;
-		case "translate":
-			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
-				current.with = c.attrs?.params;
-			}
-			if (c.attrs?.fallback) {
-				current.fallback = c.attrs?.fallback;
-			}
-			break;
-		case "storage_nbt":
-		case "block_nbt":
-		case "entity_nbt":
-			current.nbt = c.attrs?.nbt;
-			current.storage = c.attrs?.storage;
-			current.block = c.attrs?.block;
-			current.entity = c.attrs?.entity;
-			current.interpret = c.attrs?.interpret || undefined;
-			break;
-		case "keybind":
-			current.keybind = c.attrs?.key;
-			break;
-		case "selector":
-			current.selector = c.attrs?.selector;
-			break;
+	if (isMarkType(c, "clickEvent")) {
+		const ce = isMarkType(c, "clickEvent")?.attrs;
+		current.click_event = { action: ce!.action };
+		switch (ce!.action) {
+			case "open_url":
+				current.click_event.url = ce!.value;
+				break;
+			case "run_command":
+			case "suggest_command":
+				current.click_event.command = ce!.value;
+				break;
+			case "copy_to_clipboard":
+				current.click_event.value = ce!.value;
+				break;
+			case "change_page":
+				current.click_event.page = ce!.value;
+				break;
+			case "open_dialog":
+				current.click_event.dialog = ce!.value;
+				break;
+		}
 	}
-	if (includeInteractivity) {
-		if (isMarkType(c, "clickEvent")) {
-			const ce = isMarkType(c, "clickEvent")?.attrs;
-			current.click_event = { action: ce!.action };
-			switch (ce!.action) {
-				case "open_url":
-					current.click_event.url = ce!.value;
-					break;
-				case "run_command":
-				case "suggest_command":
-					current.click_event.command = ce!.value;
-					break;
-				case "copy_to_clipboard":
-					current.click_event.value = ce!.value;
-					break;
-				case "change_page":
-					current.click_event.page = ce!.value;
-					break;
-				case "open_dialog":
-					current.click_event.dialog = ce!.value;
-					break;
-			}
-		}
 
-		if (isMarkType(c, "hoverEvent")) {
-			const ce = isMarkType(c, "hoverEvent")?.attrs;
-			current.hover_event = { action: ce!.action, value: ce!.value };
-		}
+	if (isMarkType(c, "hoverEvent")) {
+		const ce = isMarkType(c, "hoverEvent")?.attrs;
+		current.hover_event = { action: ce!.action, value: ce!.value };
 	}
 }
 
 /**
- * Applies all of the properties to an (old) minecraft string
+ * Applies the interactive values for the 1.21.4 and below format
  *
  * @param current your current (old) minecraft text
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function oldApplyTypeSpecificValues(
+function oldApplyInteractiveValues(
 	current: OldMinecraftText,
-	c: JSONContent,
-	includeInteractivity = true,
+	c: JSONContent
 ) {
-	switch (c.type) {
-		case "text":
-			current.text = c.text;
-			break;
-		case "score":
-			current.score = {
-				name: c.attrs?.name,
-				objective: c.attrs?.objective,
-			};
-			break;
-		case "translate":
-			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
-				current.with = c.attrs?.params;
-			}
-			if (c.attrs?.fallback) {
-				current.fallback = c.attrs?.fallback;
-			}
-			break;
-		case "storage_nbt":
-		case "block_nbt":
-		case "entity_nbt":
-			current.nbt = c.attrs?.nbt;
-			current.storage = c.attrs?.storage;
-			current.block = c.attrs?.block;
-			current.entity = c.attrs?.entity;
-			current.interpret = c.attrs?.interpret || undefined;
-			break;
-		case "keybind":
-			current.keybind = c.attrs?.key;
-			break;
-		case "selector":
-			current.selector = c.attrs?.selector;
-			break;
+	if (isMarkType(c, "clickEvent")) {
+		const ce = isMarkType(c, "clickEvent")?.attrs;
+		current.clickEvent = { action: ce!.action, value: ce!.value };
 	}
-	if (includeInteractivity) {
-		if (isMarkType(c, "clickEvent")) {
-			const ce = isMarkType(c, "clickEvent")?.attrs;
-			current.clickEvent = { action: ce!.action, value: ce!.value };
-		}
 
-		if (isMarkType(c, "hoverEvent")) {
-			const ce = isMarkType(c, "hoverEvent")?.attrs;
-			current.hoverEvent = { action: ce!.action, contents: ce!.value };
-		}
+	if (isMarkType(c, "hoverEvent")) {
+		const ce = isMarkType(c, "hoverEvent")?.attrs;
+		current.hoverEvent = { action: ce!.action, contents: ce!.value };
 	}
 }
 

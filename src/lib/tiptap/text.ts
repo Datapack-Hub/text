@@ -34,6 +34,7 @@ const styleProps = [
 	"underlined",
 	"strikethrough",
 	"obfuscated",
+	"shadow_color",
 	"click_event",
 	"hover_event",
 	"clickEvent",
@@ -419,8 +420,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 
 					// Optimise extra
 					extras = optimise(extras)
-					// Create merged component
-					const merged = { ...sharedAll, extra: extras };
+					const first = extras.shift()
+					const merged = { ...sharedAll, text: first, extra: extras };
 					out.splice(i, group.length, merged);
 					i--; // recheck at this position
 					continue;

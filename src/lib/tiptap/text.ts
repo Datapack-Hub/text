@@ -454,7 +454,7 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 
 	// 5: If it is item lore then override 
 	if (lore) {
-		out.unshift({italic: false, color: "white"})
+		out.unshift({italic: false, color: "white", text: ""})
 	}
 
 	return out;
@@ -542,7 +542,7 @@ export function translate(
 
 		for (const p of paragraphs) {
 			const content = p.content ?? [];
-			let currentLine: StringyMCText[] = [{ italic: false, color: "white" }];
+			let currentLine: StringyMCText[] = [];
 
 			for (const [i, c] of content.entries()) {
 				let currentComponent: MinecraftText = {

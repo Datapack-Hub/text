@@ -38,13 +38,14 @@ export const ScoreNode = Node.create<NodeOptions>({
 				"data-score-node": "true",
 				contenteditable: "false",
 				style: `
-          background-color: #3c3c40;
-          padding: 1px 5px;
-          border-radius: 4px;
-          font-size: 0.9em;
-          display: inline-flex;
-          align-items: center;
-          gap: 4px 6px;
+            background-color: #18181b;
+            padding: 0px 5px;
+            border-radius: 4px;
+			vertical-align: text-top;
+            font-size: 0.9rem;
+            display: inline-block;
+			border: inherit;
+			text-decoration: inherit;
         `,
 			}),
 			["span", {}, `SCORE: ${name} - ${objective}`],

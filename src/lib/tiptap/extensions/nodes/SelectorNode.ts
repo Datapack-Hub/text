@@ -37,12 +37,14 @@ export const SelectorNode = Node.create<NodeOptions>({
 				"data-selector-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #3c3c40;
-            padding: 1px 5px;
+            background-color: #18181b;
+            padding: 0px 5px;
             border-radius: 4px;
-            font-size: 0.9em;
+			vertical-align: text-top;
+            font-size: 0.9rem;
             display: inline-block;
-			user-select: all;
+			border: inherit;
+			text-decoration: inherit;
             `,
 			}),
 			["span", {}, `SELECTOR: ${selector}`],

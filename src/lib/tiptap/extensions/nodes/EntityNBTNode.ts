@@ -25,7 +25,7 @@ export const EntityNBTNode = Node.create<NodeOptions>({
 	parseHTML() {
 		return [
 			{
-				tag: "span[data-nbt-node]",
+				tag: "p[data-nbt-node]",
 			},
 		];
 	},
@@ -34,21 +34,22 @@ export const EntityNBTNode = Node.create<NodeOptions>({
 		const { nbt, entity } = node.attrs;
 
 		return [
-			"span",
+			"p",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #3c3c40;
-            padding: 1px 5px;
+            background-color: #18181b;
+            padding: 0px 5px;
             border-radius: 4px;
-            font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px 6px;
+			vertical-align: text-top;
+            font-size: 0.9rem;
+            display: inline-block;
+			border: inherit;
+			text-decoration: inherit;
             `,
 			}),
-			["span", {}, `NBT: ${nbt}, ${entity}`],
+			["p", {}, `NBT: ${nbt}, ${entity}`],
 		];
 	},
 

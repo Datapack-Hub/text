@@ -10,6 +10,7 @@
 		recentlyCopied,
 		indent,
 		indentSize,
+		shouldOptimise = true
 	} = $props();
 </script>
 
@@ -27,7 +28,7 @@
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"/tellraw @s " +
-							convert(editor.getJSON(), "standard", outputVersion),
+							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -36,7 +37,7 @@
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				>/tellraw @s {editor
-					? convert(editor.getJSON(), "standard", outputVersion)
+					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
 					: "Loading..."}
 			</code>
 		</div>
@@ -47,7 +48,7 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion)}]`,
+						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -57,13 +58,17 @@
 			{#if outputVersion == "new"}
 				<code class="inline-block w-full overflow-auto max-h-56"
 					>[lore={editor
-						? convert(editor.getJSON(), "item_lore", outputVersion)
+						? convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)
 						: "Loading..."}]
 				</code>
 			{:else}
 				<code class="inline-block w-full overflow-auto max-h-56"
 					>[lore={editor
-						? `'${translate(editor.getJSON(), "item_lore", false, 0, outputVersion)}'`
+						? `'${translate(editor.getJSON(), {
+							exportType: "item_lore",
+							exportVersion: outputVersion,
+							optimise: shouldOptimise
+						})}`
 						: "Loading..."}]
 				</code>
 			{/if}
@@ -77,10 +82,13 @@
 					navigator.clipboard.writeText(
 						translate(
 							editor.getJSON(),
-							"standard",
-							indent,
-							indentSize,
-							outputVersion,
+							{
+								exportType: "standard",
+								exportVersion: outputVersion,
+								indent,
+								indentSize,
+								optimise: shouldOptimise
+							}
 						),
 					);
 					recentlyCopied = true;
@@ -92,10 +100,13 @@
 				><pre>{editor
 						? translate(
 								editor.getJSON(),
-								"standard",
-								indent,
-								indentSize,
-								outputVersion,
+								{
+									exportType: "standard",
+									exportVersion: outputVersion,
+									indent,
+									indentSize,
+									optimise: shouldOptimise
+								}
 							)
 						: "Loading..."}</pre>
 			</code>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { colorMap, convert, translate } from "$lib/tiptap/text";
+	import { colorMap, convert, optimise, translate } from "$lib/tiptap/text";
 
 	import {
 		BlockNBTNode,
@@ -69,6 +69,7 @@
 
 	let doesContentExist: boolean = false;
 	let colorsVisible = false;
+	let shouldOptimise = true;
 
 	let indent = false;
 	let indentSize = 2;
@@ -306,10 +307,11 @@
 		const components = JSON.parse(
 			translate(
 				editor.getJSON(),
-				"standard",
-				indent,
-				indentSize,
-				outputVersion,
+				{
+					exportType: "standard",
+					indent: false,
+					exportVersion: outputVersion
+				}
 			),
 		);
 		if (Array.isArray(components)) {
@@ -505,6 +507,23 @@
 					placement: "bottom",
 				}}
 				aria-label="Redo"><IconRedo /></button>
+			
+			<div class="h-4 w-px bg-white/50 mx-2"></div>
+
+			<div class="flex items-center gap-2">
+				<p>Optimise?</p>
+				<button
+					use:tippy={{
+						content: "Optimising makes the output smaller, but makes it harder to edit",
+						placement: "bottom",
+					}}
+					class="size-8 aspect-square bg-zinc-950 rounded-md flex flex-col items-center"
+					onclick={() => (shouldOptimise = !shouldOptimise)}>
+					{#if shouldOptimise}
+						<IconTick class="m-auto text-lg" />
+					{/if}
+				</button>
+			</div>
 
 			<div class="flex-grow"></div>
 
@@ -539,7 +558,7 @@
 					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(editor.getJSON(), "standard", outputVersion),
+							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
 						);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
@@ -553,7 +572,7 @@
 				<p>
 					<code class="inline break-all"
 						>{editor
-							? convert(editor.getJSON(), "standard", outputVersion)
+							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
 							: "Loading..."}
 					</code>
 					<button
@@ -573,7 +592,7 @@
 				<div class="flex items-center space-x-3 mt-2 select-none">
 					<p class="font-lexend text-xs text-white/60">
 						{editor
-							? convert(editor.getJSON(), "standard", outputVersion).length
+							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise).length
 							: 0} characters
 					</p>
 					<p class="font-lexend text-xs text-white/60">

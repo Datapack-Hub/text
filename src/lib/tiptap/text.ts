@@ -3,6 +3,7 @@ import type {
 	MinecraftText,
 	OldMinecraftText,
 	StringyMCText,
+	TranslateOptions,
 } from "$lib/types";
 import { Editor, type JSONContent } from "@tiptap/core";
 import { generateGradient } from "typescript-color-gradient";
@@ -476,10 +477,11 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
  */
 export function convert(
 	jsonContent: JSONContent,
-	exportType: string = "standard",
+	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
+	optimise: boolean
 ): string {
-	let out = translate(jsonContent, exportType, false, 0, exportVersion);
+	let out = translate(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new") {
 		// only remove strings
 		out = out.replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) =>
@@ -494,14 +496,11 @@ export function convert(
  */
 export function translate(
 	json: JSONContent,
-	exportType: string = "standard",
-	indent: boolean,
-	indentSize: number,
-	exportVersion: "new" | "old" = "new",
+	options: TranslateOptions,
 ): string {
 	const paragraphs = json.content ?? [];
 
-	if (exportType === "standard") {
+	if (options.exportType === "standard") {
 		let data: StringyMCText[] = [];
 
 		for (const [i, p] of paragraphs.entries()) {
@@ -524,7 +523,7 @@ export function translate(
 					);
 				}
 
-				current = addTypeSpecificValues(current, c, true, exportVersion);
+				current = addTypeSpecificValues(current, c, true, options.exportVersion);
 				data.push(current);
 			}
 			if (i < paragraphs.length - 1) data.push("\n");
@@ -536,18 +535,20 @@ export function translate(
 				: "waiting for input...";
 		}
 
-		data = optimise(data);
+		if (options.optimise) {
+			data = optimise(data);
+		}
 
 		if (data.length === 1) {
-			return indent
-				? JSON.stringify(data[0], null, indentSize)
+			return options.indent
+				? JSON.stringify(data[0], null, options.indentSize)
 				: JSON.stringify(data[0]);
 		}
 
-		return indent
-			? JSON.stringify(data, null, indentSize)
+		return options.indent
+			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
-	} else if (exportType === "item_lore") {
+	} else if (options.exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
 		for (const p of paragraphs) {
@@ -571,12 +572,12 @@ export function translate(
 			data.push(currentLine);
 		}
 
-		if (Array.isArray(data)) {
+		if (Array.isArray(data) && options.optimise) {
 			data = data.map((d) => (Array.isArray(d) ? optimise(d, true) : d));
 		}
 
-		return indent
-			? JSON.stringify(data, null, indentSize)
+		return options.indent
+			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
 	}
 

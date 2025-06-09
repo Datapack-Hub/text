@@ -28,14 +28,9 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			return;
 		}
 
-		baseDocument.content?.push({
-			type: "paragraph",
-			content: [
-				{
-					type: "text",
-					text: text,
-				},
-			],
+		baseDocument.content!.at(-1)!.content!.push({
+			type: "text",
+			text: text,
 		});
 		baseDocument = baseDocument;
 		return;
@@ -53,17 +48,19 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 
 	paragraphContent!.push(finalText);
 
+	console.log(finalText)
+
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
-			if (typeof txt == "object") {
+			if(typeof(txt) == "object") {
 				Object.assign(txt, {
 					bold: txt.bold ?? text.bold,
 					italic: txt.italic ?? text.italic,
 					underlined: txt.underlined ?? text.underlined,
 					obfuscated: txt.obfuscated ?? text.obfuscated,
 					strikethrough: txt.strikethrough ?? text.strikethrough,
-					color: txt.color ?? text.color,
+					color: txt.color ?? text.color ,
 					shadow_color: txt.shadow_color ?? text.shadow_color,
 					click_event: txt.click_event ?? text.click_event,
 					clickEvent: txt.clickEvent ?? text.clickEvent,
@@ -73,15 +70,15 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 				processTextComponent(txt, baseDocument);
 			} else {
 				let newComponent = {
-					text: txt,
-				};
+					text: txt
+				}
 				Object.assign(newComponent, {
 					bold: text.bold,
 					italic: text.italic,
 					underlined: text.underlined,
 					obfuscated: text.obfuscated,
 					strikethrough: text.strikethrough,
-					color: text.color,
+					color: text.color ,
 					shadow_color: text.shadow_color,
 					click_event: text.click_event,
 					clickEvent: text.clickEvent,
@@ -188,10 +185,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 	return finalText;
 }
 
-function applyStyling(
-	text: MinecraftText & OldMinecraftText,
-	finalText: JSONContent,
-) {
+function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONContent) {
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}

@@ -42,7 +42,7 @@ const styleProps = [
 	"hoverEvent",
 ];
 
-/**
+/** 
  * @param content the node to check
  * @param mark the mark to check
  * @returns the mark if true, undefined otherwise
@@ -57,7 +57,7 @@ export function trueMarkOrUndefined(
 
 /**
  * A color value LUT
- *
+ * 
  * @param color the hex code
  * @returns the color name
  */
@@ -70,7 +70,7 @@ export function defaultColorLUT(color: string): string | undefined {
 
 /**
  * A color name LUT
- *
+ * 
  * @param color the color name you want to find
  * @returns the hex code for the color
  */
@@ -83,7 +83,7 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 
 /**
  * Checks the type of the mark against `type`
- *
+ * 
  * @param c the node you want to examine
  * @param type type to check
  * @returns true if it matches
@@ -94,7 +94,7 @@ export function isMarkType(c: JSONContent, type: string) {
 
 /**
  * Applies the specific properties for a type of source or provider
- *
+ * 
  * @param current current text component
  * @param c the current editor JSON
  * @param includeInteractivity should it have click and hover events
@@ -221,10 +221,10 @@ function oldApplyInteractiveValues(
 
 /**
  * Applies a gradient to a selection in an editor
- *
+ * 
  * @param editor the editor you want to apply it to
  * @param gradientColors the colors you want to use
- * @returns
+ * @returns 
  */
 export function applyGradient(editor: Editor, gradientColors: string[]) {
 	const { from, to } = editor.state.selection;
@@ -277,15 +277,15 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 /**
  * Optimises the final outputted component string to reduce characters
- *
+ * 
  * @param arr An array of strings or text components
- * @returns
+ * @returns 
  */
 export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
 	if (!lore) {
-		out.push("");
+		out.push("")
 	}
 
 	// 1: Remove undefineds, flatten MinecraftText with only text
@@ -295,44 +295,37 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			continue;
 		}
 		if ("text" in comp) {
-			Object.keys(comp).forEach(
-				(k) =>
-					comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey],
-			);
+			Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
 		}
 		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
 	}
 
 	// 2: Merge adjacent strings and whitespace, group objects with shared style
 	for (let i = 0; i < out.length - 1; i++) {
-		const curr = out[i],
-			next = out[i + 1];
+		const curr = out[i], next = out[i + 1];
 
 		// Merge whitespace to prev component
-		if (
-			typeof curr === "object" &&
-			curr?.text &&
-			typeof next === "string" &&
-			(next.trim() === "" || next.trim() === "\n")
-		) {
-			curr.text += next;
-			out.splice(i + 1, 1);
-			i--;
-			continue;
-		}
+		// todo fix
+		// if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
+		// 	curr.text += next;
+		// 	out.splice(i + 1, 1); i--;
+		// 	continue;
+		// }
 		// Merge consecutive strings
 		if (typeof curr === "string" && typeof next === "string") {
 			out[i] = curr + next;
-			out.splice(i + 1, 1);
-			i--;
+			out.splice(i + 1, 1); i--;
 			continue;
 		}
 
 		// Find shared style/interactivity properties between consecutive objects
-		if (typeof curr === "object" && typeof next === "object") {
+		if (
+			typeof curr === "object" &&
+			typeof next === "object"
+		) {
 			const shared: Record<string, any> = {};
 			for (const prop of styleProps) {
-				const p = prop as MCTextKey;
+				const p = prop as MCTextKey
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
@@ -345,16 +338,15 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			const allProps = [...styleProps];
 			const sharedAll: Record<string, any> = {};
 			for (const prop of allProps) {
-				const p = prop as MCTextKey;
+				const p = prop as MCTextKey
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
-					(prop === "hover_event" ||
-					prop === "click_event" ||
-					prop === "hoverEvent" ||
-					prop === "clickEvent"
-						? JSON.stringify(curr[p]) === JSON.stringify(next[p])
-						: curr[p] === next[p])
+					(
+						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+							? JSON.stringify(curr[p]) === JSON.stringify(next[p])
+							: curr[p] === next[p]
+					)
 				) {
 					sharedAll[p] = curr[p];
 				}
@@ -370,10 +362,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					Object.keys(sharedAll).every(
 						(prop) =>
 							out[j + 1][prop as keyof StringyMCText] !== undefined &&
-							(prop === "hover_event" ||
-							prop === "click_event" ||
-							prop === "hoverEvent" ||
-							prop === "clickEvent"
+							(
+								prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
 								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
 									JSON.stringify(sharedAll[prop])
 								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
@@ -384,22 +374,30 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 				}
 				if (group.length > 1) {
 					// Remove shared properties from each group member for "extra"
-					const extras = optimise(
-						group.map((comp) => {
-							const c = { ...comp };
-							for (const prop of Object.keys(sharedAll)) {
-								delete c[prop as MCTextKey];
-							}
-							return c;
-						}),
-					);
+					let extras = group.map(comp => {
+						const c = { ...comp };
+						for (const prop of Object.keys(sharedAll)) {
+							delete c[prop as MCTextKey];
+						}
+						return c;
+					});
 
-					const first = extras.shift();
+					// Optimise extra
+					extras = optimise(extras)
+					const first = extras.shift()
 					let merged;
 					if (typeof first == "string") {
-						merged = { ...sharedAll, text: first, extra: extras };
+						if (extras[0]) {
+							merged = { ...sharedAll, text: first, extra: extras };
+						} else {
+							merged = { ...sharedAll, text: first };
+						}
 					} else {
-						merged = { ...sharedAll, ...first, extra: extras };
+						if (extras[0]) {
+							merged = { ...sharedAll, ...first, extra: extras };
+						} else {
+							merged = { ...sharedAll, ...first };
+						}
 					}
 					out.splice(i, group.length, merged);
 					i--; // recheck at this position
@@ -410,8 +408,7 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	}
 
 	// 3: Remove leading empty string if followed by a string
-	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string")
-		out.shift();
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
 
 	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
 	if (
@@ -426,9 +423,9 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		out.shift();
 	}
 
-	// 5: If it is item lore then override
+	// 5: If it is item lore then override 
 	if (lore) {
-		out.unshift({ italic: false, color: "white", text: "" });
+		out.unshift({italic: false, color: "white", text: ""})
 	}
 
 	return out;
@@ -446,7 +443,7 @@ export function convert(
 	let out = translate(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new") {
 		// only remove strings
-		out = out.replace(/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g, (match) =>
+		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
 			match.replace(/"/g, ""),
 		);
 	}
@@ -517,7 +514,7 @@ export function translate(
 			const content = p.content ?? [];
 			let currentLine: StringyMCText[] = [];
 
-			for (const c of content) {
+			for (const [i, c] of content.entries()) {
 				let currentComponent: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),

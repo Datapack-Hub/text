@@ -496,6 +496,8 @@ export function translate(
 
 		if (options.optimise) {
 			data = optimise(data);
+		} else {
+			data.unshift("")
 		}
 
 		if (data.length === 1) {

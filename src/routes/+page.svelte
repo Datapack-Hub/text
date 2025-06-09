@@ -378,11 +378,11 @@
 				<IconCustom />
 			</button>
 
-			<div class="w-4"></div>
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<TextStyleButtons {editor} />
 
-			<div class="w-4"></div>
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
 				class="toolbar-btn"
@@ -422,8 +422,8 @@
 					<IconHollow />
 				</button>
 			{/if}
-
-			<div class="w-4"></div>
+			
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
 				class="toolbar-btn {editor.isActive(
@@ -488,9 +488,11 @@
 					<IconEdit />
 				</button>
 			{/if}
+			
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
-				class="ml-2 toolbar-btn"
+				class="toolbar-btn"
 				onclick={() => editor.chain().undo().run()}
 				use:tippy={{
 					content: "Undo",
@@ -506,7 +508,7 @@
 				}}
 				aria-label="Redo"><IconRedo /></button>
 			
-			<div class="h-4 w-px bg-white/50 mx-2"></div>
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<div class="flex items-center gap-2">
 				<p>Optimise?</p>

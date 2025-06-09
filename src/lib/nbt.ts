@@ -28,14 +28,9 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			return;
 		}
 
-		baseDocument.content?.push({
-			type: "paragraph",
-			content: [
-				{
-					type: "text",
-					text: text,
-				},
-			],
+		baseDocument.content!.at(-1)!.content!.push({
+			type: "text",
+			text: text,
 		});
 		baseDocument = baseDocument;
 		return;
@@ -52,6 +47,8 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 	}
 
 	paragraphContent!.push(finalText);
+
+	console.log(finalText)
 
 	// Extra property
 	if (text.extra) {

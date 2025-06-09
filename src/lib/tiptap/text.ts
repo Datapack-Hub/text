@@ -342,11 +342,12 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		const curr = out[i], next = out[i + 1];
 
 		// Merge whitespace to prev component
-		if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
-			curr.text += next;
-			out.splice(i + 1, 1); i--;
-			continue;
-		}
+		// todo fix
+		// if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
+		// 	curr.text += next;
+		// 	out.splice(i + 1, 1); i--;
+		// 	continue;
+		// }
 		// Merge consecutive strings
 		if (typeof curr === "string" && typeof next === "string") {
 			out[i] = curr + next;
@@ -480,7 +481,7 @@ export function convert(
 	let out = translate(jsonContent, exportType, false, 0, exportVersion)
 	if (exportVersion == "new") { // only remove strings 
 		out = out.replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
+			/(?<=[{,]\s*)"[^"]*"\s*:/g,
 			(match) => match.replace(/"/g, ""),
 		);
 	}

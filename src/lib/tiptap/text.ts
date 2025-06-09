@@ -423,9 +423,17 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					const first = extras.shift()
 					let merged;
 					if (typeof first == "string") {
-						merged = { ...sharedAll, text: first, extra: extras };
+						if (extras[0]) {
+							merged = { ...sharedAll, text: first, extra: extras };
+						} else {
+							merged = { ...sharedAll, text: first };
+						}
 					} else {
-						merged = { ...sharedAll, ...first, extra: extras };
+						if (extras[0]) {
+							merged = { ...sharedAll, ...first, extra: extras };
+						} else {
+							merged = { ...sharedAll, ...first };
+						}
 					}
 					out.splice(i, group.length, merged);
 					i--; // recheck at this position

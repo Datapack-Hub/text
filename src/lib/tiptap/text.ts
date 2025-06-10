@@ -3,6 +3,7 @@ import type {
 	MinecraftText,
 	OldMinecraftText,
 	StringyMCText,
+	TranslateOptions,
 } from "$lib/types";
 import { Editor, type JSONContent } from "@tiptap/core";
 import { generateGradient } from "typescript-color-gradient";
@@ -106,153 +107,115 @@ export function addTypeSpecificValues(
 	includeInteractivity = true,
 	exportVersion: "new" | "old" = "new",
 ) {
-	switch (exportVersion) {
-		case "new":
-			newApplyTypeSpecificValues(current, c, includeInteractivity);
+	switch (c.type) {
+		case "text":
+			current.text = c.text;
 			break;
-		case "old":
-			oldApplyTypeSpecificValues(current, c, includeInteractivity);
+		case "score":
+			current.score = {
+				name: c.attrs?.name,
+				objective: c.attrs?.objective,
+			};
 			break;
+		case "translate":
+			current.translate = c.attrs?.key;
+			if (c.attrs?.params && c.attrs?.params.length != 0) {
+				current.with = c.attrs?.params;
+			}
+			if (c.attrs?.fallback) {
+				current.fallback = c.attrs?.fallback;
+			}
+			break;
+		case "storage_nbt":
+		case "block_nbt":
+		case "entity_nbt":
+			current.nbt = c.attrs?.nbt;
+			current.storage = c.attrs?.storage;
+			current.block = c.attrs?.block;
+			current.entity = c.attrs?.entity;
+			current.interpret = c.attrs?.interpret || undefined;
+			break;
+		case "keybind":
+			current.keybind = c.attrs?.key;
+			break;
+		case "selector":
+			current.selector = c.attrs?.selector;
+			break;
+	}
+
+	if (includeInteractivity) {		
+		switch (exportVersion) {
+			case "new":
+				newApplyInteractiveValues(current, c);
+				break;
+			case "old":
+				oldApplyInteractiveValues(current, c);
+				break;
+		}
 	}
 
 	return current;
 }
 
 /**
- * Applies all of the properties to a minecraft string
- * 
+ * Applies the interactive values for the 1.21.5+ format
+ *
  * @param current your current minecraft text
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function newApplyTypeSpecificValues(
+function newApplyInteractiveValues(
 	current: MinecraftText,
 	c: JSONContent,
-	includeInteractivity = true,
 ) {
-	switch (c.type) {
-		case "text":
-			current.text = c.text;
-			break;
-		case "score":
-			current.score = {
-				name: c.attrs?.name,
-				objective: c.attrs?.objective,
-			};
-			break;
-		case "translate":
-			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
-				current.with = c.attrs?.params;
-			}
-			if (c.attrs?.fallback) {
-				current.fallback = c.attrs?.fallback;
-			}
-			break;
-		case "storage_nbt":
-		case "block_nbt":
-		case "entity_nbt":
-			current.nbt = c.attrs?.nbt;
-			current.storage = c.attrs?.storage;
-			current.block = c.attrs?.block;
-			current.entity = c.attrs?.entity;
-			current.interpret = c.attrs?.interpret || undefined;
-			break;
-		case "keybind":
-			current.keybind = c.attrs?.key;
-			break;
-		case "selector":
-			current.selector = c.attrs?.selector;
-			break;
+	if (isMarkType(c, "clickEvent")) {
+		const ce = isMarkType(c, "clickEvent")?.attrs;
+		current.click_event = { action: ce!.action };
+		switch (ce!.action) {
+			case "open_url":
+				current.click_event.url = ce!.value;
+				break;
+			case "run_command":
+			case "suggest_command":
+				current.click_event.command = ce!.value;
+				break;
+			case "copy_to_clipboard":
+				current.click_event.value = ce!.value;
+				break;
+			case "change_page":
+				current.click_event.page = ce!.value;
+				break;
+			case "open_dialog":
+				current.click_event.dialog = ce!.value;
+				break;
+		}
 	}
-	if (includeInteractivity) {
-		if (isMarkType(c, "clickEvent")) {
-			const ce = isMarkType(c, "clickEvent")?.attrs;
-			current.click_event = { action: ce!.action };
-			switch (ce!.action) {
-				case "open_url":
-					current.click_event.url = ce!.value;
-					break;
-				case "run_command":
-				case "suggest_command":
-					current.click_event.command = ce!.value;
-					break;
-				case "copy_to_clipboard":
-					current.click_event.value = ce!.value;
-					break;
-				case "change_page":
-					current.click_event.page = ce!.value;
-					break;
-				case "open_dialog":
-					current.click_event.dialog = ce!.value;
-					break;
-			}
-		}
 
-		if (isMarkType(c, "hoverEvent")) {
-			const ce = isMarkType(c, "hoverEvent")?.attrs;
-			current.hover_event = { action: ce!.action, value: ce!.value };
-		}
+	if (isMarkType(c, "hoverEvent")) {
+		const ce = isMarkType(c, "hoverEvent")?.attrs;
+		current.hover_event = { action: ce!.action, value: ce!.value };
 	}
 }
 
 /**
- * Applies all of the properties to an (old) minecraft string
- * 
+ * Applies the interactive values for the 1.21.4 and below format
+ *
  * @param current your current (old) minecraft text
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function oldApplyTypeSpecificValues(
+function oldApplyInteractiveValues(
 	current: OldMinecraftText,
-	c: JSONContent,
-	includeInteractivity = true,
+	c: JSONContent
 ) {
-	switch (c.type) {
-		case "text":
-			current.text = c.text;
-			break;
-		case "score":
-			current.score = {
-				name: c.attrs?.name,
-				objective: c.attrs?.objective,
-			};
-			break;
-		case "translate":
-			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
-				current.with = c.attrs?.params;
-			}
-			if (c.attrs?.fallback) {
-				current.fallback = c.attrs?.fallback;
-			}
-			break;
-		case "storage_nbt":
-		case "block_nbt":
-		case "entity_nbt":
-			current.nbt = c.attrs?.nbt;
-			current.storage = c.attrs?.storage;
-			current.block = c.attrs?.block;
-			current.entity = c.attrs?.entity;
-			current.interpret = c.attrs?.interpret || undefined;
-			break;
-		case "keybind":
-			current.keybind = c.attrs?.key;
-			break;
-		case "selector":
-			current.selector = c.attrs?.selector;
-			break;
+	if (isMarkType(c, "clickEvent")) {
+		const ce = isMarkType(c, "clickEvent")?.attrs;
+		current.clickEvent = { action: ce!.action, value: ce!.value };
 	}
-	if (includeInteractivity) {
-		if (isMarkType(c, "clickEvent")) {
-			const ce = isMarkType(c, "clickEvent")?.attrs;
-			current.clickEvent = { action: ce!.action, value: ce!.value };
-		}
 
-		if (isMarkType(c, "hoverEvent")) {
-			const ce = isMarkType(c, "hoverEvent")?.attrs;
-			current.hoverEvent = { action: ce!.action, contents: ce!.value };
-		}
+	if (isMarkType(c, "hoverEvent")) {
+		const ce = isMarkType(c, "hoverEvent")?.attrs;
+		current.hoverEvent = { action: ce!.action, contents: ce!.value };
 	}
 }
 
@@ -447,17 +410,15 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	// 3: Remove leading empty string if followed by a string
 	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
 
-	// 4: If out[0] is a blank string, out[1] is a string, or an object without any style properties, then remove out[0]
+	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
 	if (
 		out.length >= 2 &&
 		out[0] == "" &&
-		(
-			typeof out[1] === "string" ||
-			(
-				typeof out[1] === "object" &&
-				!styleProps.some(prop => out[1][prop as MCTextKey] !== undefined)
-			)
-		)
+		(typeof out[1] === "string" ||
+			(typeof out[1] === "object" &&
+				!styleProps.some(
+					(prop) => out[1][prop as keyof StringyMCText] !== undefined,
+				)))
 	) {
 		out.shift();
 	}
@@ -475,14 +436,15 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
  */
 export function convert(
 	jsonContent: JSONContent,
-	exportType: string = "standard",
+	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
+	optimise: boolean
 ): string {
-	let out = translate(jsonContent, exportType, false, 0, exportVersion)
-	if (exportVersion == "new") { // only remove strings 
-		out = out.replace(
-			/(?<=[{,]\s*)"[^"]*"\s*:/g,
-			(match) => match.replace(/"/g, ""),
+	let out = translate(jsonContent, { exportVersion, exportType, optimise });
+	if (exportVersion == "new") {
+		// only remove strings
+		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
+			match.replace(/"/g, ""),
 		);
 	}
 	return out;
@@ -493,14 +455,11 @@ export function convert(
  */
 export function translate(
 	json: JSONContent,
-	exportType: string = "standard",
-	indent: boolean,
-	indentSize: number,
-	exportVersion: "new" | "old" = "new",
+	options: TranslateOptions,
 ): string {
 	const paragraphs = json.content ?? [];
 
-	if (exportType === "standard") {
+	if (options.exportType === "standard") {
 		let data: StringyMCText[] = [];
 
 		for (const [i, p] of paragraphs.entries()) {
@@ -523,7 +482,7 @@ export function translate(
 					);
 				}
 
-				current = addTypeSpecificValues(current, c, true, exportVersion);
+				current = addTypeSpecificValues(current, c, true, options.exportVersion);
 				data.push(current);
 			}
 			if (i < paragraphs.length - 1) data.push("\n");
@@ -535,19 +494,22 @@ export function translate(
 				: "waiting for input...";
 		}
 
-		data = optimise(data);
+		if (options.optimise) {
+			data = optimise(data);
+		} else {
+			data.unshift("")
+		}
 
 		if (data.length === 1) {
-			return indent
-				? JSON.stringify(data[0], null, indentSize)
+			return options.indent
+				? JSON.stringify(data[0], null, options.indentSize)
 				: JSON.stringify(data[0]);
 		}
 
-		return indent
-			? JSON.stringify(data, null, indentSize)
+		return options.indent
+			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
-
-	} else if (exportType === "item_lore") {
+	} else if (options.exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
 		for (const p of paragraphs) {
@@ -571,12 +533,12 @@ export function translate(
 			data.push(currentLine);
 		}
 
-		if (Array.isArray(data)) {
-			data = data.map((d) => Array.isArray(d) ? optimise(d, true) : d);
+		if (Array.isArray(data) && options.optimise) {
+			data = data.map((d) => (Array.isArray(d) ? optimise(d, true) : d));
 		}
 
-		return indent
-			? JSON.stringify(data, null, indentSize)
+		return options.indent
+			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
 	}
 

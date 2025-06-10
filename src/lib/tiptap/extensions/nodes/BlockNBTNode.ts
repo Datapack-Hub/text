@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, BlockNBTAttributes } from "..";
+import type { NodeOptions, BlockNBTAttributes } from "../index";
 
 export const BlockNBTNode = Node.create<NodeOptions>({
 	name: "block_nbt",
@@ -39,15 +39,14 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #3c3c40;
-            padding: 1px 5px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px 6px;
-			z-index:9;
-            `,
+			background-color: #18181b;
+			padding: 1px 5px;
+			border-radius: 4px;
+			font-size: 1rem;
+			display: inline-block;
+			vertical-align: var(--custom-source-align, middle);
+			text-decoration: inherit;
+			`,
 			}),
 			["span", {}, `NBT: ${nbt}, ${block}`],
 		];

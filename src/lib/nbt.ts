@@ -6,6 +6,10 @@ import { type StringyMCText } from "./types";
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
+	// replace 1b and 0b
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true")
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false")
+
 	let parsed: MinecraftText[] | MinecraftText | string;
 
 	try {

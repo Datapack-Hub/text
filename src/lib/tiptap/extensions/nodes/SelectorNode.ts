@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, SelectorAttributes } from "..";
+import type { NodeOptions, SelectorAttributes } from "../index";
 
 export const SelectorNode = Node.create<NodeOptions>({
 	name: "selector",
@@ -37,12 +37,13 @@ export const SelectorNode = Node.create<NodeOptions>({
 				"data-selector-node": "true",
 				contenteditable: "false",
 				style: `
-            background-color: #3c3c40;
-            padding: 1px 5px;
+            background-color: #18181b;
+            padding: 0px 5px;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 0.9rem;
             display: inline-block;
-			user-select: all;
+			vertical-align: var(--custom-source-align, middle);
+			text-decoration: inherit;
             `,
 			}),
 			["span", {}, `SELECTOR: ${selector}`],

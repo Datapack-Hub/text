@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, TranslateAttributes } from "..";
+import type { NodeOptions, TranslateAttributes } from "../index";
 
 export const TranslateNode = Node.create<NodeOptions>({
 	name: "translate",
@@ -39,13 +39,13 @@ export const TranslateNode = Node.create<NodeOptions>({
 				"data-translate-node": "true",
 				contenteditable: "false",
 				style: `
-          background-color: #3c3c40;
-          padding: 1px 5px;
-          border-radius: 4px;
-          font-size: 0.9em;
-          display: inline-flex;
-          align-items: center;
-          gap: 4px 6px;
+            background-color: #18181b;
+            padding: 0px 5px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: inline-block;
+			vertical-align: var(--custom-source-align, middle);
+			text-decoration: inherit;
         `,
 			}),
 			["span", {}, `TRANSLATE: ${key}`],

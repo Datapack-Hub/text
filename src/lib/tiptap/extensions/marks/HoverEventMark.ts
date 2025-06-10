@@ -1,5 +1,5 @@
 import { Mark, mergeAttributes } from "@tiptap/core";
-import type { HoverEventAttributes } from "..";
+import type { HoverEventAttributes } from "../index";
 
 export const HoverEventMark = Mark.create({
 	name: "hoverEvent",

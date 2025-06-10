@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { dev } from "$app/environment";
-	import { colorMap, translate, convert } from "$lib/tiptap/text";
+	import { colorMap, convert, optimise, translate } from "$lib/tiptap/text";
 
 	import {
 		BlockNBTNode,
@@ -68,6 +67,8 @@
 	let outputVersion: "new" | "old";
 
 	let doesContentExist: boolean = false;
+	let colorsVisible = false;
+	let shouldOptimise = true;
 
 	let indent = false;
 	let indentSize = 2;
@@ -302,9 +303,18 @@
 	}
 
 	function getTextComponentCount() {
-		const components = JSON.parse(translate(editor.getJSON(), "standard", indent, indentSize, outputVersion))
-		if(Array.isArray(components)) {
-			return components.length
+		const components = JSON.parse(
+			translate(
+				editor.getJSON(),
+				{
+					exportType: "standard",
+					indent: false,
+					exportVersion: outputVersion
+				}
+			),
+		);
+		if (Array.isArray(components)) {
+			return components.length;
 		}
 		return 1
 	}
@@ -312,7 +322,7 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex flex-col h-screen">
+<div class="flex flex-col h-screen max-h-screen">
 	<div
 		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
 		style="font-family: Lexend">
@@ -334,17 +344,6 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
 			onclick={loadDialog.open}>Load</button>
-		<button
-			class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-3 select-none"
-			use:tippy={{ content: "Click to toggle", placement: "top" }}
-			onclick={() => {
-				const ov = outputVersion;
-				if (ov == "new") {
-					outputVersion = "old";
-				} else {
-					outputVersion = "new";
-				}
-			}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
@@ -368,11 +367,11 @@
 				<IconCustom />
 			</button>
 
-			<div class="w-4"></div>
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<TextStyleButtons {editor} />
 
-			<div class="w-4"></div>
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
 				class="toolbar-btn"
@@ -412,8 +411,8 @@
 					<IconHollow />
 				</button>
 			{/if}
-
-			<div class="w-4"></div>
+			
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
 				class="toolbar-btn {editor.isActive(
@@ -478,9 +477,11 @@
 					<IconEdit />
 				</button>
 			{/if}
+			
+			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
-				class="ml-2 toolbar-btn"
+				class="toolbar-btn"
 				onclick={() => editor.chain().undo().run()}
 				use:tippy={{
 					content: "Undo",
@@ -510,7 +511,7 @@
 	</div>
 
 	<div
-		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow"
+		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow overflow-auto"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
@@ -523,13 +524,13 @@
 					: "Loading..."}</code>
 			<br />
 		{/if}
-		<div class="bg-zinc-950 p-3 max-h-56 overflow-auto">
-			<div class="flex max-w-screen items-start space-x-2">
+		<div class="bg-zinc-950 p-3">
+			<div class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
 				<button
 					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(editor.getJSON(), "standard", outputVersion),
+							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
 						);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
@@ -541,13 +542,32 @@
 						<IconCopy />
 					{/if}</button>
 				<p>
-					<code class="inline wrap-anywhere">{editor
-							? convert(editor.getJSON(), "standard", outputVersion)
+					<code class="inline break-all"
+						>{editor
+							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
 							: "Loading..."}
 					</code>
+				</p>
+			</div>
+			{#if doesContentExist}
+				<div class="flex items-center space-x-2 mt-2 select-none">
+					<p class="font-lexend text-xs text-white/60 nomob">
+						{editor
+							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise).length
+							: 0} characters
+					</p>
+					<p class="font-lexend text-xs text-white/60 nomob">
+						{getTextComponentCount()} components
+					</p>
+					<p class="font-lexend text-xs text-white/60 nomob">
+						•
+					</p>
+					<p class="font-lexend text-xs text-white/60">
+						Click to change output settings:
+					</p>
 					<button
 						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-						use:tippy={{ content: "Click to toggle", placement: "top" }}
+						use:tippy={{ content: "Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version.", placement: "top" }}
 						onclick={() => {
 							const ov = outputVersion;
 							if (ov == "new") {
@@ -556,13 +576,11 @@
 								outputVersion = "new";
 							}
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
-				</p>
-			</div>
-			{#if doesContentExist}
-			<div class="flex items-center space-x-3 mt-2 select-none">
-				<p class="font-lexend text-xs text-white/60">{editor ? convert(editor.getJSON(), "standard", outputVersion).length : 0} characters</p>
-				<p class="font-lexend text-xs text-white/60">{getTextComponentCount()} components</p>
-			</div>
+					<button
+						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
+						use:tippy={{ content: "Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually).", placement: "top" }}
+						onclick={() => shouldOptimise = !shouldOptimise}>{shouldOptimise ? "optimised" : "expanded"}</button>
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -653,16 +671,16 @@
 	{indentSize}
 	{recentlyCopied} />
 
-<Modal title="Import from NBT" bind:this={importDialog} big key="I">
+<Modal title="Import from NBT" bind:this={importDialog} key="I">
 	<div class="flex flex-col w-full space-y-2">
 		<p>
 			Paste your text components below to import them into the editor. This will
 			clear the current contents of the editor!
 		</p>
-		<input
-			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
+		<textarea
+			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft h-32"
 			placeholder="Paste NBT text components here"
-			bind:value={importText} />
+			bind:value={importText} ></textarea>
 
 		<button
 			onclick={importToEditor}

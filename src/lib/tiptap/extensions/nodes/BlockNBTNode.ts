@@ -45,6 +45,7 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 			font-size: 1rem;
 			display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
+			text-decoration: inherit;
 			`,
 			}),
 			["span", {}, `NBT: ${nbt}, ${block}`],

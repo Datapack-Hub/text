@@ -45,6 +45,7 @@ export const TranslateNode = Node.create<NodeOptions>({
             font-size: 0.9rem;
             display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
+			text-decoration: inherit;
         `,
 			}),
 			["span", {}, `TRANSLATE: ${key}`],

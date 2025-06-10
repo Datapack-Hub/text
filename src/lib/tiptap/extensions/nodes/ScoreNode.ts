@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, ScoreAttributes } from "..";
+import type { NodeOptions, ScoreAttributes } from "../index";
 
 export const ScoreNode = Node.create<NodeOptions>({
 	name: "score",
@@ -41,11 +41,9 @@ export const ScoreNode = Node.create<NodeOptions>({
             background-color: #18181b;
             padding: 0px 5px;
             border-radius: 4px;
-			vertical-align: text-top;
             font-size: 0.9rem;
             display: inline-block;
-			border: inherit;
-			text-decoration: inherit;
+			vertical-align: var(--custom-source-align, middle);
         `,
 			}),
 			["span", {}, `SCORE: ${name} - ${objective}`],

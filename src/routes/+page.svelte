@@ -322,7 +322,7 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex flex-col h-screen">
+<div class="flex flex-col h-screen max-h-screen">
 	<div
 		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
 		style="font-family: Lexend">
@@ -511,7 +511,7 @@
 	</div>
 
 	<div
-		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow"
+		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow overflow-auto"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
@@ -525,7 +525,7 @@
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">
-			<div class="flex max-w-screen items-start space-x-2 max-h-56 overflow-auto">
+			<div class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
 				<button
 					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 					onclick={() => {

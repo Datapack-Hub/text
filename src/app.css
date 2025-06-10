@@ -40,6 +40,7 @@ button {
 	padding-top: 4px;
 	padding-bottom: 2px;
 	z-index: 10;
+	--custom-source-align: top;
 }
 
 .hoverEvent {
@@ -47,6 +48,7 @@ button {
 	border-bottom: solid #ffff55 2px;
 	padding-top: 4px;
 	z-index: 10;
+	--custom-source-align: top;
 }
 
 .obfuscated {

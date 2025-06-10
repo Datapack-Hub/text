@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, StorageNBTAttributes } from "..";
+import type { NodeOptions, StorageNBTAttributes } from "../index";
 
 export const StorageNBTNode = Node.create<NodeOptions>({
 	name: "storage_nbt",
@@ -42,11 +42,9 @@ export const StorageNBTNode = Node.create<NodeOptions>({
             background-color: #18181b;
             padding: 0px 5px;
             border-radius: 4px;
-			vertical-align: text-top;
             font-size: 0.9rem;
             display: inline-block;
-			border: inherit;
-			text-decoration: inherit;
+			vertical-align: var(--custom-source-align, middle);
             `,
 			}),
 			["span", {}, `NBT: ${nbt}, ${storage}`],

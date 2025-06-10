@@ -1,5 +1,5 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, KeybindAttributes } from "..";
+import type { NodeOptions, KeybindAttributes } from "../index";
 
 export const KeybindNode = Node.create<NodeOptions>({
 	name: "keybind",
@@ -40,11 +40,9 @@ export const KeybindNode = Node.create<NodeOptions>({
             background-color: #18181b;
             padding: 0px 5px;
             border-radius: 4px;
-			vertical-align: text-top;
             font-size: 0.9rem;
             display: inline-block;
-			border: inherit;
-			text-decoration: inherit;
+			vertical-align: var(--custom-source-align, middle);
             `,
 			}),
 			["span", {}, `KEYBIND: ${key}`],

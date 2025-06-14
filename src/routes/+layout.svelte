@@ -19,10 +19,13 @@
 	<meta name="language" content="English" />
 	<meta name="author" content="Datapack Hub" />
 
-	<meta property="og:title" content="Minecraft Text Editor" />
+	<meta name="twitter:card" content="summary_large_image">
+	<meta property="og:title" content="Minecraft Text and /tellraw Editor" />
+	<meta property="og:site_name" content="Datapack Hub">
 	<meta property="og:description" content="Create /tellraw commands and text components (JSON text) for Minecraft Java Edition with our easy-to-use, modern online tool!" />
 	<meta property="og:image" content="https://us-east-1.tixte.net/uploads/dph.tixte.co/text-editor-banner.png" />
 	<meta property="og:url" content="https://text.datapackhub.net/" />
+	<meta name="theme-color" content="#ff631a">
 </svelte:head>
 
 <div

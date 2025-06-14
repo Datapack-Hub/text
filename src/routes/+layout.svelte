@@ -10,14 +10,19 @@
 	<meta name="title" content="Minecraft Text Editor" />
 	<meta
 		name="description"
-		content="Create text components (JSON text) for Minecraft Java Edition commands with our UI!" />
+		content="Minecraft Tellraw Editor for Java Edition. Create colored Minecraft /tellraw, /title, and items with our easy to use editor (especially for datapacks)." />
 	<meta
 		name="keywords"
-		content="datapacks, commands, minecraft, text, json text, minecraft tools" />
+		content="minecraft, tellraw, text, editor, java edition, commands, datapacks, title, item lore, coloured, tool" />
 	<meta name="robots" content="index, follow" />
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="language" content="English" />
 	<meta name="author" content="Datapack Hub" />
+
+	<meta property="og:title" content="Minecraft Text Editor" />
+	<meta property="og:description" content="Create /tellraw commands and text components (JSON text) for Minecraft Java Edition with our easy-to-use, modern online tool!" />
+	<meta property="og:image" content="https://us-east-1.tixte.net/uploads/dph.tixte.co/text-editor-banner.png" />
+	<meta property="og:url" content="https://text.datapackhub.net/" />
 </svelte:head>
 
 <div

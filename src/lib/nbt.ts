@@ -70,6 +70,7 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 					clickEvent: txt.clickEvent ?? text.clickEvent,
 					hover_event: txt.hover_event ?? text.hover_event,
 					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+					font: txt.font ?? text.font
 				});
 				processTextComponent(txt, baseDocument);
 			} else {
@@ -88,6 +89,7 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 					clickEvent: text.clickEvent,
 					hover_event: text.hover_event,
 					hoverEvent: text.hoverEvent,
+					font: text.font
 				});
 				processTextComponent(newComponent, baseDocument);
 			}

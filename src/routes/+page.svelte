@@ -6,6 +6,7 @@
 		ClickEventMark,
 		EntityNBTNode,
 		FixedTextStyle,
+		FontsExtension,
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
@@ -46,6 +47,8 @@
 	import IconHollow from "~icons/tabler/square-x";
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
+	import IconFont from "~icons/tabler/function";
+	import IconNoFont from "~icons/tabler/function-off";
 
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
@@ -54,6 +57,7 @@
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 	import { page } from "$app/stores";
+	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -98,6 +102,9 @@
 	let hoverEventValue: any;
 	let hoverEventEditor: MiniEditor;
 	let hoverEventDialog: Modal;
+
+	let fontDialog: Modal;
+	let fontName = "";
 
 	let customType: string | undefined;
 	let customDialog: Modal;
@@ -151,6 +158,7 @@
 				EntityNBTNode,
 				KeybindNode,
 				SelectorNode,
+				FontsExtension,
 				Placeholder.configure({
 					placeholder:
 						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
@@ -304,19 +312,17 @@
 
 	function getTextComponentCount() {
 		const components = JSON.parse(
-			translate(
-				editor.getJSON(),
-				{
-					exportType: "standard",
-					indent: false,
-					exportVersion: outputVersion
-				}
-			),
+			translate(editor.getJSON(), {
+				exportType: "standard",
+				indent: false,
+				exportVersion: outputVersion,
+				optimise: shouldOptimise
+			}),
 		);
 		if (Array.isArray(components)) {
 			return components.length;
 		}
-		return 1
+		return 1;
 	}
 </script>
 
@@ -371,6 +377,28 @@
 
 			<TextStyleButtons {editor} />
 
+			<button
+				aria-label="set font"
+				onclick={() => fontDialog.open()}
+				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes("textStyle").font
+					? 'bg-zinc-800'
+					: ''}"
+				use:tippy={{ content: "Set Font", placement: "bottom" }}>
+				<IconFont />
+			</button>
+			{#if editor.getAttributes("textStyle").font}
+			<button
+				aria-label="unset font"
+				onclick={() => editor.chain().focus().unsetFont().run()}
+				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.isActive(
+					'textStyle',
+				)
+					? 'bg-zinc-800'
+					: ''}"
+				use:tippy={{ content: "Unset Font", placement: "bottom" }}>
+				<IconNoFont />
+			</button>
+			{/if}
 			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
@@ -402,7 +430,7 @@
 					<IconSquare />
 				</button>
 			{/each}
-			{#if editor.isActive("textStyle")}
+			{#if editor.getAttributes("textStyle").color}
 				<button
 					onclick={() => editor.chain().focus().unsetColor().run()}
 					use:tippy={{ content: "Unset color", placement: "bottom" }}
@@ -411,15 +439,11 @@
 					<IconHollow />
 				</button>
 			{/if}
-			
+
 			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
-				class="toolbar-btn {editor.isActive(
-					'clickEvent',
-				)
-					? 'bg-zinc-800'
-					: ''}"
+				class="toolbar-btn {editor.isActive('clickEvent') ? 'bg-zinc-800' : ''}"
 				use:tippy={{
 					content: "Click Event",
 					placement: "bottom",
@@ -455,9 +479,7 @@
 				}}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
 					? 'ml-2'
-					: ''} toolbar-btn {editor.isActive(
-					'hoverEvent',
-				)
+					: ''} toolbar-btn {editor.isActive('hoverEvent')
 					? 'bg-zinc-800'
 					: ''}"
 				use:tippy={{
@@ -477,7 +499,7 @@
 					<IconEdit />
 				</button>
 			{/if}
-			
+
 			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
@@ -517,7 +539,7 @@
 	</div>
 
 	<div>
-		{#if $page.url.searchParams.has('dev')}
+		{#if $page.url.searchParams.has("dev")}
 			<code class="inline-block p-3 overflow-x-scroll"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
@@ -525,12 +547,18 @@
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">
-			<div class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
+			<div
+				class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
 				<button
 					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
+							convert(
+								editor.getJSON(),
+								"standard",
+								outputVersion,
+								shouldOptimise,
+							),
 						);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
@@ -544,7 +572,12 @@
 				<p>
 					<code class="inline break-all"
 						>{editor
-							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
+							? convert(
+									editor.getJSON(),
+									"standard",
+									outputVersion,
+									shouldOptimise,
+								)
 							: "Loading..."}
 					</code>
 				</p>
@@ -553,21 +586,28 @@
 				<div class="flex items-center space-x-2 mt-2 select-none">
 					<p class="font-lexend text-xs text-white/60 nomob">
 						{editor
-							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise).length
+							? convert(
+									editor.getJSON(),
+									"standard",
+									outputVersion,
+									shouldOptimise,
+								).length
 							: 0} characters
 					</p>
 					<p class="font-lexend text-xs text-white/60 nomob">
 						{getTextComponentCount()} components
 					</p>
-					<p class="font-lexend text-xs text-white/60 nomob">
-						•
-					</p>
+					<p class="font-lexend text-xs text-white/60 nomob">•</p>
 					<p class="font-lexend text-xs text-white/60">
 						Click to change output settings:
 					</p>
 					<button
 						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-						use:tippy={{ content: "Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version.", placement: "top" }}
+						use:tippy={{
+							content:
+								"Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version.",
+							placement: "top",
+						}}
 						onclick={() => {
 							const ov = outputVersion;
 							if (ov == "new") {
@@ -578,8 +618,13 @@
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 					<button
 						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-						use:tippy={{ content: "Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually).", placement: "top" }}
-						onclick={() => shouldOptimise = !shouldOptimise}>{shouldOptimise ? "optimised" : "expanded"}</button>
+						use:tippy={{
+							content:
+								"Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually).",
+							placement: "top",
+						}}
+						onclick={() => (shouldOptimise = !shouldOptimise)}
+						>{shouldOptimise ? "optimised" : "expanded"}</button>
 				</div>
 			{/if}
 		</div>
@@ -680,7 +725,7 @@
 		<textarea
 			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft h-32"
 			placeholder="Paste NBT text components here"
-			bind:value={importText} ></textarea>
+			bind:value={importText}></textarea>
 
 		<button
 			onclick={importToEditor}
@@ -690,6 +735,29 @@
 	</div>
 </Modal>
 
+<Modal title="Set font" bind:this={fontDialog} key="F">
+	<div class="flex flex-col w-full space-y-2">
+		<p>
+			Type in your font name and press submit.
+		</p>
+		<input
+			type="text"
+			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
+			placeholder="Put your font and identifier"
+			bind:value={fontName} />
+
+		<button
+			onclick={() => {
+				editor.chain().focus().setFont(fontName).run();
+				fontDialog.close();
+			}}
+			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			Set Font
+		</button>
+	</div>
+</Modal>
+
 <KeybindModal bind:keybindDialog />
+<FontUploadModal/>
 
 <ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />

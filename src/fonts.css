@@ -12,6 +12,34 @@
 	src: url("/MinecraftBold.woff2") format("woff2");
 }
 
+@font-face {
+	font-display: swap;
+	font-family: MinecraftEnchanting;
+	font-weight: 400;
+	src: url("/MinecraftEnchanting.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: MinecraftEnchantingBold;
+	font-weight: 600;
+	src: url("/MinecraftEnchantingBold.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: MinecraftIllager;
+	font-weight: 400;
+	src: url("/MinecraftIllager.woff2") format("woff2");
+}
+
+@font-face {
+	font-display: swap;
+	font-family: MinecraftIllagerBold;
+	font-weight: 600;
+	src: url("/MinecraftIllagerBold.woff2") format("woff2");
+}
+
 /* lexend-regular - latin */
 @font-face {
 	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */

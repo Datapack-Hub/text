@@ -374,7 +374,7 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 				}
 				if (group.length > 1) {
 					// Remove shared properties from each group member for "extra"
-					let extras = group.map(comp => {
+					let extras: StringyMCText[] = group.map(comp => {
 						const c = { ...comp };
 						for (const prop of Object.keys(sharedAll)) {
 							delete c[prop as MCTextKey];
@@ -472,6 +472,7 @@ export function translate(
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
@@ -516,7 +517,7 @@ export function translate(
 			const content = p.content ?? [];
 			let currentLine: StringyMCText[] = [];
 
-			for (const [i, c] of content.entries()) {
+			for (const [_, c] of content.entries()) {
 				let currentComponent: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),
@@ -524,6 +525,7 @@ export function translate(
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
 				currentComponent = addTypeSpecificValues(currentComponent, c, false);

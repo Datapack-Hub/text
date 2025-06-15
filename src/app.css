@@ -5,6 +5,15 @@
 	border-color: transparent;
 }
 
+:root {
+	accent-color: #ff631a;
+}
+
+*::selection {
+	background: #ff631a;
+	color:white;
+}
+
 @theme {
 	--font-lexend: Lexend, sans-serif;
 	--font-minecraft: Minecraft, sans-serif;

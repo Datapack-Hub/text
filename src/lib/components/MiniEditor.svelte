@@ -16,6 +16,7 @@
 
 	import {
 		ClickEventMark,
+		FontsExtension,
 		HoverEventMark,
 		Obfuscation,
 		ShadowColorMark,
@@ -44,6 +45,7 @@
 				ClickEventMark,
 				HoverEventMark,
 				ShadowColorMark,
+				FontsExtension,
 				Placeholder.configure({
 					placeholder: placeholder,
 				}),

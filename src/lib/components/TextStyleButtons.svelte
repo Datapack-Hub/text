@@ -4,9 +4,9 @@
 	import IconBold from "~icons/tabler/bold";
 	import IconItalic from "~icons/tabler/italic";
 	import IconObfuscate from "~icons/tabler/password";
+	import IconShadow from "~icons/tabler/shadow";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
-	import IconShadow from "~icons/tabler/shadow";
 
 	const { editor, small = false } = $props();
 	let shadowColorValue = $state("#ffffff");

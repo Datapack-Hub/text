@@ -14,6 +14,7 @@
 		{ keys: ["Ctrl", "Shift", "C"], action: "Custom Color" },
 		{ keys: ["Ctrl", "Shift", "L"], action: "Load a snapshot" },
 		{ keys: ["Ctrl", "Shift", "I"], action: "Import from NBT" },
+		{ keys: ["Ctrl", "Shift", "F"], action: "Add a font" },
 		// normal text editor keybinds
 		{ keys: ["Ctrl", "B"], action: "Bold" },
 		{ keys: ["Ctrl", "I"], action: "Italic" },

@@ -49,6 +49,7 @@
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconFont from "~icons/tabler/function";
 	import IconNoFont from "~icons/tabler/function-off";
+	import IconUploadFont from "~icons/tabler/function-filled";
 
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
@@ -58,6 +59,7 @@
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 	import { page } from "$app/stores";
 	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
+	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -104,6 +106,7 @@
 	let hoverEventDialog: Modal;
 
 	let fontDialog: Modal;
+	let fontUploadModal: Modal;
 	let fontName = "";
 
 	let customType: string | undefined;
@@ -316,7 +319,7 @@
 				exportType: "standard",
 				indent: false,
 				exportVersion: outputVersion,
-				optimise: shouldOptimise
+				optimise: shouldOptimise,
 			}),
 		);
 		if (Array.isArray(components)) {
@@ -380,24 +383,26 @@
 			<button
 				aria-label="set font"
 				onclick={() => fontDialog.open()}
-				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes("textStyle").font
+				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes(
+					'textStyle',
+				).font
 					? 'bg-zinc-800'
 					: ''}"
 				use:tippy={{ content: "Set Font", placement: "bottom" }}>
 				<IconFont />
 			</button>
 			{#if editor.getAttributes("textStyle").font}
-			<button
-				aria-label="unset font"
-				onclick={() => editor.chain().focus().unsetFont().run()}
-				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.isActive(
-					'textStyle',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Unset Font", placement: "bottom" }}>
-				<IconNoFont />
-			</button>
+				<button
+					aria-label="unset font"
+					onclick={() => editor.chain().focus().unsetFont().run()}
+					class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.isActive(
+						'textStyle',
+					)
+						? 'bg-zinc-800'
+						: ''}"
+					use:tippy={{ content: "Unset Font", placement: "bottom" }}>
+					<IconNoFont />
+				</button>
 			{/if}
 			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
@@ -521,6 +526,14 @@
 
 			<div class="flex-grow"></div>
 
+			<button
+				class="toolbar-btn nomob"
+				onclick={fontUploadModal.open}
+				use:tippy={{
+					content: "Upload Font",
+					placement: "bottom",
+				}}
+				aria-label="Keybinds"><IconUploadFont /></button>
 			<button
 				class="toolbar-btn nomob"
 				onclick={keybindDialog.open}
@@ -735,11 +748,48 @@
 	</div>
 </Modal>
 
-<Modal title="Set font" bind:this={fontDialog} key="F">
+<Modal title="Set font" bind:this={fontDialog} key="F" opened>
 	<div class="flex flex-col w-full space-y-2">
-		<p>
-			Type in your font name and press submit.
-		</p>
+		<p>Press to apply a font or type below to use a custom font</p>
+		<div class="grid grid-cols-2 gap-2">
+			<button
+				onclick={() => {
+					editor.chain().focus().unsetFont().run();
+					fontDialog.close();
+				}}
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				Default <span class="font-mono text-white/60">(unsets fonts)</span>
+			</button>
+			<button
+				onclick={() => {
+					editor.chain().focus().setFont("minecraft:illageralt").run();
+					fontDialog.close();
+				}}
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				Illager Alt <span class="font-mono text-white/60"
+					>(minecraft:illageralt)</span>
+			</button>
+			<button
+				onclick={() => {
+					editor.chain().focus().setFont("minecraft:alt").run();
+					fontDialog.close();
+				}}
+				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				Enchant Table <span class="font-mono text-white/60"
+					>(minecraft:alt)</span>
+			</button>
+			{#each fontLUT as [identifier, alias]}
+				<button
+					onclick={() => {
+						editor.chain().focus().setFont(alias).run();
+						fontDialog.close();
+					}}
+					class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+					Custom Font <span class="font-mono text-white/60"
+						>({identifier})</span>
+				</button>
+			{/each}
+		</div>
 		<input
 			type="text"
 			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
@@ -758,6 +808,6 @@
 </Modal>
 
 <KeybindModal bind:keybindDialog />
-<FontUploadModal/>
+<FontUploadModal bind:fontUploadModal />
 
 <ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />

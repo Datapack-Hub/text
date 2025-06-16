@@ -1,4 +1,3 @@
-
 export interface ClickEventAttributes {
 	action: string | null;
 	value: string | null;
@@ -106,4 +105,4 @@ export { ScoreNode } from "./nodes/ScoreNode";
 export { SelectorNode } from "./nodes/SelectorNode";
 export { StorageNBTNode } from "./nodes/StorageNBTNode";
 export { TranslateNode } from "./nodes/TranslateNode";
-export { FontsExtension } from "./FontsExtension"
+export { FontsExtension } from "./fonts";

@@ -42,7 +42,7 @@ const styleProps = [
 	"hoverEvent",
 ];
 
-/** 
+/**
  * @param content the node to check
  * @param mark the mark to check
  * @returns the mark if true, undefined otherwise
@@ -57,7 +57,7 @@ export function trueMarkOrUndefined(
 
 /**
  * A color value LUT
- * 
+ *
  * @param color the hex code
  * @returns the color name
  */
@@ -70,7 +70,7 @@ export function defaultColorLUT(color: string): string | undefined {
 
 /**
  * A color name LUT
- * 
+ *
  * @param color the color name you want to find
  * @returns the hex code for the color
  */
@@ -83,7 +83,7 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 
 /**
  * Checks the type of the mark against `type`
- * 
+ *
  * @param c the node you want to examine
  * @param type type to check
  * @returns true if it matches
@@ -94,7 +94,7 @@ export function isMarkType(c: JSONContent, type: string) {
 
 /**
  * Applies the specific properties for a type of source or provider
- * 
+ *
  * @param current current text component
  * @param c the current editor JSON
  * @param includeInteractivity should it have click and hover events
@@ -143,7 +143,7 @@ export function addTypeSpecificValues(
 			break;
 	}
 
-	if (includeInteractivity) {		
+	if (includeInteractivity) {
 		switch (exportVersion) {
 			case "new":
 				newApplyInteractiveValues(current, c);
@@ -164,10 +164,7 @@ export function addTypeSpecificValues(
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function newApplyInteractiveValues(
-	current: MinecraftText,
-	c: JSONContent,
-) {
+function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
 	if (isMarkType(c, "clickEvent")) {
 		const ce = isMarkType(c, "clickEvent")?.attrs;
 		current.click_event = { action: ce!.action };
@@ -204,10 +201,7 @@ function newApplyInteractiveValues(
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function oldApplyInteractiveValues(
-	current: OldMinecraftText,
-	c: JSONContent
-) {
+function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
 	if (isMarkType(c, "clickEvent")) {
 		const ce = isMarkType(c, "clickEvent")?.attrs;
 		current.clickEvent = { action: ce!.action, value: ce!.value };
@@ -221,10 +215,10 @@ function oldApplyInteractiveValues(
 
 /**
  * Applies a gradient to a selection in an editor
- * 
+ *
  * @param editor the editor you want to apply it to
  * @param gradientColors the colors you want to use
- * @returns 
+ * @returns
  */
 export function applyGradient(editor: Editor, gradientColors: string[]) {
 	const { from, to } = editor.state.selection;
@@ -277,15 +271,15 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 /**
  * Optimises the final outputted component string to reduce characters
- * 
+ *
  * @param arr An array of strings or text components
- * @returns 
+ * @returns
  */
 export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
 	if (!lore) {
-		out.push("")
+		out.push("");
 	}
 
 	// 1: Remove undefineds, flatten MinecraftText with only text
@@ -295,14 +289,18 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			continue;
 		}
 		if ("text" in comp) {
-			Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
+			Object.keys(comp).forEach(
+				(k) =>
+					comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey],
+			);
 		}
 		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
 	}
 
 	// 2: Merge adjacent strings and whitespace, group objects with shared style
 	for (let i = 0; i < out.length - 1; i++) {
-		const curr = out[i], next = out[i + 1];
+		const curr = out[i],
+			next = out[i + 1];
 
 		// Merge whitespace to prev component
 		// todo fix
@@ -314,18 +312,16 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		// Merge consecutive strings
 		if (typeof curr === "string" && typeof next === "string") {
 			out[i] = curr + next;
-			out.splice(i + 1, 1); i--;
+			out.splice(i + 1, 1);
+			i--;
 			continue;
 		}
 
 		// Find shared style/interactivity properties between consecutive objects
-		if (
-			typeof curr === "object" &&
-			typeof next === "object"
-		) {
+		if (typeof curr === "object" && typeof next === "object") {
 			const shared: Record<string, any> = {};
 			for (const prop of styleProps) {
-				const p = prop as MCTextKey
+				const p = prop as MCTextKey;
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
@@ -338,15 +334,16 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			const allProps = [...styleProps];
 			const sharedAll: Record<string, any> = {};
 			for (const prop of allProps) {
-				const p = prop as MCTextKey
+				const p = prop as MCTextKey;
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
-					(
-						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
-							? JSON.stringify(curr[p]) === JSON.stringify(next[p])
-							: curr[p] === next[p]
-					)
+					(prop === "hover_event" ||
+					prop === "click_event" ||
+					prop === "hoverEvent" ||
+					prop === "clickEvent"
+						? JSON.stringify(curr[p]) === JSON.stringify(next[p])
+						: curr[p] === next[p])
 				) {
 					sharedAll[p] = curr[p];
 				}
@@ -362,8 +359,10 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					Object.keys(sharedAll).every(
 						(prop) =>
 							out[j + 1][prop as keyof StringyMCText] !== undefined &&
-							(
-								prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+							(prop === "hover_event" ||
+							prop === "click_event" ||
+							prop === "hoverEvent" ||
+							prop === "clickEvent"
 								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
 									JSON.stringify(sharedAll[prop])
 								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
@@ -374,7 +373,7 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 				}
 				if (group.length > 1) {
 					// Remove shared properties from each group member for "extra"
-					let extras: StringyMCText[] = group.map(comp => {
+					let extras: StringyMCText[] = group.map((comp) => {
 						const c = { ...comp };
 						for (const prop of Object.keys(sharedAll)) {
 							delete c[prop as MCTextKey];
@@ -383,8 +382,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					});
 
 					// Optimise extra
-					extras = optimise(extras)
-					const first = extras.shift()
+					extras = optimise(extras);
+					const first = extras.shift();
 					let merged;
 					if (typeof first == "string") {
 						if (extras[0]) {
@@ -408,7 +407,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	}
 
 	// 3: Remove leading empty string if followed by a string
-	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string")
+		out.shift();
 
 	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
 	if (
@@ -423,9 +423,9 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		out.shift();
 	}
 
-	// 5: If it is item lore then override 
+	// 5: If it is item lore then override
 	if (lore) {
-		out.unshift({italic: false, color: "white", text: ""})
+		out.unshift({ italic: false, color: "white", text: "" });
 	}
 
 	return out;
@@ -438,7 +438,7 @@ export function convert(
 	jsonContent: JSONContent,
 	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
-	optimise: boolean
+	optimise: boolean,
 ): string {
 	let out = translate(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new") {
@@ -483,7 +483,12 @@ export function translate(
 					);
 				}
 
-				current = addTypeSpecificValues(current, c, true, options.exportVersion);
+				current = addTypeSpecificValues(
+					current,
+					c,
+					true,
+					options.exportVersion,
+				);
 				data.push(current);
 			}
 			if (i < paragraphs.length - 1) data.push("\n");
@@ -498,7 +503,7 @@ export function translate(
 		if (options.optimise) {
 			data = optimise(data);
 		} else {
-			data.unshift("")
+			data.unshift("");
 		}
 
 		if (data.length === 1) {

@@ -1,5 +1,7 @@
 import { Extension } from "@tiptap/core";
 
+export let fontLUT: Map<string, string> = new Map();
+
 export const FontsExtension = Extension.create({
 	name: "font",
 
@@ -22,21 +24,27 @@ export const FontsExtension = Extension.create({
 							if (!attributes.font) {
 								return {};
 							}
-							
-							let font = "monospace"
+
+							let font = "monospace";
 
 							switch (attributes.font.toLowerCase()) {
 								case "minecraft:alt":
-									font = "MinecraftEnchanting"
+									font = "MinecraftEnchanting";
 									break;
 								case "minecraft:illageralt":
-									font = "MinecraftIllager"
+									font = "MinecraftIllager";
 									break;
+							}
+
+							for (const [identifier, alias] of fontLUT) {
+								if (attributes.font.toLowerCase() === identifier) {
+									font = alias;
+								}
 							}
 
 							return {
 								style: `
-									font-family: ${font};
+									font-family: "${font}";
 									font-size: 12pt;
 								`,
 							};

@@ -7,8 +7,8 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
 	// replace 1b and 0b
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true")
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false")
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false");
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
@@ -52,44 +52,44 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 
 	paragraphContent!.push(finalText);
 
-	console.log(finalText)
+	console.log(finalText);
 
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
-			if(typeof(txt) == "object") {
+			if (typeof txt == "object") {
 				Object.assign(txt, {
 					bold: txt.bold ?? text.bold,
 					italic: txt.italic ?? text.italic,
 					underlined: txt.underlined ?? text.underlined,
 					obfuscated: txt.obfuscated ?? text.obfuscated,
 					strikethrough: txt.strikethrough ?? text.strikethrough,
-					color: txt.color ?? text.color ,
+					color: txt.color ?? text.color,
 					shadow_color: txt.shadow_color ?? text.shadow_color,
 					click_event: txt.click_event ?? text.click_event,
 					clickEvent: txt.clickEvent ?? text.clickEvent,
 					hover_event: txt.hover_event ?? text.hover_event,
 					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
-					font: txt.font ?? text.font
+					font: txt.font ?? text.font,
 				});
 				processTextComponent(txt, baseDocument);
 			} else {
 				let newComponent = {
-					text: txt
-				}
+					text: txt,
+				};
 				Object.assign(newComponent, {
 					bold: text.bold,
 					italic: text.italic,
 					underlined: text.underlined,
 					obfuscated: text.obfuscated,
 					strikethrough: text.strikethrough,
-					color: text.color ,
+					color: text.color,
 					shadow_color: text.shadow_color,
 					click_event: text.click_event,
 					clickEvent: text.clickEvent,
 					hover_event: text.hover_event,
 					hoverEvent: text.hoverEvent,
-					font: text.font
+					font: text.font,
 				});
 				processTextComponent(newComponent, baseDocument);
 			}
@@ -191,7 +191,10 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 	return finalText;
 }
 
-function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONContent) {
+function applyStyling(
+	text: MinecraftText & OldMinecraftText,
+	finalText: JSONContent,
+) {
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}

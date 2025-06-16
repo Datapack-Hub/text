@@ -20,6 +20,7 @@
 		"@tiptap/extension-font-family": "^2.14.0",
 		"@tiptap/extension-text-style": "^2.14.0",
 		"@tiptap/extension-underline": "^2.14.0",
+		"file-type": "^21.0.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-svelte": "^3.4.0",
 		"svelte": "^5.34.3",

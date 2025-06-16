@@ -43,7 +43,7 @@
 				StorageNBTNode,
 				TranslateNode,
 				ShadowColorMark,
-				FontsExtension
+				FontsExtension,
 			],
 			content: value,
 		}).setEditable(false);

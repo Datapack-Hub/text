@@ -10,7 +10,7 @@
 		recentlyCopied,
 		indent,
 		indentSize,
-		shouldOptimise = true
+		shouldOptimise = true,
 	} = $props();
 </script>
 
@@ -28,7 +28,12 @@
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"/tellraw @s " +
-							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
+							convert(
+								editor.getJSON(),
+								"standard",
+								outputVersion,
+								shouldOptimise,
+							),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -58,17 +63,22 @@
 			{#if outputVersion == "new"}
 				<code class="inline-block w-full overflow-auto max-h-56"
 					>[lore={editor
-						? convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)
+						? convert(
+								editor.getJSON(),
+								"item_lore",
+								outputVersion,
+								shouldOptimise,
+							)
 						: "Loading..."}]
 				</code>
 			{:else}
 				<code class="inline-block w-full overflow-auto max-h-56"
 					>[lore={editor
 						? `'${translate(editor.getJSON(), {
-							exportType: "item_lore",
-							exportVersion: outputVersion,
-							optimise: shouldOptimise
-						})}`
+								exportType: "item_lore",
+								exportVersion: outputVersion,
+								optimise: shouldOptimise,
+							})}`
 						: "Loading..."}]
 				</code>
 			{/if}
@@ -80,16 +90,13 @@
 				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						translate(
-							editor.getJSON(),
-							{
-								exportType: "standard",
-								exportVersion: outputVersion,
-								indent,
-								indentSize,
-								optimise: shouldOptimise
-							}
-						),
+						translate(editor.getJSON(), {
+							exportType: "standard",
+							exportVersion: outputVersion,
+							indent,
+							indentSize,
+							optimise: shouldOptimise,
+						}),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -98,16 +105,13 @@
 			</button>
 			<code class="inline-block w-full overflow-auto max-h-56"
 				><pre>{editor
-						? translate(
-								editor.getJSON(),
-								{
-									exportType: "standard",
-									exportVersion: outputVersion,
-									indent,
-									indentSize,
-									optimise: shouldOptimise
-								}
-							)
+						? translate(editor.getJSON(), {
+								exportType: "standard",
+								exportVersion: outputVersion,
+								indent,
+								indentSize,
+								optimise: shouldOptimise,
+							})
 						: "Loading..."}</pre>
 			</code>
 		</div>

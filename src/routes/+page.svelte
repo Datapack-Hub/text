@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { colorMap, convert, optimise, translate } from "$lib/tiptap/text";
+	import { convert, translate } from "$lib/text/nbt_or_json";
 
 	import {
 		BlockNBTNode,
@@ -19,14 +19,14 @@
 	// Components
 	import MiniEditor from "$lib/components/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import tippy from "tippy.js";
 	import "tippy.js/dist/tippy.css";
 	// optional
 
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
 	import { Editor } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -34,9 +34,14 @@
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 	// Icons
+	import IconUndo from "~icons/tabler/arrow-back-up";
+	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
+	import IconFont from "~icons/tabler/function";
+	import IconUploadFont from "~icons/tabler/function-filled";
+	import IconNoFont from "~icons/tabler/function-off";
 	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconKeybinds from "~icons/tabler/keyboard";
 	import IconColor from "~icons/tabler/palette";
@@ -45,77 +50,71 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconUndo from "~icons/tabler/arrow-back-up";
-	import IconRedo from "~icons/tabler/arrow-forward-up";
-	import IconFont from "~icons/tabler/function";
-	import IconNoFont from "~icons/tabler/function-off";
-	import IconUploadFont from "~icons/tabler/function-filled";
 
+	import { page } from "$app/stores";
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
 	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
 	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
 	import ExportModal from "$lib/components/modals/ExportModal.svelte";
+	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
-	import { page } from "$app/stores";
-	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
+	import { colorMap } from "$lib/text/general";
 
-	// TODO: convert to non-legacy mode
-	export let value = "";
+	let value: string = $state("");
 
-	let element: HTMLElement;
-	let editor: Editor;
-	let color = "#ffffff";
-	let colorDialog: Modal;
+	let element: HTMLElement | undefined = $state();
+	let editor: Editor | undefined = $state();
+	let color = $state("#ffffff");
+	let colorDialog: Modal | undefined = $state();
 
-	let outputDialog: Modal;
-	let outputVersion: "new" | "old";
+	let outputDialog: Modal | undefined = $state();
+	let outputVersion: "new" | "old" = $state("new");
 
-	let doesContentExist: boolean = false;
-	let colorsVisible = false;
-	let shouldOptimise = true;
+	let doesContentExist: boolean = $state(false);
+	let shouldOptimise = $state(true);
 
 	let indent = false;
 	let indentSize = 2;
 
 	// Import
-	let importDialog: Modal;
-	let importText: string;
+	let importDialog: Modal | undefined = $state();
+	let importText: string = $state("");
 
-	let recentlyCopied = false;
+	let recentlyCopied = $state(false);
 
 	// Snapshots and stuff
-	let snapshots: object[] = [];
-	let recentlySaved = false;
-	let loadDialog: Modal;
+	let snapshots: object[] = $state([]);
+	let recentlySaved = $state(false);
+	let loadDialog: Modal | undefined = $state();
 
 	// Dialogs
-	let gradientDialog: Modal;
-	let gradientSteps: string[] = ["#ffffff"];
+	let gradientDialog: Modal | undefined = $state();
+	let gradientSteps: string[] = $state(["#ffffff"]);
 
-	let keybindDialog: Modal;
+	let keybindDialog: Modal | undefined = $state();
 
-	let clickEventType = "";
-	let clickEventValue = "";
-	let clickEventDialog: Modal;
+	let clickEventType = $state("");
+	let clickEventValue = $state("");
+	let clickEventDialog: Modal | undefined = $state();
 
 	let hoverEventType = "";
-	let hoverEventValue: any;
-	let hoverEventEditor: MiniEditor;
-	let hoverEventDialog: Modal;
+	let hoverEventValue: any = $state();
+	let hoverEventEditor: MiniEditor | undefined = $state();
+	let hoverEventDialog: Modal | undefined = $state();
 
-	let fontDialog: Modal;
-	let fontUploadModal: Modal;
-	let fontName = "";
+	let fontDialog: Modal | undefined = $state();
+	let fontUploadModal: Modal | undefined = $state();
+	let fontName = $state("");
 
-	let customType: string | undefined;
-	let customDialog: Modal;
+	let customType: string | undefined = $state();
+	let customDialog: Modal | undefined = $state();
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
-		editor.commands.setContent(jsonContent);
-		importDialog.close();
+		editor?.commands.setContent(jsonContent);
+		importDialog?.close();
 	}
 
 	onMount(() => {
@@ -170,7 +169,7 @@
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
-				editor.getText() === ""
+				editor!.getText() === ""
 					? (doesContentExist = false)
 					: (doesContentExist = true);
 			},
@@ -195,8 +194,8 @@
 	}
 
 	function customColorHandler() {
-		editor.chain().focus().setColor(color).run();
-		colorDialog.close();
+		editor?.chain().focus().setColor(color).run();
+		colorDialog?.close();
 	}
 
 	const debounce = (callback: Function, wait: number) => {
@@ -210,18 +209,18 @@
 	};
 
 	function saveContent() {
-		localStorage.setItem("content", JSON.stringify(editor.getJSON()));
+		localStorage.setItem("content", JSON.stringify(editor!.getJSON()));
 	}
 
 	function saveSnapshot() {
 		const snapshotsTemp = localStorage.getItem("snapshots");
 		if (snapshotsTemp) {
 			snapshots = JSON.parse(snapshotsTemp);
-			snapshots.push(editor.getJSON());
+			snapshots.push(editor!.getJSON());
 			localStorage.setItem("snapshots", JSON.stringify(snapshots));
 		} else {
-			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
-			snapshots = [editor.getJSON()];
+			localStorage.setItem("snapshots", JSON.stringify([editor!.getJSON()]));
+			snapshots = [editor!.getJSON()];
 		}
 		recentlySaved = true;
 		setTimeout(() => {
@@ -230,10 +229,10 @@
 	}
 
 	function hoverEditButtonHandler() {
-		const { from, to } = editor.state.selection;
+		const { from, to } = editor!.state.selection;
 		let start = from,
 			end = to;
-		const doc = editor.state.doc;
+		const doc = editor!.state.doc;
 
 		function sameHoverEventMark(pos: number) {
 			const node = doc.nodeAt(pos);
@@ -259,10 +258,10 @@
 			end++;
 		}
 
-		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { action, value } = mark.attrs;
 		hoverEventType = action;
-		hoverEventDialog.open();
+		hoverEventDialog!.open();
 		if (hoverEventEditor) {
 			hoverEventEditor.importText(JSON.stringify(value));
 		}
@@ -271,10 +270,10 @@
 	function clickEditButtonHandler() {
 		// cobble if you want to move this elsewhere then please do
 		// what the heck -cbble_
-		const { from, to } = editor.state.selection;
+		const { from, to } = editor!.state.selection;
 		let start = from,
 			end = to;
-		const doc = editor.state.doc;
+		const doc = editor!.state.doc;
 
 		function sameClickEventMark(pos: number) {
 			const node = doc.nodeAt(pos);
@@ -300,22 +299,22 @@
 			end++;
 		}
 
-		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { action, value } = mark.attrs;
 		clickEventType = action;
 		clickEventValue = value;
-		clickEventDialog.open();
+		clickEventDialog!.open();
 	}
 
 	function clearMarksHandler(event: KeyboardEvent) {
 		if (event.ctrlKey && event.shiftKey && event.key === "X") {
-			editor.commands.unsetAllMarks();
+			editor!.commands.unsetAllMarks();
 		}
 	}
 
 	function getTextComponentCount() {
 		const components = JSON.parse(
-			translate(editor.getJSON(), {
+			translate(editor!.getJSON(), {
 				exportType: "standard",
 				indent: false,
 				exportVersion: outputVersion,
@@ -331,44 +330,43 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex flex-col h-screen max-h-screen">
+<div class="flex h-screen max-h-screen flex-col">
 	<div
-		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
+		class="flex w-full items-center bg-zinc-950 text-zinc-300"
 		style="font-family: Lexend">
-		<div class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer">
+		<div class="flex items-center px-3 py-2 hover:bg-white/3">
 			<img src="/dph.svg" class="h-5" alt="logo" />
-			<span class="ml-3 nomob">Minecraft Text Editor</span>
+			<span class="nomob ml-3">Minecraft Text Editor</span>
 		</div>
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			onclick={importDialog.open}>Import</button>
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={importDialog?.open}>Import</button>
 		{#if doesContentExist}
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-				onclick={outputDialog.open}>Export</button>
+				class="flex items-center px-3 py-2 hover:bg-white/3"
+				onclick={outputDialog?.open}>Export</button>
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
+				class="flex items-center px-3 py-2 hover:bg-white/3"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			onclick={loadDialog.open}>Load</button>
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={loadDialog?.open}>Load</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			>Discord</a>
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3">Discord</a>
 		<a
 			href="https://datapack.wiki/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3"
 			>Datapack Wiki</a>
 	</div>
 
-	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
+	<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
 		{#if editor}
 			<button
 				onclick={() => {
-					customDialog.open();
+					customDialog?.open();
 					customType = undefined;
 				}}
 				class="toolbar-btn"
@@ -376,14 +374,14 @@
 				<IconCustom />
 			</button>
 
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<TextStyleButtons {editor} />
 
 			<button
 				aria-label="set font"
-				onclick={() => fontDialog.open()}
-				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes(
+				onclick={() => fontDialog?.open()}
+				class="rounded-md p-1 text-lg font-medium hover:bg-white/3 {editor.getAttributes(
 					'textStyle',
 				).font
 					? 'bg-zinc-800'
@@ -394,8 +392,8 @@
 			{#if editor.getAttributes("textStyle").font}
 				<button
 					aria-label="unset font"
-					onclick={() => editor.chain().focus().unsetFont().run()}
-					class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.isActive(
+					onclick={() => editor?.chain().focus().unsetFont().run()}
+					class="rounded-md p-1 text-lg font-medium hover:bg-white/3 {editor.isActive(
 						'textStyle',
 					)
 						? 'bg-zinc-800'
@@ -404,28 +402,28 @@
 					<IconNoFont />
 				</button>
 			{/if}
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<button
 				class="toolbar-btn"
 				style="color: {color}"
-				onclick={colorDialog.open}
+				onclick={colorDialog?.open}
 				use:tippy={{ content: "Custom Color", placement: "bottom" }}
 				><IconColor /></button>
 			<button
 				class="toolbar-btn"
-				onclick={gradientDialog.open}
+				onclick={gradientDialog?.open}
 				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
 				><IconGradient /></button>
 			{#each colorMap as color}
 				<button
 					aria-label="set color to {color.name}"
-					onclick={() => editor.chain().focus().setColor(color.value).run()}
+					onclick={() => editor?.chain().focus().setColor(color.value).run()}
 					use:tippy={{
 						content: toTitleCase(color.name.replace("_", " ")),
 						placement: "bottom",
 					}}
-					class="p-1 text-lg hover:bg-white/3 rounded-md {editor.isActive(
+					class="rounded-md p-1 text-lg hover:bg-white/3 {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -437,15 +435,15 @@
 			{/each}
 			{#if editor.getAttributes("textStyle").color}
 				<button
-					onclick={() => editor.chain().focus().unsetColor().run()}
+					onclick={() => editor?.chain().focus().unsetColor().run()}
 					use:tippy={{ content: "Unset color", placement: "bottom" }}
-					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md"
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
 				</button>
 			{/if}
 
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<button
 				class="toolbar-btn {editor.isActive('clickEvent') ? 'bg-zinc-800' : ''}"
@@ -454,10 +452,10 @@
 					placement: "bottom",
 				}}
 				onclick={() => {
-					if (editor.isActive("clickEvent")) {
-						editor.chain().focus().unsetClickEvent().run();
+					if (editor?.isActive("clickEvent")) {
+						editor?.chain().focus().unsetClickEvent().run();
 					} else {
-						clickEventDialog.open();
+						clickEventDialog?.open();
 					}
 				}}>
 				<IconClickEvent />
@@ -476,10 +474,10 @@
 
 			<button
 				onclick={() => {
-					if (editor.isActive("hoverEvent")) {
-						editor.chain().focus().unsetHoverEvent().run();
+					if (editor?.isActive("hoverEvent")) {
+						editor?.chain().focus().unsetHoverEvent().run();
 					} else {
-						hoverEventDialog.open();
+						hoverEventDialog?.open();
 					}
 				}}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
@@ -505,11 +503,11 @@
 				</button>
 			{/if}
 
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<button
 				class="toolbar-btn"
-				onclick={() => editor.chain().undo().run()}
+				onclick={() => editor?.chain().undo().run()}
 				use:tippy={{
 					content: "Undo",
 					placement: "bottom",
@@ -517,7 +515,7 @@
 				aria-label="Undo"><IconUndo /></button>
 			<button
 				class="toolbar-btn"
-				onclick={() => editor.chain().undo().run()}
+				onclick={() => editor?.chain().undo().run()}
 				use:tippy={{
 					content: "Redo",
 					placement: "bottom",
@@ -528,7 +526,7 @@
 
 			<button
 				class="toolbar-btn nomob"
-				onclick={fontUploadModal.open}
+				onclick={fontUploadModal?.open}
 				use:tippy={{
 					content: "Upload Font",
 					placement: "bottom",
@@ -536,7 +534,7 @@
 				aria-label="Keybinds"><IconUploadFont /></button>
 			<button
 				class="toolbar-btn nomob"
-				onclick={keybindDialog.open}
+				onclick={keybindDialog?.open}
 				use:tippy={{
 					content: "Keybinds",
 					placement: "bottom",
@@ -546,14 +544,14 @@
 	</div>
 
 	<div
-		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow overflow-auto"
+		class="font-minecraft w-full flex-grow overflow-auto bg-zinc-800 first:focus:outline-none"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
 
 	<div>
 		{#if $page.url.searchParams.has("dev")}
-			<code class="inline-block p-3 overflow-x-scroll"
+			<code class="inline-block overflow-x-scroll p-3"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
 					: "Loading..."}</code>
@@ -561,13 +559,13 @@
 		{/if}
 		<div class="bg-zinc-950 p-3">
 			<div
-				class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
+				class="flex max-h-48 max-w-screen items-start space-x-2 overflow-auto">
 				<button
-					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
 						navigator.clipboard.writeText(
 							convert(
-								editor.getJSON(),
+								editor!.getJSON(),
 								"standard",
 								outputVersion,
 								shouldOptimise,
@@ -596,8 +594,8 @@
 				</p>
 			</div>
 			{#if doesContentExist}
-				<div class="flex items-center space-x-2 mt-2 select-none">
-					<p class="font-lexend text-xs text-white/60 nomob">
+				<div class="mt-2 flex items-center space-x-2 select-none">
+					<p class="font-lexend nomob text-xs text-white/60">
 						{editor
 							? convert(
 									editor.getJSON(),
@@ -607,15 +605,15 @@
 								).length
 							: 0} characters
 					</p>
-					<p class="font-lexend text-xs text-white/60 nomob">
+					<p class="font-lexend nomob text-xs text-white/60">
 						{getTextComponentCount()} components
 					</p>
-					<p class="font-lexend text-xs text-white/60 nomob">•</p>
+					<p class="font-lexend nomob text-xs text-white/60">•</p>
 					<p class="font-lexend text-xs text-white/60">
 						Click to change output settings:
 					</p>
 					<button
-						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
 						use:tippy={{
 							content:
 								"Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version.",
@@ -630,7 +628,7 @@
 							}
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 					<button
-						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
 						use:tippy={{
 							content:
 								"Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually).",
@@ -656,13 +654,13 @@
 	<button
 		onclick={() => {
 			editor
-				.chain()
+				?.chain()
 				.focus()
 				.setHoverEvent({ action: "show_text", value: hoverEventValue })
 				.run();
-			hoverEventDialog.close();
+			hoverEventDialog?.close();
 		}}
-		class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+		class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 		Add Hover Event
 	</button>
 </Modal>
@@ -670,7 +668,7 @@
 <CustomSourceModal bind:customDialog bind:customType {editor} {outputVersion} />
 
 <Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
-	<div class="flex flex-col w-full py-4">
+	<div class="flex w-full flex-col py-4">
 		<ColorPicker
 			bind:hex={color}
 			position="responsive"
@@ -684,31 +682,31 @@
 
 		<button
 			onclick={customColorHandler}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 mx-4">
+			class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Done
 		</button>
 	</div>
 </Modal>
 
 <Modal title="Load a snapshot" bind:this={loadDialog} key="L">
-	<div class="flex flex-col space-y-2 w-full">
+	<div class="flex w-full flex-col space-y-2">
 		{#if snapshots.length == 0}
 			<p>You have not saved anything yet!</p>
 		{/if}
 		{#each snapshots as snapshot (snapshot)}
 			<div class="flex flex-col space-y-0">
-				<div class="bg-zinc-900 rounded-t-md rounded-br-md">
+				<div class="rounded-t-md rounded-br-md bg-zinc-900">
 					<MiniRenderer value={snapshot} />
 				</div>
-				<div class="flex bg-zinc-950 rounded-b-md w-fit">
+				<div class="flex w-fit rounded-b-md bg-zinc-950">
 					<button
-						class="hover:bg-white/3 py-2 px-3"
+						class="px-3 py-2 hover:bg-white/3"
 						onclick={() => {
-							editor.commands.setContent(snapshot);
-							editor.commands.focus();
+							editor?.commands.setContent(snapshot);
+							editor?.commands.focus();
 						}}>Load</button>
 					<button
-						class="hover:bg-white/3 py-2 px-3"
+						class="px-3 py-2 hover:bg-white/3"
 						onclick={() => {
 							snapshots = snapshots.filter(
 								(_, index) => index !== snapshots.indexOf(snapshot),
@@ -730,61 +728,61 @@
 	{recentlyCopied} />
 
 <Modal title="Import from NBT" bind:this={importDialog} key="I">
-	<div class="flex flex-col w-full space-y-2">
+	<div class="flex w-full flex-col space-y-2">
 		<p>
 			Paste your text components below to import them into the editor. This will
 			clear the current contents of the editor!
 		</p>
 		<textarea
-			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft h-32"
+			class="font-minecraft flex h-32 items-start rounded-lg bg-zinc-950 p-3"
 			placeholder="Paste NBT text components here"
 			bind:value={importText}></textarea>
 
 		<button
 			onclick={importToEditor}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Import
 		</button>
 	</div>
 </Modal>
 
-<Modal title="Set font" bind:this={fontDialog} key="F" opened>
-	<div class="flex flex-col w-full space-y-2">
+<Modal title="Set font" bind:this={fontDialog} key="F">
+	<div class="flex w-full flex-col space-y-2">
 		<p>Press to apply a font or type below to use a custom font</p>
 		<div class="grid grid-cols-2 gap-2">
 			<button
 				onclick={() => {
-					editor.chain().focus().unsetFont().run();
-					fontDialog.close();
+					editor?.chain().focus().unsetFont().run();
+					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50">
 				Default <span class="font-mono text-white/60">(unsets fonts)</span>
 			</button>
 			<button
 				onclick={() => {
-					editor.chain().focus().setFont("minecraft:illageralt").run();
-					fontDialog.close();
+					editor?.chain().focus().setFont("minecraft:illageralt").run();
+					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50">
 				Illager Alt <span class="font-mono text-white/60"
 					>(minecraft:illageralt)</span>
 			</button>
 			<button
 				onclick={() => {
-					editor.chain().focus().setFont("minecraft:alt").run();
-					fontDialog.close();
+					editor?.chain().focus().setFont("minecraft:alt").run();
+					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50">
 				Enchant Table <span class="font-mono text-white/60"
 					>(minecraft:alt)</span>
 			</button>
 			{#each fontLUT as [identifier, alias]}
 				<button
 					onclick={() => {
-						editor.chain().focus().setFont(alias).run();
-						fontDialog.close();
+						editor?.chain().focus().setFont(alias).run();
+						fontDialog?.close();
 					}}
-					class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
+					class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50">
 					Custom Font <span class="font-mono text-white/60"
 						>({identifier})</span>
 				</button>
@@ -792,16 +790,16 @@
 		</div>
 		<input
 			type="text"
-			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
+			class="font-minecraft flex items-start rounded-lg bg-zinc-950 p-3"
 			placeholder="Put your font and identifier"
 			bind:value={fontName} />
 
 		<button
 			onclick={() => {
-				editor.chain().focus().setFont(fontName).run();
-				fontDialog.close();
+				editor?.chain().focus().setFont(fontName).run();
+				fontDialog?.close();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Set Font
 		</button>
 	</div>

@@ -1,14 +1,10 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { fileTypeFromBlob } from "file-type";
 	import IconUpload from "~icons/tabler/file-upload";
 
-	type Props = {
-		fontUploadModal: Modal;
-	};
-
-	let { fontUploadModal = $bindable() }: Props = $props();
+	let { fontUploadModal = $bindable() } = $props();
 	let step = $state(1);
 	let identifier = $state("");
 	let fontAlias = $state("");
@@ -73,14 +69,14 @@
 	{#if step === 1}
 		<label
 			for="fontFileUpload"
-			class="bg-zinc-900 p-6 rounded-md"
+			class="rounded-md bg-zinc-900 p-6"
 			ondrop={dropHandler}
 			ondragover={(e) => e.preventDefault()}>
 			<div class="flex items-center justify-center gap-3 text-xl">
 				<IconUpload />
 				<p>Upload a font file</p>
 			</div>
-			<p class="text-white/70 mx-auto w-fit mt-3 text-sm">
+			<p class="mx-auto mt-3 w-fit text-sm text-white/70">
 				(.ttf, .otf, .woff2 recommended)
 			</p>
 			<input
@@ -96,11 +92,11 @@
 		</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			bind:value={identifier} />
 		<button
 			onclick={addToFontLUT}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add font
 		</button>
 	{/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
-	import { applyGradient } from "$lib/tiptap/text";
+	import Modal from "$lib/components/Modal.svelte";
+	import { applyGradient } from "$lib/text/general";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import IconDelete from "~icons/tabler/trash";
@@ -14,11 +14,11 @@
 </script>
 
 <Modal title="Color Gradient" bind:this={gradientDialog} key="G">
-	<div class="flex flex-col w-full space-y-2">
+	<div class="flex w-full flex-col space-y-2">
 		<p>Add colours to the gradient below:</p>
 		<div class="flex flex-col space-y-1">
 			{#each gradientSteps ?? [] as _, i}
-				<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
+				<div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
 					<div class="flex-grow">
 						<ColorPicker
 							bind:hex={gradientSteps[i]}
@@ -35,7 +35,7 @@
 							gradientSteps.splice(i, 1);
 							gradientSteps = gradientSteps;
 						}}
-						class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/20 h-9 aspect-square flex items-center justify-center">
+						class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
 						<IconDelete />
 					</button>
 				</div>
@@ -45,7 +45,7 @@
 					gradientSteps.push("#ffffff");
 					gradientSteps = gradientSteps;
 				}}
-				class="bg-zinc-900 p-2 rounded-md cursor-pointer hover:bg-black/50 aspect-square h-9 w-9">
+				class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconCustom class="m-auto" />
 			</button>
 		</div>
@@ -54,7 +54,7 @@
 				applyGradient(editor, gradientSteps);
 				gradientDialog.close();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Apply Gradient
 		</button>
 	</div>

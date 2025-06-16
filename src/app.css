@@ -73,5 +73,5 @@ button {
 }
 
 .toolbar-btn {
-	@apply p-1 text-lg hover:bg-white/3 rounded-md font-medium;
+	@apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
 }

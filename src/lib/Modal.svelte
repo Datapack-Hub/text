@@ -7,6 +7,7 @@
 		small = $bindable(false),
 		nopad = $bindable(false),
 		big = $bindable(false),
+		flexible = $bindable(false),
 		children,
 		key,
 	} = $props();
@@ -48,7 +49,7 @@
 		<div
 			class="z-50 {small ? 'w-fit' : 'w-[95%] md:w-[50%] 2xl:w-[30%]'} {big
 				? 'w-[95%]!'
-				: ''} m-auto py-4">
+				: ''} {flexible ? 'w-fit! max-w-[95%]' : ''} m-auto py-4">
 			<div class="rounded-t-lg p-4 bg-zinc-900 flex items-center">
 				<span class="font-bold text-lg flex-grow">{title}</span>
 				<button aria-label="close" onclick={close}><IconClose /></button>

@@ -60,6 +60,7 @@
 	import { page } from "$app/stores";
 	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
+	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -111,6 +112,8 @@
 
 	let customType: string | undefined;
 	let customDialog: Modal;
+
+	let unicodeSelectorDialog: Modal;
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
@@ -382,28 +385,15 @@
 
 			<button
 				aria-label="set font"
-				onclick={() => fontDialog.open()}
+				onclick={() => editor.getAttributes('textStyle',).font ? editor.chain().focus().unsetFont().run() : fontDialog.open()}
 				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes(
 					'textStyle',
 				).font
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{ content: "Set Font", placement: "bottom" }}>
+				use:tippy={{ content: "Font", placement: "bottom" }}>
 				<IconFont />
 			</button>
-			{#if editor.getAttributes("textStyle").font}
-				<button
-					aria-label="unset font"
-					onclick={() => editor.chain().focus().unsetFont().run()}
-					class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.isActive(
-						'textStyle',
-					)
-						? 'bg-zinc-800'
-						: ''}"
-					use:tippy={{ content: "Unset Font", placement: "bottom" }}>
-					<IconNoFont />
-				</button>
-			{/if}
 			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
 			<button
@@ -748,53 +738,75 @@
 	</div>
 </Modal>
 
-<Modal title="Set font" bind:this={fontDialog} key="F" opened>
+<Modal title="Set font" bind:this={fontDialog} key="F">
 	<div class="flex flex-col w-full space-y-2">
-		<p>Press to apply a font or type below to use a custom font</p>
-		<div class="grid grid-cols-2 gap-2">
+		<p>Select one of the default Minecraft fonts below:</p>
+		<div class="flex flex-col space-y-1">
 			<button
 				onclick={() => {
 					editor.chain().focus().unsetFont().run();
 					fontDialog.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
-				Default <span class="font-mono text-white/60">(unsets fonts)</span>
+				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				<IconFont />
+				<span>Default</span> 
 			</button>
 			<button
 				onclick={() => {
 					editor.chain().focus().setFont("minecraft:illageralt").run();
 					fontDialog.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
-				Illager Alt <span class="font-mono text-white/60"
-					>(minecraft:illageralt)</span>
+				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				<IconFont />
+				<span>Illager Alt</span> 
+				<span class="font-mono text-white/60">(minecraft:illageralt)</span>
 			</button>
 			<button
 				onclick={() => {
 					editor.chain().focus().setFont("minecraft:alt").run();
 					fontDialog.close();
 				}}
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
-				Enchant Table <span class="font-mono text-white/60"
-					>(minecraft:alt)</span>
+				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				<IconFont />
+				<span>Standard Galactic Alphabet (enchant table)</span> 
+				<span class="font-mono text-white/60">(minecraft:alt)</span>
 			</button>
+		</div>
+
+		<p class="my-2">To use a custom font in the editor, upload or select one below.</p>
+		<div class="flex flex-col space-y-1">
+			{#key fontLUT}
 			{#each fontLUT as [identifier, alias]}
 				<button
 					onclick={() => {
 						editor.chain().focus().setFont(alias).run();
 						fontDialog.close();
 					}}
-					class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50">
-					Custom Font <span class="font-mono text-white/60"
-						>({identifier})</span>
+					class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+					<IconUploadFont />
+					<span class="font-mono text-white">{identifier}</span>
 				</button>
 			{/each}
+			{/key}
+			<button
+				onclick={() => {
+					fontDialog.close();
+					fontUploadModal.open();
+				}}
+				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				<IconCustom />
+				<span>Upload a custom font...</span>
+				<span class="font-mono text-white/60">(.ttf, .otf, .woff2)</span>
+			</button>
 		</div>
+		
+		<p class="my-2">Or, if you want to use a custom font without importing it, enter the ID:</p>
 		<input
 			type="text"
-			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft"
-			placeholder="Put your font and identifier"
+			class="bg-zinc-900 p-2 rounded-md"
+			placeholder="namespace:id"
 			bind:value={fontName} />
+		<p class="text-sm text-white/60"><b>Note:</b> in order for a custom font to show up ingame, you will need to add it with a resource pack. Also, if you don't import a font into the editor, it will show up here as your browser's default font.</p>
 
 		<button
 			onclick={() => {
@@ -811,3 +823,4 @@
 <FontUploadModal bind:fontUploadModal />
 
 <ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />
+<UnicodeSelectorModal {editor} bind:unicodeSelectorDialog />

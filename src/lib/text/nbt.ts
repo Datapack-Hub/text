@@ -1,7 +1,7 @@
 import type { JSONContent } from "@tiptap/core";
-import { defaultColorReverseLUT } from "./tiptap/text";
-import { type MinecraftText, type OldMinecraftText } from "./types";
-import { type StringyMCText } from "./types";
+import { defaultColorReverseLUT } from "./general";
+import { type MinecraftText, type OldMinecraftText } from "../types";
+import { type StringyMCText } from "../types";
 
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');

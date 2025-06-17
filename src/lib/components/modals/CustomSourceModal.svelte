@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import IconTick from "~icons/tabler/check";
 	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
@@ -48,7 +48,7 @@
 	{#if !customType}
 		<div class="grid grid-cols-3 gap-2">
 			<button
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "translate";
 				}}>
@@ -56,7 +56,7 @@
 				<span>Translate Key</span>
 			</button>
 			<button
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "nbt";
 				}}>
@@ -64,7 +64,7 @@
 				<span>NBT Value</span>
 			</button>
 			<button
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "score";
 				}}>
@@ -72,7 +72,7 @@
 				<span>Score Value</span>
 			</button>
 			<button
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "selector";
 				}}>
@@ -80,7 +80,7 @@
 				<span>Selector</span>
 			</button>
 			<button
-				class="bg-zinc-900 p-3 rounded-md w-full h-full flex flex-col items-center space-y-2 cursor-pointer hover:bg-black/50"
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "keybind";
 				}}>
@@ -89,7 +89,7 @@
 			</button>
 		</div>
 	{:else}
-		<select bind:value={customType} class="bg-zinc-900 p-2 rounded-md">
+		<select bind:value={customType} class="rounded-md bg-zinc-900 p-2">
 			<option value="translate">Translate Key</option>
 			<option value="score">Score Value</option>
 			<option value="nbt">NBT Value</option>
@@ -102,21 +102,21 @@
 		<p class="mt-2">Translate Key</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="item.minecraft.beef"
 			bind:value={customValues.translate.key} />
 
 		<p class="mt-2">Fallback</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="This text is shown if the key does not exist"
 			bind:value={customValues.translate.fallback} />
 
 		<p class="mt-2">Parameters</p>
-		<div class="w-full flex flex-col space-y-1">
+		<div class="flex w-full flex-col space-y-1">
 			{#each customValues.translate.params ?? [] as p, i}
-				<div class="flex items-center space-x-1 w-full">
+				<div class="flex w-full items-center space-x-1">
 					<MiniEditor
 						placeholder="Parameter #{i + 1}"
 						bind:output={customValues.translate.params[i]} />
@@ -129,7 +129,7 @@
 					customValues.translate.params.push("");
 					customValues.translate.params = customValues.translate.params;
 				}}
-				class="bg-zinc-900 p-1 px-2 text-sm rounded-md w-fit cursor-pointer hover:bg-black/50">
+				class="w-fit rounded-md bg-zinc-900 p-1 px-2 text-sm hover:bg-black/50">
 				Add Parameter
 			</button>
 			{#if customValues.translate.params.length != 0}
@@ -138,7 +138,7 @@
 						customValues.translate.params.pop();
 						customValues.translate.params = customValues.translate.params;
 					}}
-					class="bg-zinc-900 p-1 px-2 text-sm rounded-md w-fit cursor-pointer hover:bg-black/50">
+					class="w-fit rounded-md bg-zinc-900 p-1 px-2 text-sm hover:bg-black/50">
 					Remove Last Parameter
 				</button>
 			{/if}
@@ -157,20 +157,20 @@
 					})
 					.run();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Translate Key
 		</button>
 	{:else if customType === "score"}
 		<p class="mt-2">Objective</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="money"
 			bind:value={customValues.score.objective} />
 		<p class="mt-2">Player, Fake Player, or Entity</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="@s"
 			bind:value={customValues.score.name} />
 
@@ -186,14 +186,14 @@
 					})
 					.run();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Score Value
 		</button>
 	{:else if customType === "nbt"}
 		<p class="mt-2">NBT Source type</p>
 		<select
 			bind:value={customValues.nbt.sourceType}
-			class="bg-zinc-900 p-2 rounded-md">
+			class="rounded-md bg-zinc-900 p-2">
 			<option value="storage">Storage</option>
 			<option value="block">Block</option>
 			<option value="entity">Entity</option>
@@ -202,20 +202,20 @@
 			<p class="mt-2">Storage ID</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="example:storage"
 				bind:value={customValues.nbt.storage} />
 
 			<p class="mt-2">NBT path</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div class="flex items-center space-x-2 mt-2">
+			<div class="mt-2 flex items-center space-x-2">
 				<button
-					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
 					onclick={() =>
 						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
@@ -239,27 +239,27 @@
 						})
 						.run();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Add NBT Value
 			</button>
 		{:else if customValues.nbt.sourceType === "entity"}
 			<p class="mt-2">Entity</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="@e[type=villager,limit=1,sort=nearest]"
 				bind:value={customValues.nbt.entity} />
 
 			<p class="mt-2">NBT path</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div class="flex items-center space-x-2 mt-2">
+			<div class="mt-2 flex items-center space-x-2">
 				<button
-					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
 					onclick={() =>
 						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
@@ -283,27 +283,27 @@
 						})
 						.run();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Add NBT Value
 			</button>
 		{:else if customValues.nbt.sourceType === "block"}
 			<p class="mt-2">Entity</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="~ ~ ~"
 				bind:value={customValues.nbt.block} />
 
 			<p class="mt-2">NBT path</p>
 			<input
 				type="text"
-				class="bg-zinc-900 p-2 rounded-md"
+				class="rounded-md bg-zinc-900 p-2"
 				placeholder="Items[0].id"
 				bind:value={customValues.nbt.path} />
 
-			<div class="flex items-center space-x-2 mt-2">
+			<div class="mt-2 flex items-center space-x-2">
 				<button
-					class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
 					onclick={() =>
 						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
 					{#if customValues.nbt.interpret}
@@ -327,7 +327,7 @@
 						})
 						.run();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Add NBT Value
 			</button>
 		{/if}
@@ -335,7 +335,7 @@
 		<p class="mt-2">Keybind</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="key.jump"
 			bind:value={customValues.keybind.key} />
 		<button
@@ -347,14 +347,14 @@
 					.insertKeybind({ key: customValues.keybind.key })
 					.run();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Keybind
 		</button>
 	{:else if customType === "selector"}
 		<p class="mt-2">Selector</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="@p[tag=something]"
 			bind:value={customValues.selector.selector} />
 		<button
@@ -366,7 +366,7 @@
 					.insertSelector({ selector: customValues.selector.selector })
 					.run();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Selector
 		</button>
 	{/if}

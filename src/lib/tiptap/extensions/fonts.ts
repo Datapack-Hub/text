@@ -45,7 +45,6 @@ export const FontsExtension = Extension.create({
 							return {
 								style: `
 									font-family: "${font}";
-									font-size: 12pt;
 								`,
 							};
 						},

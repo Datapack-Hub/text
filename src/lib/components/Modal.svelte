@@ -36,11 +36,11 @@
 
 <div class="absolute {opened ? '' : 'hidden'}">
 	<div
-		class="fixed top-0 left-0 w-screen h-screen bg-black/65 flex flex-col items-center text-zinc-100 overflow-auto"
+		class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
 		style="font-family: Lexend">
 		<div
 			onclick={() => close()}
-			class="fixed top-0 left-0 w-screen h-screen"
+			class="fixed top-0 left-0 h-screen w-screen"
 			style="z-index: 40; background: transparent;"
 			aria-hidden="true"
 			tabindex="-1"
@@ -57,7 +57,7 @@
 			<div
 				class="rounded-b-lg {nopad
 					? ''
-					: 'p-4'} bg-zinc-800 flex flex-col space-y-1">
+					: 'p-4'} flex flex-col space-y-1 bg-zinc-800">
 				{@render children()}
 			</div>
 		</div>

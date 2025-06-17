@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { addTypeSpecificValues, colorMap } from "$lib/tiptap/text";
 	import { type MinecraftText } from "$lib/types";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
@@ -12,7 +11,7 @@
 	import IconColor from "~icons/tabler/palette";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import { convertToTextOrEmpty, snbtToDocument } from "../nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "../text/nbt";
 
 	import {
 		ClickEventMark,
@@ -22,6 +21,12 @@
 		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
+	import {
+		colorMap,
+		defaultColorLUT,
+		trueMarkOrUndefined,
+	} from "$lib/text/general";
+	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
 
 	// TODO: convert to non-legacy mode
 	export let value = "";
@@ -103,18 +108,6 @@
 		return JSON.stringify(data);
 	}
 
-	function trueMarkOrUndefined(
-		content: JSONContent,
-		mark: string,
-	): true | undefined {
-		const value = content.marks?.some((e) => e.type === mark);
-		return value === true ? value : undefined;
-	}
-
-	function defaultColorLUT(color: string): string {
-		return colorMap.find((e) => e.value === color)?.name || color;
-	}
-
 	function customColorHandler() {
 		editor.chain().focus().setColor(color).run();
 	}
@@ -132,8 +125,8 @@
 	}
 </script>
 
-<div class="flex flex-col w-full">
-	<div class="w-full p-2 bg-black/50 flex items-center flex-wrap rounded-t-md">
+<div class="flex w-full flex-col">
+	<div class="flex w-full flex-wrap items-center rounded-t-md bg-black/50 p-2">
 		{#if editor}
 			<TextStyleButtons {editor} small />
 
@@ -143,7 +136,7 @@
 				<button
 					onclick={() => editor.chain().focus().setColor(color.value).run()}
 					title={color.name}
-					class="p-0.5 text-sm hover:bg-white/3 rounded-md {editor.isActive(
+					class="rounded-md p-0.5 text-sm hover:bg-white/3 {editor.isActive(
 						'textStyle',
 						{ color: color.value },
 					)
@@ -157,14 +150,14 @@
 				<button
 					aria-label="unset color"
 					onclick={() => editor.chain().focus().unsetColor().run()}
-					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md">
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3">
 					<IconHollow />
 				</button>
 			{/if}
 
 			<label
 				for="color"
-				class="p-0.5 text-sm hover:bg-white/3 rounded-md font-medium"
+				class="rounded-md p-0.5 text-sm font-medium hover:bg-white/3"
 				><IconColor /></label>
 			<input
 				type="color"
@@ -176,7 +169,7 @@
 	</div>
 
 	<div
-		class="font-minecraft bg-black/30 w-full first:focus:outline-none flex-grow rounded-b-md"
+		class="font-minecraft w-full flex-grow rounded-b-md bg-black/30 first:focus:outline-none"
 		bind:this={element}>
 	</div>
 </div>

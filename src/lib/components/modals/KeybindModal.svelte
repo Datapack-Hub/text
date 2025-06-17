@@ -1,5 +1,5 @@
 <script>
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import Key from "../Key.svelte";
 
 	let { keybindDialog = $bindable() } = $props();
@@ -31,7 +31,7 @@
 <Modal title="Keybinds" bind:this={keybindDialog} big key="K">
 	<div class="grid grid-cols-2">
 		{#each keysAndActions as { keys, action }}
-			<div class="flex gap-2 items-center mb-2">
+			<div class="mb-2 flex items-center gap-2">
 				{#each keys as key}
 					<Key>{key}</Key>
 				{/each}

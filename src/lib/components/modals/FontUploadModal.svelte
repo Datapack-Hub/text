@@ -45,7 +45,6 @@
 				!type ||
 				!["font/ttf", "font/otf", "font/woff", "font/woff2"].includes(type.mime)
 			) {
-				console.log("not a font file");
 				continue;
 			}
 
@@ -65,7 +64,7 @@
 	}
 </script>
 
-<Modal title="Upload a font" bind:this={fontUploadModal} key="U">
+<Modal title="Upload a font" bind:this={fontUploadModal}>
 	{#if step === 1}
 		<label
 			for="fontFileUpload"

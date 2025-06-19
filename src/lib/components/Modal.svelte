@@ -1,6 +1,11 @@
 <script lang="ts">
 	import IconClose from "~icons/tabler/x";
 
+	type Props = {
+		key?: string;
+		[key: string]: any;
+	};
+
 	let {
 		opened = $bindable(false),
 		title = $bindable("Modal"),
@@ -10,7 +15,7 @@
 		flexible = $bindable(false),
 		children,
 		key,
-	} = $props();
+	}: Props = $props();
 
 	export function open() {
 		opened = true;
@@ -21,6 +26,9 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
+		if (!key) {
+			return;
+		}
 		if (event.key === "Escape" && opened) {
 			close();
 		}
@@ -50,8 +58,8 @@
 			class="z-50 {small ? 'w-fit' : 'w-[95%] md:w-[50%] 2xl:w-[30%]'} {big
 				? 'w-[95%]!'
 				: ''} {flexible ? 'w-fit! max-w-[95%]' : ''} m-auto py-4">
-			<div class="rounded-t-lg p-4 bg-zinc-900 flex items-center">
-				<span class="font-bold text-lg flex-grow">{title}</span>
+			<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
+				<span class="flex-grow text-lg font-bold">{title}</span>
 				<button aria-label="close" onclick={close}><IconClose /></button>
 			</div>
 			<div

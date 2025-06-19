@@ -15,7 +15,7 @@
 		{ keys: ["Ctrl", "Shift", "L"], action: "Load a snapshot" },
 		{ keys: ["Ctrl", "Shift", "I"], action: "Import from NBT" },
 		{ keys: ["Ctrl", "Shift", "F"], action: "Add a font" },
-		{ keys: ["Ctrl", "Shift", "U"], action: "Upload a font" },
+		{ keys: ["Ctrl", "Shift", "U"], action: "Open Special Character Menu" },
 		// normal text editor keybinds
 		{ keys: ["Ctrl", "B"], action: "Bold" },
 		{ keys: ["Ctrl", "I"], action: "Italic" },
@@ -28,8 +28,8 @@
 	];
 </script>
 
-<Modal title="Keybinds" bind:this={keybindDialog} big key="K">
-	<div class="grid grid-cols-2">
+<Modal title="Keybinds" bind:this={keybindDialog} flexible key="K">
+	<div class="grid grid-cols-2 space-x-3">
 		{#each keysAndActions as { keys, action }}
 			<div class="mb-2 flex items-center gap-2">
 				{#each keys as key}

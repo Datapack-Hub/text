@@ -28,15 +28,15 @@
 	} from "$lib/text/general";
 	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
 
-	// TODO: convert to non-legacy mode
-	export let value = "";
-	export let output = "";
-	export let placeholder =
-		"Write text here, and style it with the options above!";
+	let {
+		value = $bindable(),
+		output = $bindable(),
+		placeholder = "Write text here, and style it with the options above!",
+	} = $props();
 
 	let element: HTMLElement;
-	let editor: Editor;
-	let color = "";
+	let editor: Editor | undefined = $state();
+	let color = $state("");
 
 	onMount(() => {
 		editor = new Editor({
@@ -55,9 +55,10 @@
 					placeholder: placeholder,
 				}),
 			],
-			onTransaction: () => {
+			onTransaction: ({ editor: newEditor }) => {
 				// force re-render so `editor.isActive` works as expected
-				editor = editor;
+				editor = undefined;
+				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
 				value = JSON.stringify(editor.getJSON());
@@ -109,11 +110,11 @@
 	}
 
 	function customColorHandler() {
-		editor.chain().focus().setColor(color).run();
+		editor!.chain().focus().setColor(color).run();
 	}
 
 	export function getValue() {
-		return translate(editor.getJSON()).replace(
+		return translate(editor!.getJSON()).replace(
 			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
 			(match) => match.replace(/"/g, ""),
 		);
@@ -121,7 +122,7 @@
 
 	export function importText(input: string) {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(input));
-		editor.commands.setContent(jsonContent);
+		editor!.commands.setContent(jsonContent);
 	}
 </script>
 
@@ -134,7 +135,7 @@
 
 			{#each colorMap as color}
 				<button
-					onclick={() => editor.chain().focus().setColor(color.value).run()}
+					onclick={() => editor!.chain().focus().setColor(color.value).run()}
 					title={color.name}
 					class="rounded-md p-0.5 text-sm hover:bg-white/3 {editor.isActive(
 						'textStyle',
@@ -149,7 +150,7 @@
 			{#if editor.isActive("textStyle")}
 				<button
 					aria-label="unset color"
-					onclick={() => editor.chain().focus().unsetColor().run()}
+					onclick={() => editor!.chain().focus().unsetColor().run()}
 					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3">
 					<IconHollow />
 				</button>

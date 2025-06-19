@@ -52,8 +52,6 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 
 	paragraphContent!.push(finalText);
 
-	console.log(finalText);
-
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {

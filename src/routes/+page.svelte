@@ -27,7 +27,7 @@
 	// optional
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
-	import { Editor } from "@tiptap/core";
+	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import Underline from "@tiptap/extension-underline";
@@ -41,7 +41,6 @@
 	import IconCopy from "~icons/tabler/copy";
 	import IconFont from "~icons/tabler/function";
 	import IconUploadFont from "~icons/tabler/function-filled";
-	import IconNoFont from "~icons/tabler/function-off";
 	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconKeybinds from "~icons/tabler/keyboard";
 	import IconColor from "~icons/tabler/palette";
@@ -50,6 +49,7 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
+	import IconEmoji from "~icons/tabler/mood-smile-beam";
 
 	import { page } from "$app/stores";
 	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
@@ -60,27 +60,29 @@
 	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
-	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
 	import { colorMap } from "$lib/text/general";
 
-	let value: string = $state("");
+	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
+	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
 
-	let element: HTMLElement | undefined = $state();
-	let editor: Editor | undefined = $state();
+	let tiptapJSON: JSONContent = $state()!;
+
+	let element: HTMLElement = $state()!;
+	let editor: Editor | undefined = $state()!;
 	let color = $state("#ffffff");
-	let colorDialog: Modal | undefined = $state();
+	let colorDialog: Modal = $state()!;
 
-	let outputDialog: Modal | undefined = $state();
+	let outputDialog: Modal = $state()!;
 	let outputVersion: "new" | "old" = $state("new");
 
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
 
-	let indent = false;
-	let indentSize = 2;
+	let indent = $state(false);
+	let indentSize = $state(2);
 
 	// Import
-	let importDialog: Modal | undefined = $state();
+	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
 
 	let recentlyCopied = $state(false);
@@ -88,31 +90,31 @@
 	// Snapshots and stuff
 	let snapshots: object[] = $state([]);
 	let recentlySaved = $state(false);
-	let loadDialog: Modal | undefined = $state();
+	let loadDialog: Modal = $state()!;
 
 	// Dialogs
-	let gradientDialog: Modal | undefined = $state();
+	let gradientDialog: Modal = $state()!;
 	let gradientSteps: string[] = $state(["#ffffff"]);
 
-	let keybindDialog: Modal | undefined = $state();
+	let keybindDialog: Modal = $state()!;
 
 	let clickEventType = $state("");
 	let clickEventValue = $state("");
-	let clickEventDialog: Modal | undefined = $state();
+	let clickEventDialog: Modal = $state()!;
 
 	let hoverEventType = "";
 	let hoverEventValue: any = $state();
-	let hoverEventEditor: MiniEditor | undefined = $state();
-	let hoverEventDialog: Modal | undefined = $state();
+	let hoverEventEditor: MiniEditor = $state()!;
+	let hoverEventDialog: Modal = $state()!;
 
-	let fontDialog: Modal | undefined = $state();
-	let fontUploadModal: Modal | undefined = $state();
+	let fontDialog: Modal = $state()!;
+	let fontUploadModal: Modal = $state()!;
 	let fontName = $state("");
 
 	let customType: string | undefined = $state();
-	let customDialog: Modal | undefined = $state();
+	let customDialog: Modal = $state()!;
 
-	let unicodeSelectorDialog: Modal;
+	let unicodeSelectorDialog: Modal = $state()!;
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
@@ -122,9 +124,9 @@
 
 	onMount(() => {
 		if (localStorage.getItem("content")) {
-			value = localStorage.getItem("content")!;
+			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
-			value = "[]";
+			tiptapJSON = [];
 			localStorage.setItem("content", "");
 		}
 
@@ -137,7 +139,7 @@
 
 		editor = new Editor({
 			element: element,
-			content: JSON.parse(value),
+			content: tiptapJSON,
 			extensions: [
 				StarterKit.configure({
 					blockquote: false,
@@ -169,15 +171,15 @@
 						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
 				}),
 			],
-			onTransaction: () => {
-				// force re-render so `editor.isActive` works as expected
-				editor = editor;
+			onTransaction: ({ editor: newEditor }) => {
+				editor = undefined;
+				editor = newEditor;
 				editor!.getText() === ""
 					? (doesContentExist = false)
 					: (doesContentExist = true);
 			},
 			onUpdate: ({ editor }) => {
-				value = JSON.stringify(editor.getJSON());
+				tiptapJSON = editor.getJSON();
 				debounce(saveContent, 1000)();
 			},
 		});
@@ -381,47 +383,42 @@
 
 			<TextStyleButtons {editor} />
 
-			<button
-				aria-label="set font"
-				onclick={() => editor.getAttributes('textStyle',).font ? editor.chain().focus().unsetFont().run() : fontDialog.open()}
-				class="p-1 text-lg hover:bg-white/3 rounded-md font-medium {editor.getAttributes(
-					'textStyle',
-				).font
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{ content: "Font", placement: "bottom" }}>
-				<IconFont />
-			</button>
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<ToolbarButton
+				ariaLabel="set font"
+				Icon={IconFont}
+				onClick={() =>
+					editor!.getAttributes("textStyle").font
+						? editor!.chain().focus().unsetFont().run()
+						: fontDialog.open()}
+				styleVar={editor.getAttributes("textStyle").font}
+				tipContent="Font" />
+			<ToolbarButton
+				ariaLabel="open special character selector"
+				Icon={IconEmoji}
+				onClick={unicodeSelectorDialog.open}
+				tipContent="Special Characters" />
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
-			<button
-				class="toolbar-btn"
-				style="color: {color}"
-				onclick={colorDialog?.open}
-				use:tippy={{ content: "Custom Color", placement: "bottom" }}
-				><IconColor /></button>
-			<button
-				class="toolbar-btn"
-				onclick={gradientDialog?.open}
-				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
-				><IconGradient /></button>
+			<ToolbarButton
+				ariaLabel="open custom color picker"
+				{color}
+				Icon={IconColor}
+				onClick={colorDialog.open}
+				tipContent="Custom Color" />
+
+			<ToolbarButton
+				ariaLabel="open gradient modal"
+				Icon={IconGradient}
+				onClick={gradientDialog.open}
+				tipContent="Color Gradient" />
 			{#each colorMap as color}
-				<button
-					aria-label="set color to {color.name}"
-					onclick={() => editor?.chain().focus().setColor(color.value).run()}
-					use:tippy={{
-						content: toTitleCase(color.name.replace("_", " ")),
-						placement: "bottom",
-					}}
-					class="rounded-md p-1 text-lg hover:bg-white/3 {editor.isActive(
-						'textStyle',
-						{ color: color.value },
-					)
-						? 'bg-zinc-800'
-						: ''}"
-					style="color: {color.value};">
-					<IconSquare />
-				</button>
+				<ToolbarButton
+					ariaLabel="set color to {color.name}"
+					Icon={IconSquare}
+					onClick={() => editor!.chain().focus().setColor(color.value).run()}
+					styleVar={editor.isActive("textStyle", { color: color.value })}
+					color={color.value}
+					tipContent={toTitleCase(color.name.replace("_", " "))} />
 			{/each}
 			{#if editor.getAttributes("textStyle").color}
 				<button
@@ -435,31 +432,24 @@
 
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
-			<button
-				class="toolbar-btn {editor.isActive('clickEvent') ? 'bg-zinc-800' : ''}"
-				use:tippy={{
-					content: "Click Event",
-					placement: "bottom",
-				}}
-				onclick={() => {
+			<ToolbarButton
+				onClick={() => {
 					if (editor?.isActive("clickEvent")) {
 						editor?.chain().focus().unsetClickEvent().run();
 					} else {
 						clickEventDialog?.open();
 					}
-				}}>
-				<IconClickEvent />
-			</button>
+				}}
+				tipContent="Click Event"
+				styleVar={editor.isActive("clickEvent")}
+				ariaLabel="Add click event"
+				Icon={IconClickEvent} />
 			{#if editor.isActive("clickEvent")}
-				<button
-					class="toolbar-btn"
-					use:tippy={{
-						content: "Edit Click Event",
-						placement: "bottom",
-					}}
-					onclick={clickEditButtonHandler}>
-					<IconEdit />
-				</button>
+				<ToolbarButton
+					onClick={clickEditButtonHandler}
+					tipContent="Edit Click Event"
+					ariaLabel="Edit click event"
+					Icon={IconEdit} />
 			{/if}
 
 			<button
@@ -482,46 +472,36 @@
 				<IconHoverEvent />
 			</button>
 			{#if editor.isActive("hoverEvent")}
-				<button
-					class="toolbar-btn"
-					use:tippy={{
-						content: "Edit Hover Event",
-						placement: "bottom",
-					}}
-					onclick={hoverEditButtonHandler}>
-					<IconEdit />
-				</button>
+				<ToolbarButton
+					onClick={hoverEditButtonHandler}
+					tipContent="Edit Hover Event"
+					ariaLabel="Edit hover event"
+					Icon={IconEdit} />
 			{/if}
 
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
-			<button
-				class="toolbar-btn"
-				onclick={() => editor?.chain().undo().run()}
-				use:tippy={{
-					content: "Undo",
-					placement: "bottom",
-				}}
-				aria-label="Undo"><IconUndo /></button>
-			<button
-				class="toolbar-btn"
-				onclick={() => editor?.chain().undo().run()}
-				use:tippy={{
-					content: "Redo",
-					placement: "bottom",
-				}}
-				aria-label="Redo"><IconRedo /></button>
+			<ToolbarButton
+				onClick={() => editor?.chain().undo().run()}
+				tipContent="Undo"
+				ariaLabel="Undo"
+				Icon={IconUndo} />
+			<ToolbarButton
+				onClick={() => editor?.chain().redo().run()}
+				tipContent="Redo"
+				ariaLabel="Redo"
+				Icon={IconRedo} />
 
 			<div class="flex-grow"></div>
 
 			<button
-				class="toolbar-btn nomob"
+				class="toolbar-btn"
 				onclick={fontUploadModal?.open}
 				use:tippy={{
 					content: "Upload Font",
 					placement: "bottom",
 				}}
-				aria-label="Keybinds"><IconUploadFont /></button>
+				aria-label="Upload Font"><IconUploadFont /></button>
 			<button
 				class="toolbar-btn nomob"
 				onclick={keybindDialog?.open}
@@ -573,12 +553,7 @@
 				<p>
 					<code class="inline break-all"
 						>{editor
-							? convert(
-									editor.getJSON(),
-									"standard",
-									outputVersion,
-									shouldOptimise,
-								)
+							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
 							: "Loading..."}
 					</code>
 				</p>
@@ -587,12 +562,8 @@
 				<div class="mt-2 flex items-center space-x-2 select-none">
 					<p class="font-lexend nomob text-xs text-white/60">
 						{editor
-							? convert(
-									editor.getJSON(),
-									"standard",
-									outputVersion,
-									shouldOptimise,
-								).length
+							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
+									.length
 							: 0} characters
 					</p>
 					<p class="font-lexend nomob text-xs text-white/60">
@@ -737,7 +708,7 @@
 </Modal>
 
 <Modal title="Set font" bind:this={fontDialog} key="F">
-	<div class="flex flex-col w-full space-y-2">
+	<div class="flex w-full flex-col space-y-2">
 		<p>Select one of the default Minecraft fonts below:</p>
 		<div class="flex flex-col space-y-1">
 			<button
@@ -745,18 +716,18 @@
 					editor?.chain().focus().unsetFont().run();
 					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconFont />
-				<span>Default</span> 
+				<span>Default</span>
 			</button>
 			<button
 				onclick={() => {
 					editor?.chain().focus().setFont("minecraft:illageralt").run();
 					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconFont />
-				<span>Illager Alt</span> 
+				<span>Illager Alt</span>
 				<span class="font-mono text-white/60">(minecraft:illageralt)</span>
 			</button>
 			<button
@@ -764,47 +735,55 @@
 					editor?.chain().focus().setFont("minecraft:alt").run();
 					fontDialog?.close();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconFont />
-				<span>Standard Galactic Alphabet (enchant table)</span> 
+				<span>Standard Galactic Alphabet (enchant table)</span>
 				<span class="font-mono text-white/60">(minecraft:alt)</span>
 			</button>
 		</div>
 
-		<p class="my-2">To use a custom font in the editor, upload or select one below.</p>
+		<p class="my-2">
+			To use a custom font in the editor, upload or select one below.
+		</p>
 		<div class="flex flex-col space-y-1">
 			{#key fontLUT}
-			{#each fontLUT as [identifier, alias]}
-				<button
-					onclick={() => {
-						editor?.chain().focus().setFont(alias).run();
-						fontDialog?.close();
-					}}
-					class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
-					<IconUploadFont />
-					<span class="font-mono text-white">{identifier}</span>
-				</button>
-			{/each}
+				{#each fontLUT as [identifier, alias]}
+					<button
+						onclick={() => {
+							editor?.chain().focus().setFont(alias).run();
+							fontDialog?.close();
+						}}
+						class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+						<IconUploadFont />
+						<span class="font-mono text-white">{identifier}</span>
+					</button>
+				{/each}
 			{/key}
 			<button
 				onclick={() => {
-					fontDialog.close();
-					fontUploadModal.open();
+					fontDialog!.close();
+					fontUploadModal!.open();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-full h-full flex items-center space-x-2 cursor-pointer hover:bg-black/50">
+				class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconCustom />
 				<span>Upload a custom font...</span>
 				<span class="font-mono text-white/60">(.ttf, .otf, .woff2)</span>
 			</button>
 		</div>
-		
-		<p class="my-2">Or, if you want to use a custom font without importing it, enter the ID:</p>
+
+		<p class="my-2">
+			Or, if you want to use a custom font without importing it, enter the ID:
+		</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="namespace:id"
 			bind:value={fontName} />
-		<p class="text-sm text-white/60"><b>Note:</b> in order for a custom font to show up ingame, you will need to add it with a resource pack. Also, if you don't import a font into the editor, it will show up here as your browser's default font.</p>
+		<p class="text-sm text-white/60">
+			<b>Note:</b> in order for a custom font to show up ingame, you will need to
+			add it with a resource pack. Also, if you don't import a font into the editor,
+			it will show up here as your browser's default font.
+		</p>
 
 		<button
 			onclick={() => {
@@ -821,4 +800,4 @@
 <FontUploadModal bind:fontUploadModal />
 
 <ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />
-<UnicodeSelectorModal {editor} bind:unicodeSelectorDialog />
+<UnicodeSelectorModal editor={editor!} bind:unicodeSelectorDialog />

@@ -633,9 +633,8 @@
 	<div class="flex w-full flex-col py-4">
 		<ColorPicker
 			bind:hex={color}
-			position="responsive"
-			--cp-bg-color="none"
-			--cp-border-color="none"
+			--cp-bg-color="transparent"
+			--cp-border-color="transparent"
 			--cp-text-color="white"
 			--cp-input-color="#18181b"
 			--cp-button-hover-color="#18181b"

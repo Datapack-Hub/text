@@ -4,7 +4,13 @@ import { type MinecraftText, type OldMinecraftText } from "../types";
 import { type StringyMCText } from "../types";
 
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
+	if (raw === "") return []
+
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+
+	if (raw.match(/^"\w*"/)) {
+		return [raw.replace(/"/g, "")];
+	}
 
 	// replace 1b and 0b
 	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
@@ -14,9 +20,8 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 
 	try {
 		parsed = JSON.parse(raw);
-	} catch (e) {
-		console.error("Failed to parse SNBT:", e, raw);
-		return [""];
+	} catch {
+		return ["An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!"];
 	}
 
 	if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {

@@ -24,7 +24,7 @@ export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.value === color)?.name || color;
+	return colorMap.find((e) => e.value.toLowerCase() === color)?.name || color;
 } /**
  * A color name LUT
  *
@@ -36,7 +36,7 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.name === color)?.value || color;
+	return colorMap.find((e) => e.name.toLowerCase() === color)?.value || color;
 } /**
  * Checks the type of the mark against `type`
  *

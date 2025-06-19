@@ -110,7 +110,7 @@
 	}
 
 	function customColorHandler() {
-		editor!.chain().focus().setColor(color).run();
+		editor?.chain().focus().setColor(color).run();
 	}
 
 	export function getValue() {
@@ -122,7 +122,7 @@
 
 	export function importText(input: string) {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(input));
-		editor!.commands.setContent(jsonContent);
+		editor?.commands.setContent(jsonContent);
 	}
 </script>
 
@@ -135,7 +135,7 @@
 
 			{#each colorMap as color}
 				<button
-					onclick={() => editor!.chain().focus().setColor(color.value).run()}
+					onclick={() => editor?.chain().focus().setColor(color.value).run()}
 					title={color.name}
 					class="rounded-md p-0.5 text-sm hover:bg-white/3 {editor.isActive(
 						'textStyle',
@@ -150,7 +150,7 @@
 			{#if editor.isActive("textStyle")}
 				<button
 					aria-label="unset color"
-					onclick={() => editor!.chain().focus().unsetColor().run()}
+					onclick={() => editor?.chain().focus().unsetColor().run()}
 					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3">
 					<IconHollow />
 				</button>

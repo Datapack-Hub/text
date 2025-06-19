@@ -185,7 +185,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 			text: source.text || "",
 		};
 	}
-
+	
 	return finalText;
 }
 
@@ -196,9 +196,9 @@ function applyStyling(
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}
-
+	
 	if (text.color) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "textStyle",
 			attrs: {
 				color: defaultColorReverseLUT(text.color),
@@ -206,6 +206,19 @@ function applyStyling(
 		});
 	}
 
+	if (text.font) {
+		if (finalText.marks.some(mark => mark.type === "textStyle")) {
+			finalText.marks.find(mark => mark.type === "textStyle")!.attrs!.font = text.font;
+		} else {
+			finalText.marks?.push({
+				type: "textStyle",
+				attrs: {
+					font: text.font,
+				},
+			});
+		}
+	}
+	
 	if (text.shadow_color) {
 		const hex = "#" + text.shadow_color.toString(16).padStart(6, "0");
 		finalText.marks?.push({
@@ -308,14 +321,6 @@ function applyStyling(
 		});
 	}
 
-	// if (text.font) {
-	// 	finalText.marks?.push({
-	// 		type: "font",
-	// 		attrs: {
-	// 			font: text.font,
-	// 		},
-	// 	});
-	// }
 
 	return finalText;
 }

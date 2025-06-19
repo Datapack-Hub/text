@@ -119,6 +119,7 @@
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor?.commands.setContent(jsonContent);
+		tiptapJSON = jsonContent;
 		importDialog?.close();
 	}
 

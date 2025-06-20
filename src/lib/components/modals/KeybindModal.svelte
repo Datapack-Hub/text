@@ -5,31 +5,30 @@
 	let { keybindDialog = $bindable() } = $props();
 
 	const keysAndActions = [
-		{ keys: ["Ctrl", "Shift", "G"], action: "Color Gradient" },
-		{ keys: ["Ctrl", "Shift", "K"], action: "Keybinds dialog (this one)" },
-		{ keys: ["Ctrl", "Shift", "T"], action: "Click Event dialog" },
-		{ keys: ["Ctrl", "Shift", "E"], action: "Export" },
-		{ keys: ["Ctrl", "Shift", "W"], action: "Add Custom Source" },
-		{ keys: ["Ctrl", "Shift", "H"], action: "Hover Event" },
-		{ keys: ["Ctrl", "Shift", "C"], action: "Custom Color" },
-		{ keys: ["Ctrl", "Shift", "L"], action: "Load a snapshot" },
-		{ keys: ["Ctrl", "Shift", "I"], action: "Import from NBT" },
-		{ keys: ["Ctrl", "Shift", "F"], action: "Add a font" },
-		{ keys: ["Ctrl", "Shift", "U"], action: "Open Special Character Menu" },
-		// normal text editor keybinds
 		{ keys: ["Ctrl", "B"], action: "Bold" },
 		{ keys: ["Ctrl", "I"], action: "Italic" },
 		{ keys: ["Ctrl", "U"], action: "Underline" },
 		{ keys: ["Ctrl", "Shift", "S"], action: "Strikethrough" },
-		{ keys: ["Ctrl", "O"], action: "Obfuscate (random characters)" },
+		{ keys: ["Ctrl", "O"], action: "Obfuscate" },
 		{ keys: ["Ctrl", "Z"], action: "Undo" },
 		{ keys: ["Ctrl", "Y"], action: "Redo" },
 		{ keys: ["Ctrl", "Shift", "X"], action: "Clear all formatting" },
+		{ keys: ["Ctrl", "Shift", "G"], action: "Add Color Gradient" },
+		{ keys: ["Ctrl", "Shift", "K"], action: "View Keybinds" },
+		{ keys: ["Ctrl", "Shift", "T"], action: "Add Click Event" },
+		{ keys: ["Ctrl", "Shift", "H"], action: "Add Hover Event" },
+		{ keys: ["Ctrl", "Shift", "C"], action: "Add Custom Color" },
+		{ keys: ["Ctrl", "Shift", "F"], action: "Add a font" },
+		{ keys: ["Ctrl", "Shift", "W"], action: "Add Custom Source" },
+		{ keys: ["Ctrl", "Shift", "U"], action: "Open Special Character Menu" },
+		{ keys: ["Ctrl", "Shift", "I"], action: "Open Import Menu" },
+		{ keys: ["Ctrl", "Shift", "E"], action: "Open Export" },
+		{ keys: ["Ctrl", "Shift", "L"], action: "Load a snapshot" },
 	];
 </script>
 
 <Modal title="Keybinds" bind:this={keybindDialog} flexible key="K">
-	<div class="grid grid-cols-2 space-x-3">
+	<div class="grid grid-rows-10 grid-cols-2 grid-flow-col space-x-3">
 		{#each keysAndActions as { keys, action }}
 			<div class="mb-2 flex items-center gap-2">
 				{#each keys as key}

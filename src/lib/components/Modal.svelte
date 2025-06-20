@@ -42,6 +42,7 @@
 
 <svelte:window on:keydown={handleKeydown} />
 
+{#if opened}
 <div class="absolute {opened ? '' : 'hidden'}">
 	<div
 		class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
@@ -71,3 +72,4 @@
 		</div>
 	</div>
 </div>
+{/if}

@@ -604,6 +604,29 @@
 	</div>
 </div>
 
+<noscript>
+	<div class="absolute">
+		<div
+			class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
+			style="font-family: Lexend">
+			<div
+				class="z-50 w-[95%] md:w-[70%] 2xl:w-[50%] m-auto py-4">
+				<div class="flex items-center rounded-t-lg bg-zinc-900 p-4 space-x-2">
+					<img src="/dph.svg" class="h-5" alt="logo" />
+					<span class="flex-grow text-lg font-bold">Datapack Hub Text Editor</span>
+				</div>
+				<div class="rounded-b-lg flex flex-col space-y-2 bg-zinc-800 p-4">
+					<p>This is a /tellraw editor and editor for Minecraft text components, for all versions. Create /tellraw commands and text components (JSON text) for Minecraft Java Edition with our easy-to-use, modern online tool!</p>
+					<div class="bg-red-500/50 p-3 rounded-md flex flex-col">
+						<b class="text-lg">⚠️ This website requires JavaScript to work.</b> 
+						<span class="text-sm">Please enable JavaScript in your site settings. If JavaScript is enabled, please refresh. If that doesn't work, then try a different browser. If that still doesn't work, then ask for help in <a href="https://discord.datapackhub.net/" class="font-bold underline">our Discord</a></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</noscript>
+
 <ClickEventModal
 	bind:clickEventDialog
 	bind:clickEventType

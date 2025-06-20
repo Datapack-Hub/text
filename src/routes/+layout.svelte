@@ -33,6 +33,6 @@
 </svelte:head>
 
 <div
-	class="font-lexend h-full min-h-screen w-full min-w-screen bg-zinc-900 text-white">
+	class="font-lexend h-full min-h-screen w-full overflow-clip bg-zinc-900 text-white">
 	{@render children()}
 </div>

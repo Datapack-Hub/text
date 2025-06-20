@@ -29,10 +29,7 @@ export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
-	raw = raw.replace(
-		/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g,
-		'$1"$2":',
-	);
+	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
 	if (raw.match(/^"\w*"/)) {
 		return [raw.replace(/"/g, "")];

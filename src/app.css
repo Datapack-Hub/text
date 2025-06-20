@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./hint.css";
 
 ::-webkit-color-swatch,
 ::-moz-color-swatch {

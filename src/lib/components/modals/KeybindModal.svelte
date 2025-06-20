@@ -28,7 +28,7 @@
 </script>
 
 <Modal title="Keybinds" bind:this={keybindDialog} flexible key="K">
-	<div class="grid grid-rows-10 grid-cols-2 grid-flow-col space-x-3">
+	<div class="grid grid-flow-col grid-cols-2 grid-rows-10 space-x-3">
 		{#each keysAndActions as { keys, action }}
 			<div class="mb-2 flex items-center gap-2">
 				{#each keys as key}

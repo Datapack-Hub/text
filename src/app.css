@@ -10,7 +10,7 @@
 }
 
 *::selection {
-	background: #ff631a;
+	background: #ff631a55;
 	color: white;
 }
 
@@ -19,6 +19,23 @@
 	--font-minecraft: Minecraft, sans-serif;
 }
 
+/* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
+*[style*="font-family: MinecraftEnchanting"] strong,
+*[style*="font-family: 'MinecraftEnchanting'"] strong,
+*[style*='font-family: "MinecraftEnchanting"'] strong {
+	font-family: MinecraftEnchantingBold;
+	font-weight: 100;
+}
+
+/* Use MinecraftIllagerBold if parent uses MinecraftIllager font */
+*[style*="font-family: MinecraftIllager"] strong,
+*[style*="font-family: 'MinecraftIllager'"] strong,
+*[style*='font-family: "MinecraftIllager"'] strong {
+	font-family: MinecraftIllagerBold;
+	font-weight: 100;
+}
+
+/* Use MinecraftBold if not MinecraftEnchanting or MinecraftIllager */
 strong {
 	font-family: MinecraftBold;
 	font-weight: 100;

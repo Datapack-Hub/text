@@ -772,10 +772,10 @@
 		</p>
 		<div class="flex flex-col space-y-1">
 			{#key fontLUT}
-				{#each fontLUT as [identifier, alias]}
+				{#each fontLUT as [identifier, _]}
 					<button
 						onclick={() => {
-							editor?.chain().focus().setFont(alias).run();
+							editor?.chain().focus().setFont(identifier).run();
 							fontDialog?.close();
 						}}
 						class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">

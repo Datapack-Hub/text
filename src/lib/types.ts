@@ -9,7 +9,8 @@ export type BaseMinecraftText = Pick<
 	| "strikethrough"
 	| "obfuscated"
 >;
-export type StringyMCText = string | (MinecraftText & OldMinecraftText);
+export type StringyMCText = string | VersionAgnosticText;
+export type VersionAgnosticText = MinecraftText & OldMinecraftText;
 export type MinecraftText = {
 	translate?: string;
 	with?: string[];

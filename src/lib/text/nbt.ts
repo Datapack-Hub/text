@@ -3,10 +3,36 @@ import { defaultColorReverseLUT } from "./general";
 import { type MinecraftText, type OldMinecraftText } from "../types";
 import { type StringyMCText } from "../types";
 
-export function convertToTextOrEmpty(raw: string): StringyMCText[] {
-	if (raw === "") return []
+export function snbtToDocument(raw: StringyMCText[]): JSONContent {
+	let baseDocument: JSONContent = {
+		type: "doc",
+		content: [
+			{
+				type: "paragraph",
+				content: [],
+			},
+		],
+	};
 
-	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+	if (Array.isArray(raw)) {
+		for (const text of raw) {
+			processTextComponent(text, baseDocument);
+		}
+	} else {
+		processTextComponent(raw, baseDocument);
+	}
+
+	baseDocument = fixBrokenNewLines(baseDocument);
+	return baseDocument;
+}
+
+export function convertToTextOrEmpty(raw: string): StringyMCText[] {
+	if (raw === "") return [];
+
+	raw = raw.replace(
+		/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g,
+		'$1"$2":',
+	);
 
 	if (raw.match(/^"\w*"/)) {
 		return [raw.replace(/"/g, "")];
@@ -20,8 +46,11 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 
 	try {
 		parsed = JSON.parse(raw);
-	} catch {
-		return ["An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!"];
+	} catch (e) {
+		console.error("Error parsing SNBT:", e);
+		return [
+			"An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!",
+		];
 	}
 
 	if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
@@ -37,11 +66,15 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			return;
 		}
 
-		baseDocument.content!.at(-1)!.content!.push({
-			type: "text",
-			text: text,
-		});
-		baseDocument = baseDocument;
+		const temp = baseDocument.content!.at(-1)!.content!;
+		baseDocument.content!.at(-1)!.content = [
+			...temp,
+			{
+				type: "text",
+				text: text,
+			},
+		];
+
 		return;
 	}
 
@@ -98,27 +131,6 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			}
 		});
 	}
-}
-
-export function snbtToDocument(raw: StringyMCText[]): JSONContent {
-	// requote keys
-
-	let baseDocument: JSONContent = {
-		type: "doc",
-		content: [
-			{
-				type: "paragraph",
-				content: [],
-			},
-		],
-	};
-
-	for (const text of raw) {
-		processTextComponent(text, baseDocument);
-	}
-
-	baseDocument = fixBrokenNewLines(baseDocument);
-	return baseDocument;
 }
 
 function mapPropertiesToType(source: MinecraftText): JSONContent {
@@ -190,7 +202,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 			text: source.text || "",
 		};
 	}
-	
+
 	return finalText;
 }
 
@@ -201,7 +213,7 @@ function applyStyling(
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}
-	
+
 	if (text.color) {
 		finalText.marks.push({
 			type: "textStyle",
@@ -212,8 +224,9 @@ function applyStyling(
 	}
 
 	if (text.font) {
-		if (finalText.marks.some(mark => mark.type === "textStyle")) {
-			finalText.marks.find(mark => mark.type === "textStyle")!.attrs!.font = text.font;
+		if (finalText.marks.some((mark) => mark.type === "textStyle")) {
+			finalText.marks.find((mark) => mark.type === "textStyle")!.attrs!.font =
+				text.font;
 		} else {
 			finalText.marks?.push({
 				type: "textStyle",
@@ -223,7 +236,7 @@ function applyStyling(
 			});
 		}
 	}
-	
+
 	if (text.shadow_color) {
 		const hex = "#" + text.shadow_color.toString(16).padStart(6, "0");
 		finalText.marks?.push({
@@ -326,14 +339,13 @@ function applyStyling(
 		});
 	}
 
-
 	return finalText;
 }
 
-function fixBrokenNewLines(doc: any) {
+function fixBrokenNewLines(doc: JSONContent) {
 	const fixedContent = [];
 
-	for (const node of doc.content) {
+	for (const node of doc.content!) {
 		if (node.type !== "paragraph" || !node.content) {
 			// Non-paragraph nodes are copied as-is
 			fixedContent.push(node);
@@ -343,14 +355,14 @@ function fixBrokenNewLines(doc: any) {
 		let currentParagraph = [];
 
 		for (const child of node.content) {
-			if (child.type !== "text" || !child.text.includes("\n")) {
+			if (child.type !== "text" || !child.text!.includes("\n")) {
 				// No newline — add to current paragraph
 				currentParagraph.push(child);
 				continue;
 			}
 
 			// Text node contains newlines — split it
-			const lines = child.text.split("\n");
+			const lines = child.text!.split("\n");
 			for (let i = 0; i < lines.length; i++) {
 				if (i > 0) {
 					// Push previous paragraph and start a new one

@@ -370,18 +370,6 @@
 
 	<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
 		{#if editor}
-			<button
-				onclick={() => {
-					customDialog?.open();
-					customType = undefined;
-				}}
-				class="toolbar-btn"
-				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
-				<IconCustom />
-			</button>
-
-			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
-
 			<TextStyleButtons {editor} />
 
 			<ToolbarButton
@@ -393,11 +381,7 @@
 						: fontDialog.open()}
 				styleVar={editor.getAttributes("textStyle").font}
 				tipContent="Font" />
-			<ToolbarButton
-				ariaLabel="open special character selector"
-				Icon={IconEmoji}
-				onClick={unicodeSelectorDialog.open}
-				tipContent="Special Characters" />
+
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
@@ -430,6 +414,24 @@
 					<IconHollow />
 				</button>
 			{/if}
+
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
+
+			<button
+				onclick={() => {
+					customDialog?.open();
+					customType = undefined;
+				}}
+				class="toolbar-btn"
+				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
+				<IconCustom />
+			</button>
+
+			<ToolbarButton
+				ariaLabel="open special character selector"
+				Icon={IconEmoji}
+				onClick={unicodeSelectorDialog.open}
+				tipContent="Special Characters" />
 
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
@@ -496,7 +498,7 @@
 			<div class="flex-grow"></div>
 
 			<button
-				class="toolbar-btn"
+				class="toolbar-btn nomob"
 				onclick={fontUploadModal?.open}
 				use:tippy={{
 					content: "Upload Font",

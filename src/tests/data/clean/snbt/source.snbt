@@ -1,0 +1,1 @@
+["hi ",{translate:"hi",with:[["",{color:"#AA0000",text:"banana sandwiches"}]],fallback:"hi"},{nbt:"Items[0].id",storage:"hi",interpret:true},{nbt:"Items[0].id",block:"blah"},{nbt:"Items[0].id",entity:"@e[blah]"},{score:{name:"@s",objective:"money"}},{selector:"@p"},{keybind:"key.jump"}]

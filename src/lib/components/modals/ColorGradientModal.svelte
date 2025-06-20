@@ -49,6 +49,10 @@
 				<IconCustom class="m-auto" />
 			</button>
 		</div>
+		<p class="my-2">Preview</p>
+		<div class="bg-zinc-950 px-4 py-2 font-minecraft text-2xl">
+			<span style="background: -webkit-linear-gradient(0, {gradientSteps.join(",")}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Example text</span>
+		</div>
 		<button
 			onclick={() => {
 				applyGradient(editor, gradientSteps);

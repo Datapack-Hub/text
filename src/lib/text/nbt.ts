@@ -43,8 +43,7 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 
 	try {
 		parsed = JSON.parse(raw);
-	} catch (e) {
-		console.error("Error parsing SNBT:", e);
+	} catch {
 		return [
 			"An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!",
 		];

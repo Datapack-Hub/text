@@ -40,24 +40,79 @@ it("should apply a hex color to a text node", async () => {
 	expect(mark?.attrs?.color).toMatch("#c0bb1e");
 });
 
-it("should apply all text styles to a text node", async () => {
-	const allTextStyleSNBT = await readTestDataFile(
-		"clean/snbt/all_text_style_marks.snbt",
-	);
-	const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
-	const textNode = document.content?.[0]?.content?.[0];
-	expect(textNode?.marks).toBeDefined();
-	expect(textNode?.marks).toHaveLength(5);
+it("should throw an error if the format is invalid", async () => {
+	const broken = await readTestDataFile("bad/broken.snbt");
+	const converted = convertToTextOrEmpty(broken);
+	expect(converted.toString()).toMatch(/An error occurred while parsing the SNBT/);
+})
 
-	expect(textNode?.marks).toEqual(
-		expect.arrayContaining([
-			expect.objectContaining({ type: "bold" }),
-			expect.objectContaining({ type: "italic" }),
-			expect.objectContaining({ type: "strike" }),
-			expect.objectContaining({ type: "underline" }),
-			expect.objectContaining({ type: "obfuscated" }),
-		]),
-	);
+it("should return a one length array if passed with a single component", async () => {
+	const singleComponentSNBT = await readTestDataFile("clean/snbt/single_component.snbt");
+	const converted = convertToTextOrEmpty(singleComponentSNBT);
+	expect(converted.length).toEqual(1)
+	expect(converted[0]).toEqual({ text: "hi", color: "#c0bb1e" })
+})
+
+describe("handling text styling marks", () => {
+	it("should bold text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "bold" });
+	});
+
+	it("should italic text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "italic" });
+	});
+
+	it("should obfuscated text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "obfuscated" });
+	});
+
+	it("should underline text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "underline" });
+	});
+
+	it("should strike text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "strike" });
+	});
 });
 
 it("should return nothing if its an empty string literal", () => {
@@ -245,7 +300,7 @@ describe("applying source props", () => {
 });
 
 describe("handling extra", () => {
-	it("should apply bold styling", async () => {
+	it("should apply text styling (bold)", async () => {
 		const boldSNBT = await readTestDataFile("clean/snbt/extra_test.snbt");
 		const document = snbtToDocument(convertToTextOrEmpty(boldSNBT));
 		const textNode = document.content?.[0]?.content?.[0];

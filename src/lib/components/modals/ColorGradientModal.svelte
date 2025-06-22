@@ -30,6 +30,7 @@
 							textInputModes={["hex"]}
 							isAlpha={false} />
 					</div>
+					{#if gradientSteps.length > 1}
 					<button
 						onclick={() => {
 							gradientSteps.splice(i, 1);
@@ -38,6 +39,7 @@
 						class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
 						<IconDelete />
 					</button>
+					{/if}
 				</div>
 			{/each}
 			<button
@@ -55,7 +57,7 @@
 				style="background: -webkit-linear-gradient(0, {gradientSteps.join(
 					',',
 				)}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
-				>{editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, ' ')}</span>
+				>{editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, ' ') || "error! no text selected"}</span>
 		</div>
 
 		<p class="text-sm text-white/60">

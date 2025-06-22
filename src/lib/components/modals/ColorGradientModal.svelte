@@ -55,8 +55,13 @@
 				style="background: -webkit-linear-gradient(0, {gradientSteps.join(
 					',',
 				)}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
-				>Example text</span>
+				>{editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, ' ')}</span>
 		</div>
+
+		<p class="text-sm text-white/60">
+			<b>Note:</b> you need to select text in the editor before you try and apply a gradient.
+		</p>
+
 		<button
 			onclick={() => {
 				applyGradient(editor, gradientSteps);

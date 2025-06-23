@@ -91,7 +91,7 @@
 			class="rounded-md bg-zinc-900 p-2"
 			placeholder="namespace:id"
 			bind:value={fontName} />
-			
+
 		<p class="text-sm text-white/60">
 			<b>Note:</b> in order for a custom font to show up ingame, you will need to
 			add it with a resource pack. Also, if you don't import a font into the editor,

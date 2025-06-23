@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { tooltip } from "$lib/tooltip";
 	import type { Component } from "svelte";
+	import tippy from "tippy.js";
 
 	type Props = {
 		onClick: () => void;
@@ -15,9 +17,8 @@
 <button
 	aria-label={ariaLabel}
 	onclick={onClick}
+	{@attach tooltip}
 	style="color: {color || 'inherit'}"
-	class="toolbar-btn hint--bottom hint--rounded hint--no-shadow {styleVar
-		? 'bg-zinc-800'
-		: ''}">
+	class="toolbar-btn {styleVar ? 'bg-zinc-800' : ''}">
 	<Icon />
 </button>

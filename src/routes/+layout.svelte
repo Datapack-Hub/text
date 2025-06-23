@@ -1,6 +1,8 @@
 <script lang="ts">
 	import "../app.css";
 	import "../fonts.css";
+	import "tippy.js/dist/tippy.css"; // optional for styling
+	import "tippy.js/animations/shift-away.css"; // optional for styling
 	/** @type {{children?: import('svelte').Snippet}} */
 	let { children } = $props();
 </script>

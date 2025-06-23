@@ -8,7 +8,9 @@ describe("translate", () => {
 	it("should return a basic string", () => {
 		const document = {
 			type: "doc",
-			content: [{ type: "paragraph", content: [{ type: "text", text: "test" }] }],
+			content: [
+				{ type: "paragraph", content: [{ type: "text", text: "test" }] },
+			],
 		};
 		const snbt = translate(document, {
 			exportType: "standard",
@@ -18,7 +20,9 @@ describe("translate", () => {
 	});
 
 	it("should return a basic color string", async () => {
-		const document = await readTestDataFile("clean/json/basic_color_tiptap.json");
+		const document = await readTestDataFile(
+			"clean/json/basic_color_tiptap.json",
+		);
 		const snbt = translate(JSON.parse(document), {
 			exportType: "standard",
 			optimise: true,
@@ -139,7 +143,9 @@ describe("translate", () => {
 	});
 
 	it("uses older format output when exportVersion=old", async () => {
-		const json: JSONContent = await readTestJSONFile("clean/json/interactives_tiptap.json") as JSONContent
+		const json: JSONContent = (await readTestJSONFile(
+			"clean/json/interactives_tiptap.json",
+		)) as JSONContent;
 		const result = translate(json, { ...baseOptions, exportVersion: "old" });
 		expect(JSON.parse(result)).toHaveProperty("[1].clickEvent");
 		expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");

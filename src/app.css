@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./hint.css";
 
 ::-webkit-color-swatch,
 ::-moz-color-swatch {
@@ -92,4 +91,9 @@ button {
 
 .toolbar-btn {
 	@apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
+}
+
+.tippy-box[data-theme~="dph"] {
+	@apply bg-zinc-700;
+	font-family: "Lexend", sans-serif;
 }

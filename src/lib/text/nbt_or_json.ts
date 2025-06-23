@@ -408,7 +408,12 @@ export function translate(
 					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
-				currentComponent = addTypeSpecificValues(currentComponent, c, false, options.exportVersion);
+				currentComponent = addTypeSpecificValues(
+					currentComponent,
+					c,
+					false,
+					options.exportVersion,
+				);
 				currentLine.push(currentComponent);
 			}
 

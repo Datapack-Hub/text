@@ -60,6 +60,7 @@
 	import FontPickerModal from "$lib/components/modals/FontPickerModal.svelte";
 	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
 	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
+	import { tooltip } from "$lib/tooltip";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -401,7 +402,8 @@
 				<button
 					onclick={() => editor?.chain().focus().unsetColor().run()}
 					aria-label="Unset color"
-					class="hint--bottom hint--rounded hint--no-shadow rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
+					{@attach tooltip}
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
 				</button>
@@ -414,7 +416,8 @@
 					customDialog?.open();
 					customType = undefined;
 				}}
-				class="toolbar-btn hint--bottom hint--rounded hint--no-shadow"
+				{@attach tooltip}
+				class="toolbar-btn"
 				aria-label="Add Custom Source">
 				<IconCustom />
 			</button>
@@ -452,11 +455,10 @@
 						hoverEventDialog?.open();
 					}
 				}}
+				{@attach tooltip}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
 					? 'ml-2'
-					: ''} toolbar-btn hint--bottom hint--rounded hint--no-shadow {editor.isActive(
-					'hoverEvent',
-				)
+					: ''} toolbar-btn {editor.isActive('hoverEvent')
 					? 'bg-zinc-800'
 					: ''}"
 				aria-label="Hover Event">
@@ -483,11 +485,13 @@
 			<div class="flex-grow"></div>
 
 			<button
-				class="toolbar-btn hint--left hint--rounded hint--no-shadow nomob"
+				{@attach tooltip}
+				class="toolbar-btn nomob"
 				onclick={fontUploadModal?.open}
 				aria-label="Upload Font"><IconUploadFont /></button>
 			<button
-				class="toolbar-btn hint--left hint--rounded hint--no-shadow nomob"
+				{@attach tooltip}
+				class="toolbar-btn nomob"
 				onclick={keybindDialog?.open}
 				aria-label="Keybinds"><IconKeybinds /></button>
 		{/if}
@@ -511,7 +515,8 @@
 			<div
 				class="flex max-h-48 max-w-screen items-start space-x-2 overflow-auto">
 				<button
-					class="hint--bottom hint--rounded hint--no-shadow rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
+					{@attach tooltip}
+					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
 						navigator.clipboard.writeText(
 							convert(
@@ -554,7 +559,8 @@
 						Click to change output settings:
 					</p>
 					<button
-						class="hint--bottom hint--rounded hint--no-shadow ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+						{@attach tooltip}
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
 						aria-label="Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version."
 						onclick={() => {
 							const ov = outputVersion;
@@ -565,7 +571,8 @@
 							}
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 					<button
-						class="hint--bottom hint--rounded hint--no-shadow ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+						{@attach tooltip}
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
 						aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
 						onclick={() => (shouldOptimise = !shouldOptimise)}
 						>{shouldOptimise ? "optimised" : "expanded"}</button>

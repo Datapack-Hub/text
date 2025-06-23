@@ -43,15 +43,19 @@ it("should apply a hex color to a text node", async () => {
 it("should throw an error if the format is invalid", async () => {
 	const broken = await readTestDataFile("bad/broken.snbt");
 	const converted = convertToTextOrEmpty(broken);
-	expect(converted.toString()).toMatch(/An error occurred while parsing the SNBT/);
-})
+	expect(converted.toString()).toMatch(
+		/An error occurred while parsing the SNBT/,
+	);
+});
 
 it("should return a one length array if passed with a single component", async () => {
-	const singleComponentSNBT = await readTestDataFile("clean/snbt/single_component.snbt");
+	const singleComponentSNBT = await readTestDataFile(
+		"clean/snbt/single_component.snbt",
+	);
 	const converted = convertToTextOrEmpty(singleComponentSNBT);
-	expect(converted.length).toEqual(1)
-	expect(converted[0]).toEqual({ text: "hi", color: "#c0bb1e" })
-})
+	expect(converted.length).toEqual(1);
+	expect(converted[0]).toEqual({ text: "hi", color: "#c0bb1e" });
+});
 
 describe("handling text styling marks", () => {
 	it("should bold text styling to a text node", async () => {

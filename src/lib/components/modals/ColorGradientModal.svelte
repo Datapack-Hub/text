@@ -31,14 +31,14 @@
 							isAlpha={false} />
 					</div>
 					{#if gradientSteps.length > 1}
-					<button
-						onclick={() => {
-							gradientSteps.splice(i, 1);
-							gradientSteps = gradientSteps;
-						}}
-						class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
-						<IconDelete />
-					</button>
+						<button
+							onclick={() => {
+								gradientSteps.splice(i, 1);
+								gradientSteps = gradientSteps;
+							}}
+							class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
+							<IconDelete />
+						</button>
 					{/if}
 				</div>
 			{/each}
@@ -57,11 +57,16 @@
 				style="background: -webkit-linear-gradient(0, {gradientSteps.join(
 					',',
 				)}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
-				>{editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to, ' ') || "error! no text selected"}</span>
+				>{editor?.state.doc.textBetween(
+					editor.state.selection.from,
+					editor.state.selection.to,
+					" ",
+				) || "error! no text selected"}</span>
 		</div>
 
 		<p class="text-sm text-white/60">
-			<b>Note:</b> you need to select text in the editor before you try and apply a gradient.
+			<b>Note:</b> you need to select text in the editor before you try and apply
+			a gradient.
 		</p>
 
 		<button

@@ -1,6 +1,7 @@
 import { Extension } from "@tiptap/core";
+import { SvelteMap } from "svelte/reactivity"
 
-export let fontLUT: Map<string, string> = new Map();
+export let fontLUT: SvelteMap<string, string> = new SvelteMap();
 
 export const FontsExtension = Extension.create({
 	name: "font",
@@ -43,9 +44,7 @@ export const FontsExtension = Extension.create({
 							}
 
 							return {
-								style: `
-									font-family: "${font}";
-								`,
+								style: `font-family: "${font}", monospace;`,
 							};
 						},
 					},

@@ -61,6 +61,8 @@
 	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
 	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
 	import { tooltip } from "$lib/tooltip";
+	import { openDataStore } from "$lib/db";
+	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -120,7 +122,7 @@
 		importDialog?.close();
 	}
 
-	onMount(() => {
+	async function loadData() {
 		if (localStorage.getItem("content")) {
 			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
@@ -134,6 +136,24 @@
 			snapshots = [];
 			localStorage.setItem("snapshots", "");
 		}
+
+		const db = await openDataStore();
+		const fontStore = await db.getAll("fonts");
+
+		type FontStoreSchema = {
+			identifier: string;
+			alias: string;
+			data: File;
+		};
+
+		fontStore.forEach(async ({ identifier, alias, data }: FontStoreSchema) => {
+			fontLUT.set(identifier, alias);
+			document.fonts.add(new FontFace(identifier, await data.arrayBuffer()));
+		});
+	}
+
+	onMount(() => {
+		loadData();
 
 		editor = new Editor({
 			element: element,

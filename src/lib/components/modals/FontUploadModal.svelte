@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
+	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { fileTypeFromBlob } from "file-type";
 	import IconUpload from "~icons/tabler/file-upload";
@@ -8,6 +9,7 @@
 	let step = $state(1);
 	let identifier = $state("");
 	let fontAlias = $state("");
+	let fontData: Blob
 
 	async function dropHandler(
 		e: DragEvent & {
@@ -53,14 +55,25 @@
 			document.fonts.add(font);
 			fontAlias = fileName;
 			await font.load();
+			fontData = file
 		}
 		step = 2;
 	}
 
-	function addToFontLUT() {
+	async function addToFontLUT() {
 		fontLUT.set(identifier, fontAlias);
 		fontUploadModal.close();
 		step = 1;
+		
+		const db = await openDataStore()
+		await db.put("fonts", {
+			alias: fontAlias,
+			identifier,
+			data: fontData
+		})
+
+		identifier = "";
+		fontAlias = "";
 	}
 </script>
 

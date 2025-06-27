@@ -1,8 +1,8 @@
-import { translate } from "$lib/text/nbt_or_json";
+import { addTypeSpecificValues, translate } from "$lib/text/nbt_or_json";
+import type { MinecraftText, TranslateOptions } from "$lib/types";
+import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
-import type { TranslateOptions } from "$lib/types";
-import type { JSONContent } from "@tiptap/core";
 
 describe("translate", () => {
 	it("should return a basic string", () => {
@@ -191,5 +191,74 @@ describe("translate", () => {
 			exportType: "unknown" as any,
 		});
 		expect(result).toBe("[]");
+	});
+});
+
+describe("adding type props", () => {
+	it("should add text property for type 'text'", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = { type: "text", text: "hello" };
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.text).toBe("hello");
+	});
+
+	it("should add score property for type 'score'", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "score",
+			attrs: { name: "player", objective: "obj" },
+		};
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.score).toEqual({ name: "player", objective: "obj" });
+	});
+
+	it("should add translate, with, and fallback for type 'translate'", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "translate",
+			attrs: {
+				key: "translation.key",
+				params: ["param1", "param2"],
+				fallback: "fallback text",
+			},
+		};
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.translate).toBe("translation.key");
+		expect(result.with).toEqual(["param1", "param2"]);
+		expect(result.fallback).toBe("fallback text");
+	});
+
+	it("should add nbt, storage, block, entity, interpret for nbt types", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "storage_nbt",
+			attrs: {
+				nbt: "someNbt",
+				storage: "someStorage",
+				block: "someBlock",
+				entity: "someEntity",
+				interpret: true,
+			},
+		};
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.nbt).toBe("someNbt");
+		expect(result.storage).toBe("someStorage");
+		expect(result.block).toBe("someBlock");
+		expect(result.entity).toBe("someEntity");
+		expect(result.interpret).toBe(true);
+	});
+
+	it("should add keybind property for type 'keybind'", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = { type: "keybind", attrs: { key: "key.jump" } };
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.keybind).toBe("key.jump");
+	});
+
+	it("should add selector property for type 'selector'", () => {
+		const current: MinecraftText = {};
+		const c: JSONContent = { type: "selector", attrs: { selector: "@a" } };
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.selector).toBe("@a");
 	});
 });

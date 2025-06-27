@@ -556,7 +556,7 @@
 						<IconCopy />
 					{/if}</button>
 				<p>
-					<code class="inline break-all"
+					<code id="outputbox" class="inline break-all"
 						>{editor
 							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
 							: "Loading..."}

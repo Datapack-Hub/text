@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { convert, translate } from "$lib/text/nbt_or_json";
+	import { convert, translateJSON } from "$lib/text/nbt_or_json";
 
 	import {
 		BlockNBTNode,
@@ -48,21 +48,15 @@
 	import IconHollow from "~icons/tabler/square-x";
 
 	import { page } from "$app/state";
-	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
-	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
-	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
-	import ExportModal from "$lib/components/modals/ExportModal.svelte";
-	import FontUploadModal from "$lib/components/modals/FontUploadModal.svelte";
-	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
+
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
 	import { colorMap } from "$lib/text/general";
 
-	import FontPickerModal from "$lib/components/modals/FontPickerModal.svelte";
-	import UnicodeSelectorModal from "$lib/components/modals/UnicodeSelectorModal.svelte";
 	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
-	import { tooltip } from "$lib/tooltip";
 	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
+	import { tooltip } from "$lib/tooltip";
+	import { translateMOTD } from "$lib/text/motd";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -101,7 +95,6 @@
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
 
-	let hoverEventType = "";
 	let hoverEventValue: any = $state();
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
@@ -152,7 +145,7 @@
 		});
 	}
 
-	onMount(() => {
+	onMount(async () => {
 		loadData();
 
 		editor = new Editor({
@@ -282,8 +275,7 @@
 		}
 
 		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
-		const { action, value } = mark.attrs;
-		hoverEventType = action;
+		const { value } = mark.attrs;
 		hoverEventDialog!.open();
 		if (hoverEventEditor) {
 			hoverEventEditor.importText(JSON.stringify(value));
@@ -337,7 +329,7 @@
 
 	function getTextComponentCount() {
 		const components = JSON.parse(
-			translate(editor!.getJSON(), {
+			translateJSON(editor!.getJSON(), {
 				exportType: "standard",
 				indent: false,
 				exportVersion: outputVersion,
@@ -410,14 +402,16 @@
 				Icon={IconGradient}
 				onClick={gradientDialog.open}
 				ariaLabel="Color Gradient" />
-			{#each colorMap as color}
-				<ToolbarButton
-					Icon={IconSquare}
-					onClick={() => editor!.chain().focus().setColor(color.value).run()}
-					styleVar={editor.isActive("textStyle", { color: color.value })}
-					color={color.value}
-					ariaLabel={toTitleCase(color.name.replace("_", " "))} />
-			{/each}
+			<div id="colorBtns">
+				{#each colorMap as color}
+					<ToolbarButton
+						Icon={IconSquare}
+						onClick={() => editor!.chain().focus().setColor(color.value).run()}
+						styleVar={editor.isActive("textStyle", { color: color.value })}
+						color={color.value}
+						ariaLabel={toTitleCase(color.name.replace("_", " "))} />
+				{/each}
+			</div>
 			{#if editor.getAttributes("textStyle").color}
 				<button
 					onclick={() => editor?.chain().focus().unsetColor().run()}
@@ -556,8 +550,9 @@
 						<IconCopy />
 					{/if}</button>
 				<p>
-					<code id="outputbox" class="inline break-all"
-						>{editor
+					<code id="outputbox" class="inline break-all">
+						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
+						{editor
 							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
 							: "Loading..."}
 					</code>
@@ -638,11 +633,14 @@
 </noscript>
 
 <div>
-	<ClickEventModal
-		bind:clickEventDialog
-		bind:clickEventType
-		bind:clickEventValue
-		{editor} />
+	<!-- code splitted to reduce bundle size -->
+	{#await import("$lib/components/modals/ClickEventModal.svelte") then modal}
+		<modal.default
+			bind:clickEventDialog
+			bind:clickEventType
+			bind:clickEventValue
+			{editor} />
+	{/await}
 
 	<Modal title="Hover Event" bind:this={hoverEventDialog} key="H">
 		<p>Text to show</p>
@@ -661,11 +659,9 @@
 		</button>
 	</Modal>
 
-	<CustomSourceModal
-		bind:customDialog
-		bind:customType
-		{editor}
-		{outputVersion} />
+	{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
+		<modal.default bind:customDialog bind:customType {editor} {outputVersion} />
+	{/await}
 
 	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
 		<div class="flex w-full flex-col py-4">
@@ -718,13 +714,15 @@
 		</div>
 	</Modal>
 
-	<ExportModal
-		bind:outputDialog
-		bind:outputVersion
-		{editor}
-		{indent}
-		{indentSize}
-		{recentlyCopied} />
+	{#await import("$lib/components/modals/ExportModal.svelte") then modal}
+		<modal.default
+			bind:outputDialog
+			bind:outputVersion
+			{editor}
+			{indent}
+			{indentSize}
+			{recentlyCopied} />
+	{/await}
 
 	<Modal title="Import from NBT" bind:this={importDialog} key="I">
 		<div class="flex w-full flex-col space-y-2">
@@ -745,15 +743,25 @@
 		</div>
 	</Modal>
 
-	<FontPickerModal
-		bind:fontDialog
-		{fontUploadModal}
-		editor={editor!}
-		bind:fontName />
+	{#await import("$lib/components/modals/FontPickerModal.svelte") then modal}
+		<modal.default
+			bind:fontDialog
+			{fontUploadModal}
+			editor={editor!}
+			bind:fontName />
+	{/await}
 
-	<KeybindModal bind:keybindDialog />
-	<FontUploadModal bind:fontUploadModal />
+	{#await import("$lib/components/modals/KeybindModal.svelte") then modal}
+		<modal.default bind:keybindDialog />
+	{/await}
+	{#await import("$lib/components/modals/FontUploadModal.svelte") then modal}
+		<modal.default bind:fontUploadModal />
+	{/await}
 
-	<ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />
-	<UnicodeSelectorModal editor={editor!} bind:unicodeSelectorDialog />
+	{#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
+		<modal.default {editor} bind:gradientSteps bind:gradientDialog />
+	{/await}
+	{#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
+		<modal.default editor={editor!} bind:unicodeSelectorDialog />
+	{/await}
 </div>

@@ -13,25 +13,26 @@ export function trueMarkOrUndefined(
 ): true | undefined {
 	const value = content.marks?.some((e) => e.type === mark);
 	return value === true ? value : undefined;
-} /**
- * A color value LUT
+}
+/**
+ * A LUT to find the name of a color
  *
  * @param color the hex code
  * @returns the color name
  */
-
 export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
 	return colorMap.find((e) => e.value.toLowerCase() === color)?.name || color;
-} /**
- * A color name LUT
+}
+
+/**
+ * A LUT to find the value of a named color
  *
  * @param color the color name you want to find
  * @returns the hex code for the color
  */
-
 export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
@@ -104,21 +105,22 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 
 	chain.run();
 }
+
 export const colorMap = [
-	{ name: "dark_red", value: "#AA0000" },
-	{ name: "red", value: "#FF5555" },
-	{ name: "gold", value: "#FFAA00" },
-	{ name: "yellow", value: "#FFFF55" },
-	{ name: "green", value: "#55FF55" },
-	{ name: "dark_green", value: "#00AA00" },
-	{ name: "aqua", value: "#55FFFF" },
-	{ name: "dark_aqua", value: "#00AAAA" },
-	{ name: "blue", value: "#5555FF" },
-	{ name: "dark_blue", value: "#0000AA" },
-	{ name: "dark_purple", value: "#AA00AA" },
-	{ name: "light_purple", value: "#FF55FF" },
-	{ name: "white", value: "#FFFFFF" },
-	{ name: "gray", value: "#AAAAAA" },
-	{ name: "dark_gray", value: "#555555" },
-	{ name: "black", value: "#000000" },
+	{ name: "dark_red", value: "#AA0000", code: "4" },
+	{ name: "red", value: "#FF5555", code: "c" },
+	{ name: "gold", value: "#FFAA00", code: "6" },
+	{ name: "yellow", value: "#FFFF55", code: "e" },
+	{ name: "green", value: "#55FF55", code: "2" },
+	{ name: "dark_green", value: "#00AA00", code: "a" },
+	{ name: "aqua", value: "#55FFFF", code: "b"},
+	{ name: "dark_aqua", value: "#00AAAA", code: "3"},
+	{ name: "blue", value: "#5555FF", code: "1"},
+	{ name: "dark_blue", value: "#0000AA", code: "9"},
+	{ name: "dark_purple", value: "#AA00AA", code: "d"},
+	{ name: "light_purple", value: "#FF55FF", code: "5"},
+	{ name: "white", value: "#FFFFFF", code: "f"},
+	{ name: "gray", value: "#AAAAAA", code: "7"},
+	{ name: "dark_gray", value: "#555555", code: "8"},
+	{ name: "black", value: "#000000", code: "0"},
 ];

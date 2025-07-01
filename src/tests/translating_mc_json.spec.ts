@@ -1,4 +1,4 @@
-import { addTypeSpecificValues, translate } from "$lib/text/nbt_or_json";
+import { addTypeSpecificValues, translateJSON } from "$lib/text/nbt_or_json";
 import type { MinecraftText, TranslateOptions } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
@@ -12,7 +12,7 @@ describe("translate", () => {
 				{ type: "paragraph", content: [{ type: "text", text: "test" }] },
 			],
 		};
-		const snbt = translate(document, {
+		const snbt = translateJSON(document, {
 			exportType: "standard",
 			optimise: true,
 		});
@@ -23,7 +23,7 @@ describe("translate", () => {
 		const document = await readTestDataFile(
 			"clean/json/basic_color_tiptap.json",
 		);
-		const snbt = translate(JSON.parse(document), {
+		const snbt = translateJSON(JSON.parse(document), {
 			exportType: "standard",
 			optimise: true,
 		});
@@ -40,7 +40,7 @@ describe("translate", () => {
 
 	it("returns waiting message for empty content", () => {
 		const json: JSONContent = {};
-		const result = translate(json, baseOptions);
+		const result = translateJSON(json, baseOptions);
 		expect(result).toBeOneOf([
 			"waiting for input...",
 			"🤓 <- james is waiting for you to type something",
@@ -61,7 +61,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, baseOptions);
+		const result = translateJSON(json, baseOptions);
 		expect(result).toContain("Hello");
 		expect(result).not.toContain("color");
 	});
@@ -80,7 +80,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, baseOptions);
+		const result = translateJSON(json, baseOptions);
 		expect(result).toContain("BoldItalic");
 		expect(result).toContain('"bold":true');
 		expect(result).toContain('"italic":true');
@@ -105,7 +105,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, baseOptions);
+		const result = translateJSON(json, baseOptions);
 		expect(result).toContain('"shadow_color":16711935');
 	});
 
@@ -120,7 +120,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, baseOptions);
+		const result = translateJSON(json, baseOptions);
 		expect(result).toContain("First");
 		expect(result).toContain("Second");
 		expect(result).toContain("\\n");
@@ -137,7 +137,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, { ...baseOptions, optimise: true });
+		const result = translateJSON(json, { ...baseOptions, optimise: true });
 		expect(result).toContain("A");
 		expect(result).toContain("B");
 	});
@@ -146,7 +146,10 @@ describe("translate", () => {
 		const json: JSONContent = (await readTestJSONFile(
 			"clean/json/interactives_tiptap.json",
 		)) as JSONContent;
-		const result = translate(json, { ...baseOptions, exportVersion: "old" });
+		const result = translateJSON(json, {
+			...baseOptions,
+			exportVersion: "old",
+		});
 		expect(JSON.parse(result)).toHaveProperty("[1].clickEvent");
 		expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");
 		expect(JSON.parse(result)).toHaveProperty("[1].hoverEvent");
@@ -161,7 +164,7 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, {
+		const result = translateJSON(json, {
 			...baseOptions,
 			indent: true,
 			indentSize: 4,
@@ -177,7 +180,10 @@ describe("translate", () => {
 				},
 			],
 		};
-		const result = translate(json, { ...baseOptions, exportType: "item_lore" });
+		const result = translateJSON(json, {
+			...baseOptions,
+			exportType: "item_lore",
+		});
 		expect(result).toContain("Lore");
 		expect(result.startsWith("[")).toBe(true);
 	});
@@ -186,7 +192,7 @@ describe("translate", () => {
 		const json: JSONContent = {
 			content: [],
 		};
-		const result = translate(json, {
+		const result = translateJSON(json, {
 			...baseOptions,
 			exportType: "unknown" as any,
 		});

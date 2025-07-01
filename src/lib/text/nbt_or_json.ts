@@ -6,7 +6,7 @@ import type {
 	TranslateOptions,
 } from "$lib/types";
 import { type JSONContent } from "@tiptap/core";
-import { defaultColorLUT, isMarkType, trueMarkOrUndefined } from "./general";
+import { colorMap, defaultColorLUT, isMarkType, trueMarkOrUndefined } from "./general";
 
 const styleProps = [
 	"color",
@@ -315,7 +315,7 @@ export function convert(
 	exportVersion: "new" | "old" = "new",
 	optimise: boolean,
 ): string {
-	let out = translate(jsonContent, { exportVersion, exportType, optimise });
+	let out = translateJSON(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new") {
 		// only remove strings
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
@@ -328,7 +328,7 @@ export function convert(
 /**
  * Converts the JSON content of the editor to a Minecraft JSON string.
  */
-export function translate(
+export function translateJSON(
 	json: JSONContent,
 	options: TranslateOptions,
 ): string {
@@ -340,6 +340,12 @@ export function translate(
 		for (const [i, p] of paragraphs.entries()) {
 			const content = p.content ?? [];
 			for (const c of content) {
+				colorMap.find((e) => {
+					console.log(e.value)
+					console.log(c.marks?.at(0)?.attrs?.color);
+					console.log(e.value.toUpperCase() == c.marks?.at(0)?.attrs?.color)
+						e.value.toUpperCase() == c.marks?.at(0)?.attrs?.color;
+					})?.name
 				let current: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),

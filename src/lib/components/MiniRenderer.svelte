@@ -17,6 +17,7 @@
 		ShadowColorMark,
 		ClickEventMark,
 		HoverEventMark,
+		FontsExtension,
 	} from "$lib/tiptap/extensions/index";
 
 	let { value } = $props();
@@ -42,6 +43,7 @@
 				StorageNBTNode,
 				TranslateNode,
 				ShadowColorMark,
+				FontsExtension,
 			],
 			content: value,
 		}).setEditable(false);

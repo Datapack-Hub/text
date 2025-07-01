@@ -1,8 +1,9 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import IconCopy from "~icons/tabler/copy";
 	import IconTick from "~icons/tabler/check";
-	import { translate, convert } from "$lib/tiptap/text";
+	import { translateJSON, convert } from "$lib/text/nbt_or_json";
+	import { translateMOTD } from "$lib/text/motd";
 	let {
 		outputDialog = $bindable(),
 		outputVersion = $bindable(),
@@ -10,32 +11,37 @@
 		recentlyCopied,
 		indent,
 		indentSize,
-		shouldOptimise = true
+		shouldOptimise = true,
 	} = $props();
 </script>
 
 <Modal title="More output formats" bind:this={outputDialog} big key="E">
 	<p>Select a Minecraft version:</p>
-	<select bind:value={outputVersion} class="bg-zinc-900 p-2 rounded-md w-fit">
+	<select bind:value={outputVersion} class="w-fit rounded-md bg-zinc-900 p-2">
 		<option value="new">1.21.5+</option>
 		<option value="old">Before 1.21.5</option>
 	</select>
-	<div class="flex flex-col w-full mt-2">
+	<div class="mt-2 flex w-full flex-col">
 		<p>For tellraw commands (send to chat):</p>
-		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
-				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
 						"/tellraw @s " +
-							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
+							convert(
+								editor.getJSON(),
+								"standard",
+								outputVersion,
+								shouldOptimise,
+							),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
-			<code class="inline-block w-full overflow-auto max-h-56"
+			<code class="inline-block max-h-56 w-full overflow-auto"
 				>/tellraw @s {editor
 					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
 					: "Loading..."}
@@ -43,9 +49,9 @@
 		</div>
 
 		<p class="mt-2">As a lore component:</p>
-		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
-				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
 						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)}]`,
@@ -56,66 +62,83 @@
 				<IconCopy />
 			</button>
 			{#if outputVersion == "new"}
-				<code class="inline-block w-full overflow-auto max-h-56"
+				<code class="inline-block max-h-56 w-full overflow-auto"
 					>[lore={editor
-						? convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)
+						? convert(
+								editor.getJSON(),
+								"item_lore",
+								outputVersion,
+								shouldOptimise,
+							)
 						: "Loading..."}]
 				</code>
 			{:else}
-				<code class="inline-block w-full overflow-auto max-h-56"
+				<code class="inline-block max-h-56 w-full overflow-auto"
 					>[lore={editor
-						? `'${translate(editor.getJSON(), {
-							exportType: "item_lore",
-							exportVersion: outputVersion,
-							optimise: shouldOptimise
-						})}`
+						? `'${translateJSON(editor.getJSON(), {
+								exportType: "item_lore",
+								exportVersion: outputVersion,
+								optimise: shouldOptimise,
+							})}`
 						: "Loading..."}]
 				</code>
 			{/if}
 		</div>
 
-		<p class="mt-2">As JSON:</p>
-		<div class="flex items-start bg-zinc-950 p-3 space-x-3 rounded-lg">
+		<p class="mt-2">As a MOTD:</p>
+		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
-				class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						translate(
-							editor.getJSON(),
-							{
-								exportType: "standard",
-								exportVersion: outputVersion,
-								indent,
-								indentSize,
-								optimise: shouldOptimise
-							}
-						),
+						editor ? translateMOTD(editor.getJSON()) : "Loading...",
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
-			<code class="inline-block w-full overflow-auto max-h-56"
+			<code class="inline-block max-h-56 w-full overflow-auto"
+				>{editor ? translateMOTD(editor.getJSON()) : "Loading..."}
+			</code>
+		</div>
+
+		<p class="mt-2">As JSON:</p>
+		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
+			<button
+				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
+				onclick={() => {
+					navigator.clipboard.writeText(
+						translateJSON(editor.getJSON(), {
+							exportType: "standard",
+							exportVersion: outputVersion,
+							indent,
+							indentSize,
+							optimise: shouldOptimise,
+						}),
+					);
+					recentlyCopied = true;
+					setTimeout(() => (recentlyCopied = false), 2000);
+				}}>
+				<IconCopy />
+			</button>
+			<code class="inline-block max-h-56 w-full overflow-auto"
 				><pre>{editor
-						? translate(
-								editor.getJSON(),
-								{
-									exportType: "standard",
-									exportVersion: outputVersion,
-									indent,
-									indentSize,
-									optimise: shouldOptimise
-								}
-							)
+						? translateJSON(editor.getJSON(), {
+								exportType: "standard",
+								exportVersion: outputVersion,
+								indent,
+								indentSize,
+								optimise: shouldOptimise,
+							})
 						: "Loading..."}</pre>
 			</code>
 		</div>
 
-		<div class="flex items-center gap-2 mt-2">
+		<div class="mt-2 flex items-center gap-2">
 			<p>Indent?</p>
 			<button
-				class="size-8 aspect-square bg-zinc-900 rounded-md flex flex-col items-center"
+				class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
 				onclick={() => (indent = !indent)}>
 				{#if indent}
 					<IconTick class="m-auto text-lg" />
@@ -130,7 +153,7 @@
 				max="8"
 				min="1"
 				bind:value={indentSize}
-				class="bg-zinc-900 p-2 rounded-md w-fit" />
+				class="w-fit rounded-md bg-zinc-900 p-2" />
 		{/if}
 	</div>
 </Modal>

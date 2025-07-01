@@ -5,27 +5,13 @@ import type {
 	StringyMCText,
 	TranslateOptions,
 } from "$lib/types";
-import { Editor, type JSONContent } from "@tiptap/core";
-import { generateGradient } from "typescript-color-gradient";
-
-export const colorMap = [
-	{ name: "dark_red", value: "#AA0000" },
-	{ name: "red", value: "#FF5555" },
-	{ name: "gold", value: "#FFAA00" },
-	{ name: "yellow", value: "#FFFF55" },
-	{ name: "green", value: "#55FF55" },
-	{ name: "dark_green", value: "#00AA00" },
-	{ name: "aqua", value: "#55FFFF" },
-	{ name: "dark_aqua", value: "#00AAAA" },
-	{ name: "blue", value: "#5555FF" },
-	{ name: "dark_blue", value: "#0000AA" },
-	{ name: "dark_purple", value: "#AA00AA" },
-	{ name: "light_purple", value: "#FF55FF" },
-	{ name: "white", value: "#FFFFFF" },
-	{ name: "gray", value: "#AAAAAA" },
-	{ name: "dark_gray", value: "#555555" },
-	{ name: "black", value: "#000000" },
-];
+import { type JSONContent } from "@tiptap/core";
+import {
+	defaultColorLUT,
+	isMarkType,
+	trueMarkOrUndefined,
+	unescapeUnicode,
+} from "./general";
 
 const styleProps = [
 	"color",
@@ -42,59 +28,9 @@ const styleProps = [
 	"hoverEvent",
 ];
 
-/** 
- * @param content the node to check
- * @param mark the mark to check
- * @returns the mark if true, undefined otherwise
- */
-export function trueMarkOrUndefined(
-	content: JSONContent,
-	mark: string,
-): true | undefined {
-	const value = content.marks?.some((e) => e.type === mark);
-	return value === true ? value : undefined;
-}
-
-/**
- * A color value LUT
- * 
- * @param color the hex code
- * @returns the color name
- */
-export function defaultColorLUT(color: string): string | undefined {
-	if (!color || color === "null") {
-		return;
-	}
-	return colorMap.find((e) => e.value === color)?.name || color;
-}
-
-/**
- * A color name LUT
- * 
- * @param color the color name you want to find
- * @returns the hex code for the color
- */
-export function defaultColorReverseLUT(color: string): string | undefined {
-	if (!color || color === "null") {
-		return;
-	}
-	return colorMap.find((e) => e.name === color)?.value || color;
-}
-
-/**
- * Checks the type of the mark against `type`
- * 
- * @param c the node you want to examine
- * @param type type to check
- * @returns true if it matches
- */
-export function isMarkType(c: JSONContent, type: string) {
-	return c.marks?.find((e) => e.type === type);
-}
-
 /**
  * Applies the specific properties for a type of source or provider
- * 
+ *
  * @param current current text component
  * @param c the current editor JSON
  * @param includeInteractivity should it have click and hover events
@@ -109,7 +45,7 @@ export function addTypeSpecificValues(
 ) {
 	switch (c.type) {
 		case "text":
-			current.text = c.text;
+			current.text = unescapeUnicode(c.text!);
 			break;
 		case "score":
 			current.score = {
@@ -143,7 +79,7 @@ export function addTypeSpecificValues(
 			break;
 	}
 
-	if (includeInteractivity) {		
+	if (includeInteractivity) {
 		switch (exportVersion) {
 			case "new":
 				newApplyInteractiveValues(current, c);
@@ -164,10 +100,7 @@ export function addTypeSpecificValues(
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function newApplyInteractiveValues(
-	current: MinecraftText,
-	c: JSONContent,
-) {
+function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
 	if (isMarkType(c, "clickEvent")) {
 		const ce = isMarkType(c, "clickEvent")?.attrs;
 		current.click_event = { action: ce!.action };
@@ -204,10 +137,7 @@ function newApplyInteractiveValues(
  * @param c the content
  * @param includeInteractivity if it should have interactive events or not
  */
-function oldApplyInteractiveValues(
-	current: OldMinecraftText,
-	c: JSONContent
-) {
+function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
 	if (isMarkType(c, "clickEvent")) {
 		const ce = isMarkType(c, "clickEvent")?.attrs;
 		current.clickEvent = { action: ce!.action, value: ce!.value };
@@ -220,72 +150,16 @@ function oldApplyInteractiveValues(
 }
 
 /**
- * Applies a gradient to a selection in an editor
- * 
- * @param editor the editor you want to apply it to
- * @param gradientColors the colors you want to use
- * @returns 
- */
-export function applyGradient(editor: Editor, gradientColors: string[]) {
-	const { from, to } = editor.state.selection;
-	if (from === to) return;
-
-	const doc = editor.state.doc;
-	let text = "";
-	let textPositions: { pos: number; len: number }[] = [];
-
-	// Collect all text and their positions in the selection
-	doc.nodesBetween(from, to, (node, pos) => {
-		if (node.isText) {
-			const nodeStart = Math.max(from, pos);
-			const nodeEnd = Math.min(to, pos + node.text!.length);
-			const sliceStart = nodeStart - pos;
-			const sliceEnd = nodeEnd - pos;
-			const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
-			if (part.length > 0) {
-				text += part;
-				textPositions.push({ pos: nodeStart, len: part.length });
-			}
-		}
-	});
-	if (!text.length) return;
-
-	const total = text.length;
-	if (total === 0 || gradientColors.length < 2) return;
-
-	const gradientArray = generateGradient(gradientColors, total);
-
-	let chain = editor.chain();
-
-	// Remove color from selection first
-	chain.focus().setTextSelection({ from, to }).unsetColor();
-
-	let charIndex = 0;
-	for (const { pos, len } of textPositions) {
-		for (let i = 0; i < len; i++) {
-			const color = gradientArray[charIndex];
-			chain
-				.setTextSelection({ from: pos + i, to: pos + i + 1 })
-				.setColor(color);
-			charIndex++;
-		}
-	}
-	chain.focus().setTextSelection({ from, to });
-
-	chain.run();
-}
-
-/**
  * Optimises the final outputted component string to reduce characters
- * 
+ *
  * @param arr An array of strings or text components
- * @returns 
+ * @returns
  */
 export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	let out: StringyMCText[] = [];
 
 	if (!lore) {
-		out.push("")
+		out.push("");
 	}
 
 	// 1: Remove undefineds, flatten MinecraftText with only text
@@ -295,14 +169,18 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			continue;
 		}
 		if ("text" in comp) {
-			Object.keys(comp).forEach(k => comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey]);
+			Object.keys(comp).forEach(
+				(k) =>
+					comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey],
+			);
 		}
 		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
 	}
 
 	// 2: Merge adjacent strings and whitespace, group objects with shared style
 	for (let i = 0; i < out.length - 1; i++) {
-		const curr = out[i], next = out[i + 1];
+		const curr = out[i],
+			next = out[i + 1];
 
 		// Merge whitespace to prev component
 		// todo fix
@@ -314,18 +192,16 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		// Merge consecutive strings
 		if (typeof curr === "string" && typeof next === "string") {
 			out[i] = curr + next;
-			out.splice(i + 1, 1); i--;
+			out.splice(i + 1, 1);
+			i--;
 			continue;
 		}
 
 		// Find shared style/interactivity properties between consecutive objects
-		if (
-			typeof curr === "object" &&
-			typeof next === "object"
-		) {
+		if (typeof curr === "object" && typeof next === "object") {
 			const shared: Record<string, any> = {};
 			for (const prop of styleProps) {
-				const p = prop as MCTextKey
+				const p = prop as MCTextKey;
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
@@ -338,15 +214,16 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 			const allProps = [...styleProps];
 			const sharedAll: Record<string, any> = {};
 			for (const prop of allProps) {
-				const p = prop as MCTextKey
+				const p = prop as MCTextKey;
 				if (
 					curr[p] !== undefined &&
 					next[p] !== undefined &&
-					(
-						prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
-							? JSON.stringify(curr[p]) === JSON.stringify(next[p])
-							: curr[p] === next[p]
-					)
+					(prop === "hover_event" ||
+					prop === "click_event" ||
+					prop === "hoverEvent" ||
+					prop === "clickEvent"
+						? JSON.stringify(curr[p]) === JSON.stringify(next[p])
+						: curr[p] === next[p])
 				) {
 					sharedAll[p] = curr[p];
 				}
@@ -362,8 +239,10 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					Object.keys(sharedAll).every(
 						(prop) =>
 							out[j + 1][prop as keyof StringyMCText] !== undefined &&
-							(
-								prop === "hover_event" || prop === "click_event" || prop === "hoverEvent" || prop === "clickEvent"
+							(prop === "hover_event" ||
+							prop === "click_event" ||
+							prop === "hoverEvent" ||
+							prop === "clickEvent"
 								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
 									JSON.stringify(sharedAll[prop])
 								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
@@ -374,7 +253,7 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 				}
 				if (group.length > 1) {
 					// Remove shared properties from each group member for "extra"
-					let extras = group.map(comp => {
+					let extras: StringyMCText[] = group.map((comp) => {
 						const c = { ...comp };
 						for (const prop of Object.keys(sharedAll)) {
 							delete c[prop as MCTextKey];
@@ -383,8 +262,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 					});
 
 					// Optimise extra
-					extras = optimise(extras)
-					const first = extras.shift()
+					extras = optimise(extras);
+					const first = extras.shift();
 					let merged;
 					if (typeof first == "string") {
 						if (extras[0]) {
@@ -408,7 +287,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	}
 
 	// 3: Remove leading empty string if followed by a string
-	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string") out.shift();
+	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string")
+		out.shift();
 
 	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
 	if (
@@ -423,9 +303,9 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 		out.shift();
 	}
 
-	// 5: If it is item lore then override 
+	// 5: If it is item lore then override
 	if (lore) {
-		out.unshift({italic: false, color: "white", text: ""})
+		out.unshift({ italic: false, color: "white", text: "" });
 	}
 
 	return out;
@@ -438,9 +318,9 @@ export function convert(
 	jsonContent: JSONContent,
 	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
-	optimise: boolean
+	optimise: boolean,
 ): string {
-	let out = translate(jsonContent, { exportVersion, exportType, optimise });
+	let out = translateJSON(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new") {
 		// only remove strings
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
@@ -453,7 +333,7 @@ export function convert(
 /**
  * Converts the JSON content of the editor to a Minecraft JSON string.
  */
-export function translate(
+export function translateJSON(
 	json: JSONContent,
 	options: TranslateOptions,
 ): string {
@@ -472,6 +352,7 @@ export function translate(
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
@@ -482,7 +363,12 @@ export function translate(
 					);
 				}
 
-				current = addTypeSpecificValues(current, c, true, options.exportVersion);
+				current = addTypeSpecificValues(
+					current,
+					c,
+					true,
+					options.exportVersion,
+				);
 				data.push(current);
 			}
 			if (i < paragraphs.length - 1) data.push("\n");
@@ -497,7 +383,7 @@ export function translate(
 		if (options.optimise) {
 			data = optimise(data);
 		} else {
-			data.unshift("")
+			data.unshift("");
 		}
 
 		if (data.length === 1) {
@@ -516,7 +402,7 @@ export function translate(
 			const content = p.content ?? [];
 			let currentLine: StringyMCText[] = [];
 
-			for (const [i, c] of content.entries()) {
+			for (const [_, c] of content.entries()) {
 				let currentComponent: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),
@@ -524,9 +410,15 @@ export function translate(
 					strikethrough: trueMarkOrUndefined(c, "strike"),
 					underlined: trueMarkOrUndefined(c, "underline"),
 					obfuscated: trueMarkOrUndefined(c, "obfuscated"),
+					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
-				currentComponent = addTypeSpecificValues(currentComponent, c, false);
+				currentComponent = addTypeSpecificValues(
+					currentComponent,
+					c,
+					false,
+					options.exportVersion,
+				);
 				currentLine.push(currentComponent);
 			}
 

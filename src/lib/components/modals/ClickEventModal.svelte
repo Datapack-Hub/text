@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 
 	let {
 		clickEventDialog = $bindable(),
@@ -11,7 +11,7 @@
 
 <Modal title="Click Event" bind:this={clickEventDialog} key="T">
 	<p>Event Type</p>
-	<select bind:value={clickEventType} class="bg-zinc-900 p-2 rounded-md">
+	<select bind:value={clickEventType} class="rounded-md bg-zinc-900 p-2">
 		<option value="open_url">Open URL</option>
 		<option value="run_command">Run Command</option>
 		<option value="suggest_command">Suggest Command</option>
@@ -24,14 +24,14 @@
 		<p class="mt-2">URL:</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="https://example.com"
 			bind:value={clickEventValue} />
 	{:else if clickEventType == "run_command"}
 		<p class="mt-2">Command:</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="/give @s apple"
 			bind:value={clickEventValue} />
 		<p class="text-zinc-400">
@@ -41,7 +41,7 @@
 		<p class="mt-2">Command:</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="/give @s apple"
 			bind:value={clickEventValue} />
 		<p class="text-zinc-400">
@@ -51,21 +51,21 @@
 		<p class="mt-2">Text to copy:</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="I love the Wuppertal Suspension Railway"
 			bind:value={clickEventValue} />
 	{:else if clickEventType == "change_page"}
 		<p class="mt-2">Page to go to:</p>
 		<input
 			type="number"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="32"
 			bind:value={clickEventValue} />
 	{:else if clickEventType == "open_dialog"}
 		<p class="mt-2">Dialog ID:</p>
 		<input
 			type="text"
-			class="bg-zinc-900 p-2 rounded-md"
+			class="rounded-md bg-zinc-900 p-2"
 			placeholder="namespace:example_dialog"
 			bind:value={clickEventValue} />
 	{/if}
@@ -81,7 +81,7 @@
 						.setClickEvent({ action: clickEventType, value: clickEventValue })
 						.run();
 				}}
-				class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Add Click Event
 			</button>
 		{/if}

@@ -1,22 +1,52 @@
 import type { JSONContent } from "@tiptap/core";
-import { defaultColorReverseLUT } from "./tiptap/text";
-import { type MinecraftText, type OldMinecraftText } from "./types";
-import { type StringyMCText } from "./types";
+import { defaultColorReverseLUT } from "./general";
+import { type MinecraftText, type OldMinecraftText } from "../types";
+import { type StringyMCText } from "../types";
+
+export function snbtToDocument(raw: StringyMCText[]): JSONContent {
+	let baseDocument: JSONContent = {
+		type: "doc",
+		content: [
+			{
+				type: "paragraph",
+				content: [],
+			},
+		],
+	};
+
+	if (Array.isArray(raw)) {
+		for (const text of raw) {
+			processTextComponent(text, baseDocument);
+		}
+	} else {
+		processTextComponent(raw, baseDocument);
+	}
+
+	baseDocument = fixBrokenNewLines(baseDocument);
+	return baseDocument;
+}
 
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
+	if (raw === "") return [];
+
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
 
+	if (raw.match(/^"\w*"/)) {
+		return [raw.replace(/"/g, "")];
+	}
+
 	// replace 1b and 0b
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true")
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false")
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
+	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false");
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
 	try {
 		parsed = JSON.parse(raw);
-	} catch (e) {
-		console.error("Failed to parse SNBT:", e, raw);
-		return [""];
+	} catch {
+		return [
+			"An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!",
+		];
 	}
 
 	if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
@@ -32,11 +62,15 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 			return;
 		}
 
-		baseDocument.content!.at(-1)!.content!.push({
-			type: "text",
-			text: text,
-		});
-		baseDocument = baseDocument;
+		const temp = baseDocument.content!.at(-1)!.content!;
+		baseDocument.content!.at(-1)!.content = [
+			...temp,
+			{
+				type: "text",
+				text: text,
+			},
+		];
+
 		return;
 	}
 
@@ -52,68 +86,47 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 
 	paragraphContent!.push(finalText);
 
-	console.log(finalText)
-
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
-			if(typeof(txt) == "object") {
+			if (typeof txt == "object") {
 				Object.assign(txt, {
 					bold: txt.bold ?? text.bold,
 					italic: txt.italic ?? text.italic,
 					underlined: txt.underlined ?? text.underlined,
 					obfuscated: txt.obfuscated ?? text.obfuscated,
 					strikethrough: txt.strikethrough ?? text.strikethrough,
-					color: txt.color ?? text.color ,
+					color: txt.color ?? text.color,
 					shadow_color: txt.shadow_color ?? text.shadow_color,
 					click_event: txt.click_event ?? text.click_event,
 					clickEvent: txt.clickEvent ?? text.clickEvent,
 					hover_event: txt.hover_event ?? text.hover_event,
 					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
+					font: txt.font ?? text.font,
 				});
 				processTextComponent(txt, baseDocument);
 			} else {
 				let newComponent = {
-					text: txt
-				}
+					text: txt,
+				};
 				Object.assign(newComponent, {
 					bold: text.bold,
 					italic: text.italic,
 					underlined: text.underlined,
 					obfuscated: text.obfuscated,
 					strikethrough: text.strikethrough,
-					color: text.color ,
+					color: text.color,
 					shadow_color: text.shadow_color,
 					click_event: text.click_event,
 					clickEvent: text.clickEvent,
 					hover_event: text.hover_event,
 					hoverEvent: text.hoverEvent,
+					font: text.font,
 				});
 				processTextComponent(newComponent, baseDocument);
 			}
 		});
 	}
-}
-
-export function snbtToDocument(raw: StringyMCText[]): JSONContent {
-	// requote keys
-
-	let baseDocument: JSONContent = {
-		type: "doc",
-		content: [
-			{
-				type: "paragraph",
-				content: [],
-			},
-		],
-	};
-
-	for (const text of raw) {
-		processTextComponent(text, baseDocument);
-	}
-
-	baseDocument = fixBrokenNewLines(baseDocument);
-	return baseDocument;
 }
 
 function mapPropertiesToType(source: MinecraftText): JSONContent {
@@ -189,18 +202,35 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 	return finalText;
 }
 
-function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONContent) {
+function applyStyling(
+	text: MinecraftText & OldMinecraftText,
+	finalText: JSONContent,
+) {
 	if (!finalText.marks) {
 		finalText.marks = [];
 	}
 
 	if (text.color) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "textStyle",
 			attrs: {
 				color: defaultColorReverseLUT(text.color),
 			},
 		});
+	}
+
+	if (text.font) {
+		if (finalText.marks.some((mark) => mark.type === "textStyle")) {
+			finalText.marks.find((mark) => mark.type === "textStyle")!.attrs!.font =
+				text.font;
+		} else {
+			finalText.marks?.push({
+				type: "textStyle",
+				attrs: {
+					font: text.font,
+				},
+			});
+		}
 	}
 
 	if (text.shadow_color) {
@@ -305,22 +335,13 @@ function applyStyling(text: MinecraftText & OldMinecraftText, finalText: JSONCon
 		});
 	}
 
-	// if (text.font) {
-	// 	finalText.marks?.push({
-	// 		type: "font",
-	// 		attrs: {
-	// 			font: text.font,
-	// 		},
-	// 	});
-	// }
-
 	return finalText;
 }
 
-function fixBrokenNewLines(doc: any) {
+function fixBrokenNewLines(doc: JSONContent) {
 	const fixedContent = [];
 
-	for (const node of doc.content) {
+	for (const node of doc.content!) {
 		if (node.type !== "paragraph" || !node.content) {
 			// Non-paragraph nodes are copied as-is
 			fixedContent.push(node);
@@ -330,14 +351,14 @@ function fixBrokenNewLines(doc: any) {
 		let currentParagraph = [];
 
 		for (const child of node.content) {
-			if (child.type !== "text" || !child.text.includes("\n")) {
+			if (child.type !== "text" || !child.text!.includes("\n")) {
 				// No newline — add to current paragraph
 				currentParagraph.push(child);
 				continue;
 			}
 
 			// Text node contains newlines — split it
-			const lines = child.text.split("\n");
+			const lines = child.text!.split("\n");
 			for (let i = 0; i < lines.length; i++) {
 				if (i > 0) {
 					// Push previous paragraph and start a new one

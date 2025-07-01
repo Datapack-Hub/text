@@ -1,6 +1,8 @@
 <script lang="ts">
 	import "../app.css";
 	import "../fonts.css";
+	import "tippy.js/dist/tippy.css"; // optional for styling
+	import "tippy.js/animations/shift-away.css"; // optional for styling
 	/** @type {{children?: import('svelte').Snippet}} */
 	let { children } = $props();
 </script>
@@ -19,16 +21,20 @@
 	<meta name="language" content="English" />
 	<meta name="author" content="Datapack Hub" />
 
-	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:card" content="summary_large_image" />
 	<meta property="og:title" content="Minecraft Text and /tellraw Editor" />
-	<meta property="og:site_name" content="Datapack Hub">
-	<meta property="og:description" content="Create /tellraw commands and text components (JSON text) for Minecraft Java Edition with our easy-to-use, modern online tool!" />
-	<meta property="og:image" content="https://us-east-1.tixte.net/uploads/dph.tixte.co/text-editor-banner.png" />
+	<meta property="og:site_name" content="Datapack Hub" />
+	<meta
+		property="og:description"
+		content="Create /tellraw commands and text components (JSON text) for Minecraft Java Edition with our easy-to-use, modern online tool!" />
+	<meta
+		property="og:image"
+		content="https://us-east-1.tixte.net/uploads/dph.tixte.co/text-editor-banner.png" />
 	<meta property="og:url" content="https://text.datapackhub.net/" />
-	<meta name="theme-color" content="#ff631a">
+	<meta name="theme-color" content="#ff631a" />
 </svelte:head>
 
 <div
-	class="font-lexend bg-zinc-900 text-white min-h-screen min-w-screen h-full w-full">
+	class="font-lexend h-full min-h-screen w-full overflow-clip bg-zinc-900 text-white">
 	{@render children()}
 </div>

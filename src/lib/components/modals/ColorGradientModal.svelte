@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Modal from "$lib/Modal.svelte";
-	import { applyGradient } from "$lib/tiptap/text";
+	import Modal from "$lib/components/Modal.svelte";
+	import { applyGradient } from "$lib/text/general";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import IconDelete from "~icons/tabler/trash";
@@ -14,11 +14,11 @@
 </script>
 
 <Modal title="Color Gradient" bind:this={gradientDialog} key="G">
-	<div class="flex flex-col w-full space-y-2">
+	<div class="flex w-full flex-col space-y-2">
 		<p>Add colours to the gradient below:</p>
 		<div class="flex flex-col space-y-1">
 			{#each gradientSteps ?? [] as _, i}
-				<div class="bg-zinc-900 w-full rounded-md p-2 flex items-center">
+				<div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
 					<div class="flex-grow">
 						<ColorPicker
 							bind:hex={gradientSteps[i]}
@@ -30,14 +30,16 @@
 							textInputModes={["hex"]}
 							isAlpha={false} />
 					</div>
-					<button
-						onclick={() => {
-							gradientSteps.splice(i, 1);
-							gradientSteps = gradientSteps;
-						}}
-						class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/20 h-9 aspect-square flex items-center justify-center">
-						<IconDelete />
-					</button>
+					{#if gradientSteps.length > 1}
+						<button
+							onclick={() => {
+								gradientSteps.splice(i, 1);
+								gradientSteps = gradientSteps;
+							}}
+							class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
+							<IconDelete />
+						</button>
+					{/if}
 				</div>
 			{/each}
 			<button
@@ -45,16 +47,34 @@
 					gradientSteps.push("#ffffff");
 					gradientSteps = gradientSteps;
 				}}
-				class="bg-zinc-900 p-2 rounded-md cursor-pointer hover:bg-black/50 aspect-square h-9 w-9">
+				class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				<IconCustom class="m-auto" />
 			</button>
 		</div>
+		<p class="my-2">Preview</p>
+		<div class="font-minecraft bg-zinc-950 px-4 py-2 text-2xl">
+			<span
+				style="background: -webkit-linear-gradient(0, {gradientSteps.join(
+					',',
+				)}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+				>{editor?.state.doc.textBetween(
+					editor.state.selection.from,
+					editor.state.selection.to,
+					" ",
+				) || "error! no text selected"}</span>
+		</div>
+
+		<p class="text-sm text-white/60">
+			<b>Note:</b> you need to select text in the editor before you try and apply
+			a gradient.
+		</p>
+
 		<button
 			onclick={() => {
 				applyGradient(editor, gradientSteps);
 				gradientDialog.close();
 			}}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
+			class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Apply Gradient
 		</button>
 	</div>

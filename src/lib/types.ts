@@ -9,7 +9,8 @@ export type BaseMinecraftText = Pick<
 	| "strikethrough"
 	| "obfuscated"
 >;
-export type StringyMCText = string | (MinecraftText & OldMinecraftText);
+export type StringyMCText = string | VersionAgnosticText;
+export type VersionAgnosticText = MinecraftText & OldMinecraftText;
 export type MinecraftText = {
 	translate?: string;
 	with?: string[];
@@ -105,9 +106,9 @@ export type ExternalSources = {
 
 export type MCTextKey = keyof MinecraftText;
 export type TranslateOptions = Partial<{
-	indent: boolean
-	indentSize: number
-	exportVersion: "old" | "new"
-	optimise: boolean,
-	exportType: "standard" | "item_lore"
-}>
+	indent: boolean;
+	indentSize: number;
+	exportVersion: "old" | "new";
+	optimise: boolean;
+	exportType: "standard" | "item_lore";
+}>;

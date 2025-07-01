@@ -1,5 +1,3 @@
-import type { FixedTextStyle } from "./FixedTextStyle";
-
 export interface ClickEventAttributes {
 	action: string | null;
 	value: string | null;
@@ -47,6 +45,19 @@ export interface SelectorAttributes {
 
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
+		font: {
+			/**
+			 * Set the font family
+			 * @param font The font family
+			 * @example editor.commands.setFontFamily('Arial')
+			 */
+			setFont: (fontFamily: string) => ReturnType;
+			/**
+			 * Unset the font family
+			 * @example editor.commands.unsetFontFamily()
+			 */
+			unsetFont: () => ReturnType;
+		};
 		marks: {
 			setObfuscated: () => ReturnType;
 			toggleObfuscated: () => ReturnType;
@@ -82,15 +93,16 @@ export interface NodeOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
-export { BlockNBTNode } from "./nodes/BlockNBTNode";
-export { EntityNBTNode } from "./nodes/EntityNBTNode";
-export { StorageNBTNode } from "./nodes/StorageNBTNode";
-export { ScoreNode } from "./nodes/ScoreNode";
-export { TranslateNode } from "./nodes/TranslateNode";
-export { KeybindNode } from "./nodes/KeybindNode";
-export { SelectorNode } from "./nodes/SelectorNode";
-export { Obfuscation } from "./marks/ObfuscationMark";
+export { FixedTextStyle } from "./FixedTextStyle";
 export { ClickEventMark } from "./marks/ClickEventMark";
 export { HoverEventMark } from "./marks/HoverEventMark";
+export { Obfuscation } from "./marks/ObfuscationMark";
 export { ShadowColorMark } from "./marks/ShadowColorMark";
-export { FixedTextStyle } from "./FixedTextStyle";
+export { BlockNBTNode } from "./nodes/BlockNBTNode";
+export { EntityNBTNode } from "./nodes/EntityNBTNode";
+export { KeybindNode } from "./nodes/KeybindNode";
+export { ScoreNode } from "./nodes/ScoreNode";
+export { SelectorNode } from "./nodes/SelectorNode";
+export { StorageNBTNode } from "./nodes/StorageNBTNode";
+export { TranslateNode } from "./nodes/TranslateNode";
+export { FontsExtension } from "./fonts";

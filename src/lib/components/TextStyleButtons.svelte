@@ -1,100 +1,100 @@
 <script lang="ts">
-	import tippy from "svelte-tippy";
-
+	import { tooltip } from "$lib/tooltip";
 	import IconBold from "~icons/tabler/bold";
 	import IconItalic from "~icons/tabler/italic";
 	import IconObfuscate from "~icons/tabler/password";
+	import IconShadow from "~icons/tabler/shadow";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
-	import IconShadow from "~icons/tabler/shadow";
 
 	const { editor, small = false } = $props();
 	let shadowColorValue = $state("#ffffff");
 </script>
 
 <button
-	aria-label="bold"
+	aria-label="Bold"
 	onclick={() => editor.chain().focus().toggleBold().run()}
+	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
 		'bold',
 	)
 		? 'bg-zinc-800'
-		: ''}"
-	use:tippy={{ content: "Bold", placement: "bottom" }}>
+		: ''}">
 	<IconBold />
 </button>
 <button
-	aria-label="italic"
+	aria-label="Italic"
 	onclick={() => editor.chain().focus().toggleItalic().run()}
+	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
 		'italic',
 	)
 		? 'bg-zinc-800'
-		: ''}"
-	use:tippy={{ content: "Italic", placement: "bottom" }}>
+		: ''}">
 	<IconItalic />
 </button>
 <button
-	aria-label="strikethrough"
+	aria-label="Strikethrough"
 	onclick={() => editor.chain().focus().toggleStrike().run()}
+	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
 		'strike',
 	)
 		? 'bg-zinc-800'
-		: ''}"
-	use:tippy={{ content: "Strikethrough", placement: "bottom" }}>
+		: ''}">
 	<IconStrikethrough />
 </button>
 <button
-	aria-label="underline"
+	aria-label="Underline"
 	onclick={() => editor.chain().focus().toggleUnderline().run()}
+	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
 		'underline',
 	)
 		? 'bg-zinc-800'
-		: ''}"
-	use:tippy={{ content: "Underline", placement: "bottom" }}>
+		: ''}">
 	<IconUnderline />
 </button>
 <button
-	aria-label="obfuscated"
+	aria-label="Obfuscated"
 	onclick={() => editor.chain().focus().toggleObfuscated().run()}
+	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'
-		: 'text-lg'} hover:bg-white/3 rounded-md font-medium {editor.isActive(
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
 		'obfuscated',
 	)
 		? 'bg-zinc-800'
-		: ''}"
-	use:tippy={{ content: "Obfuscated", placement: "bottom" }}>
+		: ''}">
 	<IconObfuscate />
 </button>
 {#if editor.isActive("shadowColor")}
 	<button
-		aria-label="shadow_color"
-		class="cursor-pointer p-1 {small
+		aria-label="Shadow Color"
+		name="shadow_color"
+		{@attach tooltip}
+		class="p-1 {small
 			? 'text-sm'
-			: 'text-lg'} hover:bg-white/3 rounded-md font-medium bg-zinc-800"
-		onclick={() => editor.chain().focus().unsetShadowColor().run()}
-		use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
+			: 'text-lg'} rounded-md bg-zinc-800 font-medium hover:bg-white/3"
+		onclick={() => editor.chain().focus().unsetShadowColor().run()}>
 		<IconShadow />
 	</button>
 {:else}
 	<label
 		for="shadow_color"
-		aria-label="shadow_color"
-		class="cursor-pointer p-1 {small
+		aria-label="Shadow Color"
+		{@attach tooltip}
+		class="p-1 {small
 			? 'text-sm'
-			: 'text-lg'} hover:bg-white/3 rounded-md font-medium"
-		use:tippy={{ content: "Shadow Color", placement: "bottom" }}>
+			: 'text-lg'} rounded-md font-medium hover:bg-white/3">
 		<IconShadow />
 	</label>
 	<input

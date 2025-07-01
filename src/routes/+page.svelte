@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { colorMap, convert, optimise, translate } from "$lib/tiptap/text";
+	import { convert, translateJSON } from "$lib/text/nbt_or_json";
 
 	import {
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
 		FixedTextStyle,
+		FontsExtension,
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
@@ -18,101 +19,107 @@
 	// Components
 	import MiniEditor from "$lib/components/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
-	import Modal from "$lib/Modal.svelte";
+	import Modal from "$lib/components/Modal.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
-	import tippy from "tippy.js";
-	import "tippy.js/dist/tippy.css";
-	// optional
-
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/nbt";
-	import { Editor } from "@tiptap/core";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
+	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 	// Icons
+	import IconUndo from "~icons/tabler/arrow-back-up";
+	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
 	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
+	import IconFont from "~icons/tabler/function";
+	import IconUploadFont from "~icons/tabler/function-filled";
 	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconKeybinds from "~icons/tabler/keyboard";
+	import IconEmoji from "~icons/tabler/mood-smile-beam";
 	import IconColor from "~icons/tabler/palette";
 	import IconEdit from "~icons/tabler/pencil";
 	import IconCustom from "~icons/tabler/plus";
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import IconUndo from "~icons/tabler/arrow-back-up";
-	import IconRedo from "~icons/tabler/arrow-forward-up";
 
-	import ClickEventModal from "$lib/components/modals/ClickEventModal.svelte";
-	import ColorGradientModal from "$lib/components/modals/ColorGradientModal.svelte";
-	import CustomSourceModal from "$lib/components/modals/CustomSourceModal.svelte";
-	import ExportModal from "$lib/components/modals/ExportModal.svelte";
-	import KeybindModal from "$lib/components/modals/KeybindModal.svelte";
+	import { page } from "$app/state";
+
 	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
-	import { page } from "$app/stores";
+	import { colorMap } from "$lib/text/general";
 
-	// TODO: convert to non-legacy mode
-	export let value = "";
+	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
+	import { openDataStore } from "$lib/db";
+	import { fontLUT } from "$lib/tiptap/extensions/fonts";
+	import { tooltip } from "$lib/tooltip";
+	import { translateMOTD } from "$lib/text/motd";
 
-	let element: HTMLElement;
-	let editor: Editor;
-	let color = "#ffffff";
-	let colorDialog: Modal;
+	let tiptapJSON: JSONContent = $state()!;
 
-	let outputDialog: Modal;
-	let outputVersion: "new" | "old";
+	let element: HTMLElement = $state()!;
+	let editor: Editor | undefined = $state()!;
+	let color = $state("#ffffff");
+	let colorDialog: Modal = $state()!;
 
-	let doesContentExist: boolean = false;
-	let colorsVisible = false;
-	let shouldOptimise = true;
+	let outputDialog: Modal = $state()!;
+	let outputVersion: "new" | "old" = $state("new");
 
-	let indent = false;
-	let indentSize = 2;
+	let doesContentExist: boolean = $state(false);
+	let shouldOptimise = $state(true);
+
+	let indent = $state(false);
+	let indentSize = $state(2);
 
 	// Import
-	let importDialog: Modal;
-	let importText: string;
+	let importDialog: Modal = $state()!;
+	let importText: string = $state("");
 
-	let recentlyCopied = false;
+	let recentlyCopied = $state(false);
 
 	// Snapshots and stuff
-	let snapshots: object[] = [];
-	let recentlySaved = false;
-	let loadDialog: Modal;
+	let snapshots: object[] = $state([]);
+	let recentlySaved = $state(false);
+	let loadDialog: Modal = $state()!;
 
 	// Dialogs
-	let gradientDialog: Modal;
-	let gradientSteps: string[] = ["#ffffff"];
+	let gradientDialog: Modal = $state()!;
+	let gradientSteps: string[] = $state(["#ffffff"]);
 
-	let keybindDialog: Modal;
+	let keybindDialog: Modal = $state()!;
 
-	let clickEventType = "";
-	let clickEventValue = "";
-	let clickEventDialog: Modal;
+	let clickEventType = $state("");
+	let clickEventValue = $state("");
+	let clickEventDialog: Modal = $state()!;
 
-	let hoverEventType = "";
-	let hoverEventValue: any;
-	let hoverEventEditor: MiniEditor;
-	let hoverEventDialog: Modal;
+	let hoverEventValue: any = $state();
+	let hoverEventEditor: MiniEditor = $state()!;
+	let hoverEventDialog: Modal = $state()!;
 
-	let customType: string | undefined;
-	let customDialog: Modal;
+	let fontDialog: Modal = $state()!;
+	let fontUploadModal: Modal = $state()!;
+	let fontName = $state("");
+
+	let customType: string | undefined = $state();
+	let customDialog: Modal = $state()!;
+
+	let unicodeSelectorDialog: Modal = $state()!;
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
-		editor.commands.setContent(jsonContent);
-		importDialog.close();
+		editor?.commands.setContent(jsonContent);
+		tiptapJSON = jsonContent;
+		importDialog?.close();
 	}
 
-	onMount(() => {
+	async function loadData() {
 		if (localStorage.getItem("content")) {
-			value = localStorage.getItem("content")!;
+			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
-			value = "[]";
+			tiptapJSON = [];
 			localStorage.setItem("content", "");
 		}
 
@@ -123,9 +130,27 @@
 			localStorage.setItem("snapshots", "");
 		}
 
+		const db = await openDataStore();
+		const fontStore = await db.getAll("fonts");
+
+		type FontStoreSchema = {
+			identifier: string;
+			alias: string;
+			data: File;
+		};
+
+		fontStore.forEach(async ({ identifier, alias, data }: FontStoreSchema) => {
+			fontLUT.set(identifier, alias);
+			document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
+		});
+	}
+
+	onMount(async () => {
+		await loadData();
+
 		editor = new Editor({
 			element: element,
-			content: JSON.parse(value),
+			content: tiptapJSON,
 			extensions: [
 				StarterKit.configure({
 					blockquote: false,
@@ -151,20 +176,21 @@
 				EntityNBTNode,
 				KeybindNode,
 				SelectorNode,
+				FontsExtension,
 				Placeholder.configure({
 					placeholder:
 						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
 				}),
 			],
-			onTransaction: () => {
-				// force re-render so `editor.isActive` works as expected
-				editor = editor;
-				editor.getText() === ""
+			onTransaction: ({ editor: newEditor }) => {
+				editor = undefined;
+				editor = newEditor;
+				editor!.getText() === ""
 					? (doesContentExist = false)
 					: (doesContentExist = true);
 			},
 			onUpdate: ({ editor }) => {
-				value = JSON.stringify(editor.getJSON());
+				tiptapJSON = editor.getJSON();
 				debounce(saveContent, 1000)();
 			},
 		});
@@ -184,8 +210,8 @@
 	}
 
 	function customColorHandler() {
-		editor.chain().focus().setColor(color).run();
-		colorDialog.close();
+		editor?.chain().focus().setColor(color).run();
+		colorDialog?.close();
 	}
 
 	const debounce = (callback: Function, wait: number) => {
@@ -199,18 +225,18 @@
 	};
 
 	function saveContent() {
-		localStorage.setItem("content", JSON.stringify(editor.getJSON()));
+		localStorage.setItem("content", JSON.stringify(editor!.getJSON()));
 	}
 
 	function saveSnapshot() {
 		const snapshotsTemp = localStorage.getItem("snapshots");
 		if (snapshotsTemp) {
 			snapshots = JSON.parse(snapshotsTemp);
-			snapshots.push(editor.getJSON());
+			snapshots.push(editor!.getJSON());
 			localStorage.setItem("snapshots", JSON.stringify(snapshots));
 		} else {
-			localStorage.setItem("snapshots", JSON.stringify([editor.getJSON()]));
-			snapshots = [editor.getJSON()];
+			localStorage.setItem("snapshots", JSON.stringify([editor!.getJSON()]));
+			snapshots = [editor!.getJSON()];
 		}
 		recentlySaved = true;
 		setTimeout(() => {
@@ -219,10 +245,10 @@
 	}
 
 	function hoverEditButtonHandler() {
-		const { from, to } = editor.state.selection;
+		const { from, to } = editor!.state.selection;
 		let start = from,
 			end = to;
-		const doc = editor.state.doc;
+		const doc = editor!.state.doc;
 
 		function sameHoverEventMark(pos: number) {
 			const node = doc.nodeAt(pos);
@@ -248,10 +274,9 @@
 			end++;
 		}
 
-		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
-		const { action, value } = mark.attrs;
-		hoverEventType = action;
-		hoverEventDialog.open();
+		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
+		const { value } = mark.attrs;
+		hoverEventDialog!.open();
 		if (hoverEventEditor) {
 			hoverEventEditor.importText(JSON.stringify(value));
 		}
@@ -260,10 +285,10 @@
 	function clickEditButtonHandler() {
 		// cobble if you want to move this elsewhere then please do
 		// what the heck -cbble_
-		const { from, to } = editor.state.selection;
+		const { from, to } = editor!.state.selection;
 		let start = from,
 			end = to;
-		const doc = editor.state.doc;
+		const doc = editor!.state.doc;
 
 		function sameClickEventMark(pos: number) {
 			const node = doc.nodeAt(pos);
@@ -289,285 +314,269 @@
 			end++;
 		}
 
-		editor.chain().focus().setTextSelection({ from: start, to: end }).run();
+		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { action, value } = mark.attrs;
 		clickEventType = action;
 		clickEventValue = value;
-		clickEventDialog.open();
+		clickEventDialog!.open();
 	}
 
 	function clearMarksHandler(event: KeyboardEvent) {
 		if (event.ctrlKey && event.shiftKey && event.key === "X") {
-			editor.commands.unsetAllMarks();
+			editor!.commands.unsetAllMarks();
 		}
 	}
 
 	function getTextComponentCount() {
 		const components = JSON.parse(
-			translate(
-				editor.getJSON(),
-				{
-					exportType: "standard",
-					indent: false,
-					exportVersion: outputVersion
-				}
-			),
+			translateJSON(editor!.getJSON(), {
+				exportType: "standard",
+				indent: false,
+				exportVersion: outputVersion,
+				optimise: shouldOptimise,
+			}),
 		);
 		if (Array.isArray(components)) {
 			return components.length;
 		}
-		return 1
+		return 1;
 	}
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex flex-col h-screen max-h-screen">
+<div class="flex h-screen max-h-screen flex-col">
 	<div
-		class="bg-zinc-950 w-full text-zinc-300 flex items-center"
+		class="flex w-full items-center bg-zinc-950 text-zinc-300"
 		style="font-family: Lexend">
-		<div class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer">
+		<div class="flex items-center px-3 py-2 hover:bg-white/3">
 			<img src="/dph.svg" class="h-5" alt="logo" />
-			<span class="ml-3 nomob">Minecraft Text Editor</span>
+			<span class="nomob ml-3">Minecraft Text Editor</span>
 		</div>
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			onclick={importDialog.open}>Import</button>
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={importDialog?.open}>Import</button>
 		{#if doesContentExist}
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-				onclick={outputDialog.open}>Export</button>
+				class="flex items-center px-3 py-2 hover:bg-white/3"
+				onclick={outputDialog?.open}>Export</button>
 			<button
-				class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
+				class="flex items-center px-3 py-2 hover:bg-white/3"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
 		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			onclick={loadDialog.open}>Load</button>
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={loadDialog?.open}>Load</button>
 		<div class="flex-grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
-			>Discord</a>
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3">Discord</a>
 		<a
 			href="https://datapack.wiki/"
-			class="nomob flex items-center px-3 py-2 hover:bg-white/3 cursor-pointer"
+			class="nomob flex items-center px-3 py-2 hover:bg-white/3"
 			>Datapack Wiki</a>
 	</div>
 
-	<div class="w-full p-3 bg-zinc-900 flex items-center flex-wrap">
+	<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
 		{#if editor}
-			<button
-				onclick={() => {
-					customDialog.open();
-					customType = undefined;
-				}}
-				class="toolbar-btn"
-				use:tippy={{ content: "Add Custom Source", placement: "bottom" }}>
-				<IconCustom />
-			</button>
-
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
-
 			<TextStyleButtons {editor} />
 
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+			<ToolbarButton
+				Icon={IconFont}
+				onClick={() =>
+					editor!.getAttributes("textStyle").font
+						? editor!.chain().focus().unsetFont().run()
+						: fontDialog.open()}
+				styleVar={editor.getAttributes("textStyle").font}
+				ariaLabel="Font" />
 
-			<button
-				class="toolbar-btn"
-				style="color: {color}"
-				onclick={colorDialog.open}
-				use:tippy={{ content: "Custom Color", placement: "bottom" }}
-				><IconColor /></button>
-			<button
-				class="toolbar-btn"
-				onclick={gradientDialog.open}
-				use:tippy={{ content: "Color Gradient", placement: "bottom" }}
-				><IconGradient /></button>
-			{#each colorMap as color}
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
+
+			<ToolbarButton
+				{color}
+				Icon={IconColor}
+				onClick={colorDialog.open}
+				ariaLabel="Custom Color" />
+
+			<ToolbarButton
+				Icon={IconGradient}
+				onClick={gradientDialog.open}
+				ariaLabel="Color Gradient" />
+			<div id="colorBtns">
+				{#each colorMap as color}
+					<ToolbarButton
+						Icon={IconSquare}
+						onClick={() => editor!.chain().focus().setColor(color.value).run()}
+						styleVar={editor.isActive("textStyle", { color: color.value })}
+						color={color.value}
+						ariaLabel={toTitleCase(color.name.replace("_", " "))} />
+				{/each}
+			</div>
+			{#if editor.getAttributes("textStyle").color}
 				<button
-					aria-label="set color to {color.name}"
-					onclick={() => editor.chain().focus().setColor(color.value).run()}
-					use:tippy={{
-						content: toTitleCase(color.name.replace("_", " ")),
-						placement: "bottom",
-					}}
-					class="p-1 text-lg hover:bg-white/3 rounded-md {editor.isActive(
-						'textStyle',
-						{ color: color.value },
-					)
-						? 'bg-zinc-800'
-						: ''}"
-					style="color: {color.value};">
-					<IconSquare />
-				</button>
-			{/each}
-			{#if editor.isActive("textStyle")}
-				<button
-					onclick={() => editor.chain().focus().unsetColor().run()}
-					use:tippy={{ content: "Unset color", placement: "bottom" }}
-					class="p-1 text-lg hover:bg-white/3 text-zinc-500 rounded-md"
+					onclick={() => editor?.chain().focus().unsetColor().run()}
+					aria-label="Unset color"
+					{@attach tooltip}
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
 					class:active={editor.isActive("underline")}>
 					<IconHollow />
 				</button>
 			{/if}
-			
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
+
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<button
-				class="toolbar-btn {editor.isActive(
-					'clickEvent',
-				)
-					? 'bg-zinc-800'
-					: ''}"
-				use:tippy={{
-					content: "Click Event",
-					placement: "bottom",
-				}}
 				onclick={() => {
-					if (editor.isActive("clickEvent")) {
-						editor.chain().focus().unsetClickEvent().run();
-					} else {
-						clickEventDialog.open();
-					}
-				}}>
-				<IconClickEvent />
+					customDialog?.open();
+					customType = undefined;
+				}}
+				{@attach tooltip}
+				class="toolbar-btn"
+				aria-label="Add Custom Source">
+				<IconCustom />
 			</button>
+
+			<ToolbarButton
+				Icon={IconEmoji}
+				onClick={unicodeSelectorDialog.open}
+				ariaLabel="Special Characters" />
+
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
+
+			<ToolbarButton
+				onClick={() => {
+					if (editor?.isActive("clickEvent")) {
+						editor?.chain().focus().unsetClickEvent().run();
+					} else {
+						clickEventDialog?.open();
+					}
+				}}
+				ariaLabel="Click Event"
+				styleVar={editor.isActive("clickEvent")}
+				Icon={IconClickEvent} />
 			{#if editor.isActive("clickEvent")}
-				<button
-					class="toolbar-btn"
-					use:tippy={{
-						content: "Edit Click Event",
-						placement: "bottom",
-					}}
-					onclick={clickEditButtonHandler}>
-					<IconEdit />
-				</button>
+				<ToolbarButton
+					onClick={clickEditButtonHandler}
+					ariaLabel="Edit Click Event"
+					Icon={IconEdit} />
 			{/if}
 
 			<button
 				onclick={() => {
-					if (editor.isActive("hoverEvent")) {
-						editor.chain().focus().unsetHoverEvent().run();
+					if (editor?.isActive("hoverEvent")) {
+						editor?.chain().focus().unsetHoverEvent().run();
 					} else {
-						hoverEventDialog.open();
+						hoverEventDialog?.open();
 					}
 				}}
+				{@attach tooltip}
 				class="{editor.isActive('clickEvent') || editor.isActive('hoverEvent')
 					? 'ml-2'
-					: ''} toolbar-btn {editor.isActive(
-					'hoverEvent',
-				)
+					: ''} toolbar-btn {editor.isActive('hoverEvent')
 					? 'bg-zinc-800'
 					: ''}"
-				use:tippy={{
-					content: "Hover Event",
-					placement: "bottom",
-				}}>
+				aria-label="Hover Event">
 				<IconHoverEvent />
 			</button>
 			{#if editor.isActive("hoverEvent")}
-				<button
-					class="toolbar-btn"
-					use:tippy={{
-						content: "Edit Hover Event",
-						placement: "bottom",
-					}}
-					onclick={hoverEditButtonHandler}>
-					<IconEdit />
-				</button>
+				<ToolbarButton
+					onClick={hoverEditButtonHandler}
+					ariaLabel="Edit Hover Event"
+					Icon={IconEdit} />
 			{/if}
-			
-			<div class="h-5 w-px bg-zinc-600 mx-2"></div>
 
-			<button
-				class="toolbar-btn"
-				onclick={() => editor.chain().undo().run()}
-				use:tippy={{
-					content: "Undo",
-					placement: "bottom",
-				}}
-				aria-label="Undo"><IconUndo /></button>
-			<button
-				class="toolbar-btn"
-				onclick={() => editor.chain().undo().run()}
-				use:tippy={{
-					content: "Redo",
-					placement: "bottom",
-				}}
-				aria-label="Redo"><IconRedo /></button>
+			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
+
+			<ToolbarButton
+				onClick={() => editor?.chain().undo().run()}
+				ariaLabel="Undo"
+				Icon={IconUndo} />
+			<ToolbarButton
+				onClick={() => editor?.chain().redo().run()}
+				ariaLabel="Redo"
+				Icon={IconRedo} />
 
 			<div class="flex-grow"></div>
 
 			<button
+				{@attach tooltip}
 				class="toolbar-btn nomob"
-				onclick={keybindDialog.open}
-				use:tippy={{
-					content: "Keybinds",
-					placement: "bottom",
-				}}
+				onclick={fontUploadModal?.open}
+				aria-label="Upload Font"><IconUploadFont /></button>
+			<button
+				{@attach tooltip}
+				class="toolbar-btn nomob"
+				onclick={keybindDialog?.open}
 				aria-label="Keybinds"><IconKeybinds /></button>
 		{/if}
 	</div>
 
 	<div
-		class="font-minecraft bg-zinc-800 w-full first:focus:outline-none flex-grow overflow-auto"
+		class="font-minecraft w-full flex-grow overflow-auto bg-zinc-800 first:focus:outline-none"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
 
 	<div>
-		{#if $page.url.searchParams.has('dev')}
-			<code class="inline-block p-3 overflow-x-scroll"
+		{#if page.url.searchParams.has("dev")}
+			<code class="inline-block overflow-x-scroll p-3"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
 					: "Loading..."}</code>
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">
-			<div class="flex max-w-screen items-start space-x-2 max-h-48 overflow-auto">
+			<div
+				class="flex max-h-48 max-w-screen items-start space-x-2 overflow-auto">
 				<button
-					class="p-1 text-lg hover:bg-zinc-900 active:bg-white/10 rounded-md font-medium"
+					{@attach tooltip}
+					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(editor.getJSON(), "standard", outputVersion, shouldOptimise),
+							convert(
+								editor!.getJSON(),
+								"standard",
+								outputVersion,
+								shouldOptimise,
+							),
 						);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
 					}}
-					use:tippy={{ content: "Copy" }}>
+					aria-label="Copy">
 					{#if recentlyCopied}
 						<IconTick />
 					{:else}
 						<IconCopy />
 					{/if}</button>
 				<p>
-					<code class="inline break-all"
-						>{editor
-							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
+					<code id="outputbox" class="inline break-all">
+						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
+						{editor
+							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
 							: "Loading..."}
 					</code>
 				</p>
 			</div>
 			{#if doesContentExist}
-				<div class="flex items-center space-x-2 mt-2 select-none">
-					<p class="font-lexend text-xs text-white/60 nomob">
+				<div class="mt-2 flex items-center space-x-2 select-none">
+					<p class="font-lexend nomob text-xs text-white/60">
 						{editor
-							? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise).length
+							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
+									.length
 							: 0} characters
 					</p>
-					<p class="font-lexend text-xs text-white/60 nomob">
+					<p class="font-lexend nomob text-xs text-white/60">
 						{getTextComponentCount()} components
 					</p>
-					<p class="font-lexend text-xs text-white/60 nomob">
-						•
-					</p>
+					<p class="font-lexend nomob text-xs text-white/60">•</p>
 					<p class="font-lexend text-xs text-white/60">
 						Click to change output settings:
 					</p>
 					<button
-						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-						use:tippy={{ content: "Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version.", placement: "top" }}
+						{@attach tooltip}
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+						aria-label="Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version."
 						onclick={() => {
 							const ov = outputVersion;
 							if (ov == "new") {
@@ -577,119 +586,182 @@
 							}
 						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
 					<button
-						class="bg-zinc-800 hover:bg-zinc-700 font-mono px-1 rounded-md ml-1 select-none"
-						use:tippy={{ content: "Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually).", placement: "top" }}
-						onclick={() => shouldOptimise = !shouldOptimise}>{shouldOptimise ? "optimised" : "expanded"}</button>
+						{@attach tooltip}
+						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+						aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
+						onclick={() => (shouldOptimise = !shouldOptimise)}
+						>{shouldOptimise ? "optimised" : "expanded"}</button>
 				</div>
 			{/if}
 		</div>
 	</div>
 </div>
 
-<ClickEventModal
-	bind:clickEventDialog
-	bind:clickEventType
-	bind:clickEventValue
-	{editor} />
-
-<Modal title="Hover Event" bind:this={hoverEventDialog} key="H">
-	<p>Text to show</p>
-	<MiniEditor bind:this={hoverEventEditor} bind:output={hoverEventValue} />
-	<button
-		onclick={() => {
-			editor
-				.chain()
-				.focus()
-				.setHoverEvent({ action: "show_text", value: hoverEventValue })
-				.run();
-			hoverEventDialog.close();
-		}}
-		class="bg-zinc-900 p-2 rounded-md w-fit mt-2 cursor-pointer hover:bg-black/50">
-		Add Hover Event
-	</button>
-</Modal>
-
-<CustomSourceModal bind:customDialog bind:customType {editor} {outputVersion} />
-
-<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
-	<div class="flex flex-col w-full py-4">
-		<ColorPicker
-			bind:hex={color}
-			position="responsive"
-			--cp-bg-color="none"
-			--cp-border-color="none"
-			--cp-text-color="white"
-			--cp-input-color="#18181b"
-			--cp-button-hover-color="#18181b"
-			isDialog={false}
-			isAlpha={false} />
-
-		<button
-			onclick={customColorHandler}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50 mx-4">
-			Done
-		</button>
-	</div>
-</Modal>
-
-<Modal title="Load a snapshot" bind:this={loadDialog} key="L">
-	<div class="flex flex-col space-y-2 w-full">
-		{#if snapshots.length == 0}
-			<p>You have not saved anything yet!</p>
-		{/if}
-		{#each snapshots as snapshot (snapshot)}
-			<div class="flex flex-col space-y-0">
-				<div class="bg-zinc-900 rounded-t-md rounded-br-md">
-					<MiniRenderer value={snapshot} />
+<noscript>
+	<div class="absolute">
+		<div
+			class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
+			style="font-family: Lexend">
+			<div class="z-50 m-auto w-[95%] py-4 md:w-[70%] 2xl:w-[50%]">
+				<div class="flex items-center space-x-2 rounded-t-lg bg-zinc-900 p-4">
+					<img src="/dph.svg" class="h-5" alt="logo" />
+					<span class="flex-grow text-lg font-bold"
+						>Datapack Hub Text Editor</span>
 				</div>
-				<div class="flex bg-zinc-950 rounded-b-md w-fit">
-					<button
-						class="hover:bg-white/3 py-2 px-3"
-						onclick={() => {
-							editor.commands.setContent(snapshot);
-							editor.commands.focus();
-						}}>Load</button>
-					<button
-						class="hover:bg-white/3 py-2 px-3"
-						onclick={() => {
-							snapshots = snapshots.filter(
-								(_, index) => index !== snapshots.indexOf(snapshot),
-							);
-							localStorage.setItem("snapshots", JSON.stringify(snapshots));
-						}}>Delete</button>
+				<div class="flex flex-col space-y-2 rounded-b-lg bg-zinc-800 p-4">
+					<p>
+						This is a /tellraw editor and editor for Minecraft text components,
+						for all versions. Create /tellraw commands and text components (JSON
+						text) for Minecraft Java Edition with our easy-to-use, modern online
+						tool!
+					</p>
+					<div class="flex flex-col rounded-md bg-red-500/50 p-3">
+						<b class="text-lg">⚠️ This website requires JavaScript to work.</b>
+						<span class="text-sm"
+							>Please enable JavaScript in your site settings. If JavaScript is
+							enabled, please refresh. If that doesn't work, then try a
+							different browser. If that still doesn't work, then ask for help
+							in <a
+								href="https://discord.datapackhub.net/"
+								class="font-bold underline">our Discord</a
+							></span>
+					</div>
 				</div>
 			</div>
-		{/each}
+		</div>
 	</div>
-</Modal>
+</noscript>
 
-<ExportModal
-	bind:outputDialog
-	bind:outputVersion
-	{editor}
-	{indent}
-	{indentSize}
-	{recentlyCopied} />
+<div>
+	<!-- code splitted to reduce bundle size -->
+	{#await import("$lib/components/modals/ClickEventModal.svelte") then modal}
+		<modal.default
+			bind:clickEventDialog
+			bind:clickEventType
+			bind:clickEventValue
+			{editor} />
+	{/await}
 
-<Modal title="Import from NBT" bind:this={importDialog} key="I">
-	<div class="flex flex-col w-full space-y-2">
-		<p>
-			Paste your text components below to import them into the editor. This will
-			clear the current contents of the editor!
-		</p>
-		<textarea
-			class="flex items-start bg-zinc-950 p-3 rounded-lg font-minecraft h-32"
-			placeholder="Paste NBT text components here"
-			bind:value={importText} ></textarea>
-
+	<Modal title="Hover Event" bind:this={hoverEventDialog} key="H">
+		<p>Text to show</p>
+		<MiniEditor bind:this={hoverEventEditor} bind:output={hoverEventValue} />
 		<button
-			onclick={importToEditor}
-			class="bg-zinc-900 p-2 rounded-md w-fit cursor-pointer hover:bg-black/50">
-			Import
+			onclick={() => {
+				editor
+					?.chain()
+					.focus()
+					.setHoverEvent({ action: "show_text", value: hoverEventValue })
+					.run();
+				hoverEventDialog?.close();
+			}}
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+			Add Hover Event
 		</button>
-	</div>
-</Modal>
+	</Modal>
 
-<KeybindModal bind:keybindDialog />
+	{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
+		<modal.default bind:customDialog bind:customType {editor} {outputVersion} />
+	{/await}
 
-<ColorGradientModal {editor} bind:gradientSteps bind:gradientDialog />
+	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
+		<div class="flex w-full flex-col py-4">
+			<ColorPicker
+				bind:hex={color}
+				--cp-bg-color="transparent"
+				--cp-border-color="transparent"
+				--cp-text-color="white"
+				--cp-input-color="#18181b"
+				--cp-button-hover-color="#18181b"
+				isDialog={false}
+				isAlpha={false} />
+
+			<button
+				onclick={customColorHandler}
+				class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+				Done
+			</button>
+		</div>
+	</Modal>
+
+	<Modal title="Load a snapshot" bind:this={loadDialog} key="L">
+		<div class="flex w-full flex-col space-y-2">
+			{#if snapshots.length == 0}
+				<p>You have not saved anything yet!</p>
+			{/if}
+			{#each snapshots as snapshot (snapshot)}
+				<div class="flex flex-col space-y-0">
+					<div class="rounded-t-md rounded-br-md bg-zinc-900">
+						<MiniRenderer value={snapshot} />
+					</div>
+					<div class="flex w-fit rounded-b-md bg-zinc-950">
+						<button
+							class="px-3 py-2 hover:bg-white/3"
+							onclick={() => {
+								editor?.commands.setContent(snapshot);
+								editor?.commands.focus();
+							}}>Load</button>
+						<button
+							class="px-3 py-2 hover:bg-white/3"
+							onclick={() => {
+								snapshots = snapshots.filter(
+									(_, index) => index !== snapshots.indexOf(snapshot),
+								);
+								localStorage.setItem("snapshots", JSON.stringify(snapshots));
+							}}>Delete</button>
+					</div>
+				</div>
+			{/each}
+		</div>
+	</Modal>
+
+	{#await import("$lib/components/modals/ExportModal.svelte") then modal}
+		<modal.default
+			bind:outputDialog
+			bind:outputVersion
+			{editor}
+			{indent}
+			{indentSize}
+			{recentlyCopied} />
+	{/await}
+
+	<Modal title="Import from NBT" bind:this={importDialog} key="I">
+		<div class="flex w-full flex-col space-y-2">
+			<p>
+				Paste your text components below to import them into the editor. This
+				will clear the current contents of the editor!
+			</p>
+			<textarea
+				class="font-minecraft flex h-32 items-start rounded-lg bg-zinc-950 p-3"
+				placeholder="Paste NBT text components here"
+				bind:value={importText}></textarea>
+
+			<button
+				onclick={importToEditor}
+				class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+				Import
+			</button>
+		</div>
+	</Modal>
+
+	{#await import("$lib/components/modals/FontPickerModal.svelte") then modal}
+		<modal.default
+			bind:fontDialog
+			{fontUploadModal}
+			editor={editor!}
+			bind:fontName />
+	{/await}
+
+	{#await import("$lib/components/modals/KeybindModal.svelte") then modal}
+		<modal.default bind:keybindDialog />
+	{/await}
+	{#await import("$lib/components/modals/FontUploadModal.svelte") then modal}
+		<modal.default bind:fontUploadModal />
+	{/await}
+
+	{#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
+		<modal.default {editor} bind:gradientSteps bind:gradientDialog />
+	{/await}
+	{#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
+		<modal.default editor={editor!} bind:unicodeSelectorDialog />
+	{/await}
+</div>

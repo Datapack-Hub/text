@@ -51,13 +51,21 @@ export function isMarkType(c: JSONContent, type: string) {
 }
 
 export function unescapeUnicode(str: string) {
-	const matches = str.match(/(\\u[0-9a-f]{4})/gi);
+	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;
 
-	if (!matches) {
-		return str
-	}
+	return str.replace(regex, (match, p1, p2) => {
+		// p1 will contain the 4-digit hex if it's \uXXXX
+		// p2 will contain the variable hex if it's \u{XXXXX}
+		const hex = p1 || p2; // Get the hex value from whichever group matched
 
-	return str.replaceAll(/(\\u[0-9a-f]{4})/gi, decodeURIComponent(JSON.parse(`"${matches![0]}"`)));
+		if (hex) {
+			const codePoint = parseInt(hex, 16);
+			return String.fromCodePoint(codePoint);
+		}
+		// If for some reason no hex was captured (shouldn't happen with this regex),
+		// return the original match to avoid breaking the string.
+		return match;
+	});
 }
 
 /**

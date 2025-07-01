@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorMap, defaultColorLUT, trueMarkOrUndefined } from "./general";
+import { colorMap, defaultColorLUT, trueMarkOrUndefined, unescapeUnicode } from "./general";
 
 function hexToRgb(hex: string): [number, number, number] {
 	hex = hex.replace(/^#/, "");
@@ -76,7 +76,7 @@ export function translateMOTD(c: JSONContent) {
             let lowestDEVal = "";
             let formatting = ""
 
-			const color = defaultColorLUT(c.marks?.at(0)?.attrs?.color);
+			const color = c.marks?.at(0)?.attrs?.color;
             for (const c of colorMap) {
                 if (!color) {
                     continue;
@@ -99,7 +99,7 @@ export function translateMOTD(c: JSONContent) {
                 }
             }
             
-            data += `${char}r${lowestDEVal}${formatting}${c.text}`
+            data += `${char}r${lowestDEVal}${formatting}${unescapeUnicode(c.text)}`
         }
 		if (i < paragraphs.length - 1) data += "\\n";
     }

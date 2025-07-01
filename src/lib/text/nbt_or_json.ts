@@ -6,7 +6,7 @@ import type {
 	TranslateOptions,
 } from "$lib/types";
 import { type JSONContent } from "@tiptap/core";
-import { colorMap, defaultColorLUT, isMarkType, trueMarkOrUndefined } from "./general";
+import { colorMap, defaultColorLUT, isMarkType, trueMarkOrUndefined, unescapeUnicode } from "./general";
 
 const styleProps = [
 	"color",
@@ -40,7 +40,7 @@ export function addTypeSpecificValues(
 ) {
 	switch (c.type) {
 		case "text":
-			current.text = c.text;
+			current.text = unescapeUnicode(c.text!);
 			break;
 		case "score":
 			current.score = {
@@ -340,12 +340,6 @@ export function translateJSON(
 		for (const [i, p] of paragraphs.entries()) {
 			const content = p.content ?? [];
 			for (const c of content) {
-				colorMap.find((e) => {
-					console.log(e.value)
-					console.log(c.marks?.at(0)?.attrs?.color);
-					console.log(e.value.toUpperCase() == c.marks?.at(0)?.attrs?.color)
-						e.value.toUpperCase() == c.marks?.at(0)?.attrs?.color;
-					})?.name
 				let current: MinecraftText = {
 					color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
 					bold: trueMarkOrUndefined(c, "bold"),

@@ -24,7 +24,7 @@ export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.value.toLowerCase() === color)?.name || color;
+	return colorMap.find((e) => e.value.toUpperCase() === color)?.name || color;
 }
 
 /**
@@ -48,6 +48,16 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 
 export function isMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
+}
+
+export function unescapeUnicode(str: string) {
+	const matches = str.match(/(\\u[0-9a-f]{4})/gi);
+
+	if (!matches) {
+		return str
+	}
+
+	return str.replaceAll(/(\\u[0-9a-f]{4})/gi, decodeURIComponent(JSON.parse(`"${matches![0]}"`)));
 }
 
 /**

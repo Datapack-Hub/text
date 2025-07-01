@@ -141,12 +141,12 @@
 
 		fontStore.forEach(async ({ identifier, alias, data }: FontStoreSchema) => {
 			fontLUT.set(identifier, alias);
-			document.fonts.add(new FontFace(identifier, await data.arrayBuffer()));
+			document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
 		});
 	}
 
 	onMount(async () => {
-		loadData();
+		await loadData();
 
 		editor = new Editor({
 			element: element,

@@ -90,15 +90,16 @@
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
-					navigator.clipboard.writeText(editor ? translateMOTD(editor.getJSON()) : "Loading...");
+					navigator.clipboard.writeText(
+						editor ? translateMOTD(editor.getJSON()) : "Loading...",
+					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto"
-				>{editor
-					? translateMOTD(editor.getJSON()) : "Loading..."}
+				>{editor ? translateMOTD(editor.getJSON()) : "Loading..."}
 			</code>
 		</div>
 

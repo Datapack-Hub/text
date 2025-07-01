@@ -9,7 +9,7 @@
 	let step = $state(1);
 	let identifier = $state("");
 	let fontAlias = $state("");
-	let fontData: Blob
+	let fontData: Blob;
 
 	async function dropHandler(
 		e: DragEvent & {
@@ -55,7 +55,7 @@
 			document.fonts.add(font);
 			fontAlias = fileName;
 			await font.load();
-			fontData = file
+			fontData = file;
 		}
 		step = 2;
 	}
@@ -64,13 +64,13 @@
 		fontLUT.set(identifier, fontAlias);
 		fontUploadModal.close();
 		step = 1;
-		
-		const db = await openDataStore()
+
+		const db = await openDataStore();
 		await db.put("fonts", {
 			alias: fontAlias,
 			identifier,
-			data: fontData
-		})
+			data: fontData,
+		});
 
 		identifier = "";
 		fontAlias = "";

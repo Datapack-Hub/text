@@ -1,5 +1,5 @@
 import { Extension } from "@tiptap/core";
-import { SvelteMap } from "svelte/reactivity"
+import { SvelteMap } from "svelte/reactivity";
 
 export let fontLUT: SvelteMap<string, string> = new SvelteMap();
 

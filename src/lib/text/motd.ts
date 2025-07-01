@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorMap, defaultColorLUT, trueMarkOrUndefined, unescapeUnicode } from "./general";
+import { colorMap, trueMarkOrUndefined, unescapeUnicode } from "./general";
 
 function hexToRgb(hex: string): [number, number, number] {
 	hex = hex.replace(/^#/, "");
@@ -50,58 +50,57 @@ export function deltaE(hex1: string, hex2: string): number {
 }
 
 const formattingCodes = [
-    {key: "obfuscated", value: "k"},
-    {key: "bold", value: "l"},
-    {key: "strike", value: "m"},
-    {key: "underline", value: "n"},
-    {key: "italic", value: "o"},
-]
+	{ key: "obfuscated", value: "k" },
+	{ key: "bold", value: "l" },
+	{ key: "strike", value: "m" },
+	{ key: "underline", value: "n" },
+	{ key: "italic", value: "o" },
+];
 
 export function translateMOTD(c: JSONContent) {
 	const char = "\\u00a7";
 	const paragraphs = c.content!;
 
-    let data = "";
+	let data = "";
 
 	for (const [i, p] of paragraphs.entries()) {
-        const content = p.content ?? [];
-        
-        
+		const content = p.content ?? [];
+
 		for (const c of content) {
-            if (!c.text) {
-                continue;
-            }    
+			if (!c.text) {
+				continue;
+			}
 
 			let lowestDE = 999;
-            let lowestDEVal = "";
-            let formatting = ""
+			let lowestDEVal = "";
+			let formatting = "";
 
 			const color = c.marks?.at(0)?.attrs?.color;
-            for (const c of colorMap) {
-                if (!color) {
-                    continue;
-                }
+			for (const c of colorMap) {
+				if (!color) {
+					continue;
+				}
 
-                const dE = deltaE(color, c.value);
-                if (dE === 0) {
-                    lowestDEVal = `${char}${c.code}`
-                    break;
-                }
-                if (dE < lowestDE) {
-                    lowestDE = dE
-                    lowestDEVal = `${char}${c.code}`
-                }
-            }
+				const dE = deltaE(color, c.value);
+				if (dE === 0) {
+					lowestDEVal = `${char}${c.code}`;
+					break;
+				}
+				if (dE < lowestDE) {
+					lowestDE = dE;
+					lowestDEVal = `${char}${c.code}`;
+				}
+			}
 
-            for (const code of formattingCodes) {
-                if (trueMarkOrUndefined(c, code.key)) {
-                    formatting += `${char}${code.value}`
-                }
-            }
-            
-            data += `${char}r${lowestDEVal}${formatting}${unescapeUnicode(c.text)}`
-        }
+			for (const code of formattingCodes) {
+				if (trueMarkOrUndefined(c, code.key)) {
+					formatting += `${char}${code.value}`;
+				}
+			}
+
+			data += `${char}r${lowestDEVal}${formatting}${unescapeUnicode(c.text)}`;
+		}
 		if (i < paragraphs.length - 1) data += "\\n";
-    }
-    return data
+	}
+	return data;
 }

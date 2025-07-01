@@ -6,7 +6,12 @@ import type {
 	TranslateOptions,
 } from "$lib/types";
 import { type JSONContent } from "@tiptap/core";
-import { colorMap, defaultColorLUT, isMarkType, trueMarkOrUndefined, unescapeUnicode } from "./general";
+import {
+	defaultColorLUT,
+	isMarkType,
+	trueMarkOrUndefined,
+	unescapeUnicode,
+} from "./general";
 
 const styleProps = [
 	"color",

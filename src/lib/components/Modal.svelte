@@ -52,16 +52,18 @@
 		: 'w-[95%] md:w-[50%] 2xl:w-[30%]'} {big ? 'w-[95%]!' : ''} {flexible
 		? 'w-fit! max-w-[95%]'
 		: ''} m-auto bg-transparent text-zinc-100 backdrop:bg-black/65">
-	<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
-		<span class="flex-grow text-lg font-bold">{title}</span>
-		<button aria-label="close" onclick={close}><IconClose /></button>
-	</div>
-	<div
-		class="rounded-b-lg {nopad
-			? ''
-			: 'p-4'} flex flex-col space-y-1 bg-zinc-800">
-		{@render children()}
-	</div>
+		<div class="flex items-center justify-center h-[90vh] flex-col">
+			<div class="flex items-center rounded-t-lg bg-zinc-900 p-4 w-full">
+				<span class="flex-grow text-lg font-bold">{title}</span>
+				<button aria-label="close" onclick={close}><IconClose /></button>
+			</div>
+			<div
+				class="rounded-b-lg {nopad
+					? ''
+					: 'p-4'} bg-zinc-800 w-full">
+				{@render children()}
+			</div>
+		</div>
 </dialog>
 <!-- <div class="absolute {opened ? '' : 'hidden'}">
 	<div

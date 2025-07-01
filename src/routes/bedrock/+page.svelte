@@ -49,13 +49,14 @@
 
 	import { page } from "$app/state";
 
-	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
-	import { colorMap } from "$lib/text/general";
+	import BedrockTextStyleButtons from "$lib/components/bedrock/BedrockTextStyleButtons.svelte";
+	import { bedrockColorMap, colorMap } from "$lib/text/general";
 
 	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
+	import { translateBedrockJSON } from "$lib/text/bedrock";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -378,7 +379,7 @@
 
 	<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
 		{#if editor}
-			<TextStyleButtons {editor} />
+			<BedrockTextStyleButtons {editor} />
 
 			<ToolbarButton
 				Icon={IconFont}
@@ -397,12 +398,12 @@
 				onClick={colorDialog.open}
 				ariaLabel="Custom Color" />
 
-			<ToolbarButton
+			<!-- <ToolbarButton
 				Icon={IconGradient}
 				onClick={gradientDialog.open}
-				ariaLabel="Color Gradient" />
+				ariaLabel="Color Gradient" /> -->
 			<div id="colorBtns">
-				{#each colorMap as color}
+				{#each bedrockColorMap as color}
 					<ToolbarButton
 						Icon={IconSquare}
 						onClick={() => editor!.chain().focus().setColor(color.value).run()}
@@ -440,9 +441,9 @@
 				onClick={unicodeSelectorDialog.open}
 				ariaLabel="Special Characters" />
 
-			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
+			<!-- <div class="mx-2 h-5 w-px bg-zinc-600"></div> -->
 
-			<ToolbarButton
+			<!-- <ToolbarButton
 				onClick={() => {
 					if (editor?.isActive("clickEvent")) {
 						editor?.chain().focus().unsetClickEvent().run();
@@ -482,7 +483,7 @@
 					onClick={hoverEditButtonHandler}
 					ariaLabel="Edit Hover Event"
 					Icon={IconEdit} />
-			{/if}
+			{/if} -->
 
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
@@ -532,11 +533,13 @@
 					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(
+							translateBedrockJSON(
 								editor!.getJSON(),
-								"standard",
-								outputVersion,
-								shouldOptimise,
+								{
+									exportType: "standard",
+									exportVersion: outputVersion,
+									optimise: false,
+								}
 							),
 						);
 						recentlyCopied = true;
@@ -552,7 +555,14 @@
 					<code id="outputbox" class="inline break-all">
 						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
 						{editor
-							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
+							? translateBedrockJSON(
+								tiptapJSON,
+								{
+									exportType: "standard",
+									exportVersion: outputVersion,
+									optimise: false,
+								}
+							)
 							: "Loading..."}
 					</code>
 				</p>
@@ -757,9 +767,9 @@
 		<modal.default bind:fontUploadModal />
 	{/await}
 
-	{#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
+	<!-- {#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
 		<modal.default {editor} bind:gradientSteps bind:gradientDialog />
-	{/await}
+	{/await} -->
 	{#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
 		<modal.default editor={editor!} bind:unicodeSelectorDialog />
 	{/await}

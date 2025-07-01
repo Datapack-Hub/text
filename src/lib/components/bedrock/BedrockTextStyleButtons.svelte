@@ -4,8 +4,6 @@
 	import IconItalic from "~icons/tabler/italic";
 	import IconObfuscate from "~icons/tabler/password";
 	import IconShadow from "~icons/tabler/shadow";
-	import IconStrikethrough from "~icons/tabler/strikethrough";
-	import IconUnderline from "~icons/tabler/underline";
 
 	const { editor, small = false } = $props();
 	let shadowColorValue = $state("#ffffff");
@@ -36,32 +34,6 @@
 		? 'bg-zinc-800'
 		: ''}">
 	<IconItalic />
-</button>
-<button
-	aria-label="Strikethrough"
-	onclick={() => editor.chain().focus().toggleStrike().run()}
-	{@attach tooltip}
-	class="p-1 {small
-		? 'text-sm'
-		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
-		'strike',
-	)
-		? 'bg-zinc-800'
-		: ''}">
-	<IconStrikethrough />
-</button>
-<button
-	aria-label="Underline"
-	onclick={() => editor.chain().focus().toggleUnderline().run()}
-	{@attach tooltip}
-	class="p-1 {small
-		? 'text-sm'
-		: 'text-lg'} rounded-md font-medium hover:bg-white/3 {editor.isActive(
-		'underline',
-	)
-		? 'bg-zinc-800'
-		: ''}">
-	<IconUnderline />
 </button>
 <button
 	aria-label="Obfuscated"

@@ -28,6 +28,19 @@ export function defaultColorLUT(color: string): string | undefined {
 }
 
 /**
+ * A LUT to find the name of a color
+ *
+ * @param color the hex code
+ * @returns the color name
+ */
+export function defaultCodeBedrockLUT(color: string): string | undefined {
+	if (!color || color === "null") {
+		return;
+	}
+	return bedrockColorMap.find((e) => e.value.toUpperCase() === color)?.code || color;
+}
+
+/**
  * A LUT to find the value of a named color
  *
  * @param color the color name you want to find
@@ -140,5 +153,36 @@ export const colorMap = [
 	{ name: "white", value: "#FFFFFF", code: "f" },
 	{ name: "gray", value: "#AAAAAA", code: "7" },
 	{ name: "dark_gray", value: "#555555", code: "8" },
+	{ name: "black", value: "#000000", code: "0" },
+];
+
+export const bedrockColorMap = [
+	{ name: "material_copper", value: "#B4684D", code: "n" },
+	{ name: "material_redstone", value: "#971607", code: "m" },
+	{ name: "dark_red", value: "#AA0000", code: "4" },
+	{ name: "red", value: "#FF5555", code: "c" },
+	{ name: "material_resin", value: "#EB7114", code: "v" },
+	{ name: "gold", value: "#FFAA00", code: "6" },
+	{ name: "material_gold", value: "#DEB12D", code: "p" },
+	{ name: "minecoin_gold", value: "#DDD605", code: "g" },
+	{ name: "yellow", value: "#FFFF55", code: "e" },
+	{ name: "green", value: "#55FF55", code: "2" },
+	{ name: "dark_green", value: "#00AA00", code: "a" },
+	{ name: "material_emerald", value: "#119F36", code: "q" },
+	{ name: "aqua", value: "#55FFFF", code: "b" },
+	{ name: "material_diamond", value: "#2CBAA8", code: "s" },
+	{ name: "dark_aqua", value: "#00AAAA", code: "3" },
+	{ name: "material_lapis", value: "#21497B", code: "t" },
+	{ name: "blue", value: "#5555FF", code: "1" },
+	{ name: "dark_blue", value: "#0000AA", code: "9" },
+	{ name: "dark_purple", value: "#AA00AA", code: "d" },
+	{ name: "material_amethyst", value: "#9A5CC6", code: "u" },
+	{ name: "light_purple", value: "#FF55FF", code: "5" },
+	{ name: "white", value: "#FFFFFF", code: "f" },
+	{ name: "gray", value: "#C6C6C6", code: "7" },
+	{ name: "material_iron", value: "#CECACA", code: "i" },
+	{ name: "material_quartz", value: "#E3D4D1", code: "h" },
+	{ name: "dark_gray", value: "#555555", code: "8" },
+	{ name: "material_netherite", value: "#443A3B", code: "j" },
 	{ name: "black", value: "#000000", code: "0" },
 ];

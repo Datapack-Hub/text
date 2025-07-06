@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
-	import IconCopy from "~icons/tabler/copy";
-	import IconTick from "~icons/tabler/check";
-	import { translateJSON, convert } from "$lib/text/nbt_or_json";
 	import { translateMOTD } from "$lib/text/motd";
+	import { convert, translateJSON } from "$lib/text/nbt_or_json";
+	import IconCopy from "~icons/tabler/copy";
+	import CheckBox from "../CheckBox.svelte";
 	let {
 		outputDialog = $bindable(),
 		outputVersion = $bindable(),
@@ -13,6 +13,24 @@
 		indentSize,
 		shouldOptimise = true,
 	} = $props();
+
+	let exportAsJSON = $state(false);
+
+	function exportThing(exportAsJSON: boolean) {
+		if (!exportAsJSON) {
+			return convert(
+				editor.getJSON(),
+				"item_lore",
+				outputVersion,
+				shouldOptimise,
+			);
+		}
+		return translateJSON(editor.getJSON(), {
+			exportType: "item_lore",
+			exportVersion: outputVersion,
+			optimise: shouldOptimise,
+		});
+	}
 </script>
 
 <Modal title="More output formats" bind:this={outputDialog} big key="E">
@@ -42,7 +60,8 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto"
-				>/tellraw @s {editor
+				><span class="text-white/60">/tellraw @s</span>
+				{editor
 					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
 					: "Loading..."}
 			</code>
@@ -63,24 +82,21 @@
 			</button>
 			{#if outputVersion == "new"}
 				<code class="inline-block max-h-56 w-full overflow-auto"
-					>[lore={editor
-						? convert(
-								editor.getJSON(),
-								"item_lore",
-								outputVersion,
-								shouldOptimise,
-							)
-						: "Loading..."}]
+					><span class="text-white/60">[lore=</span>{editor
+						? exportThing(exportAsJSON)
+						: "Loading..."}<span class="text-white/60">]</span>
 				</code>
+				<CheckBox bind:value={exportAsJSON} label="json" />
+				<label for="json">Export as JSON</label>
 			{:else}
 				<code class="inline-block max-h-56 w-full overflow-auto"
-					>[lore={editor
+					><span class="text-white/60">[lore=</span>{editor
 						? `'${translateJSON(editor.getJSON(), {
 								exportType: "item_lore",
 								exportVersion: outputVersion,
 								optimise: shouldOptimise,
 							})}`
-						: "Loading..."}]
+						: "Loading..."}'<span class="text-white/60">]</span>
 				</code>
 			{/if}
 		</div>
@@ -103,7 +119,7 @@
 			</code>
 		</div>
 
-		<p class="mt-2">As JSON:</p>
+		<!-- <p class="mt-2">As JSON:</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -154,6 +170,6 @@
 				min="1"
 				bind:value={indentSize}
 				class="w-fit rounded-md bg-zinc-900 p-2" />
-		{/if}
+		{/if} -->
 	</div>
 </Modal>

@@ -178,7 +178,7 @@
 				FontsExtension,
 				Placeholder.configure({
 					placeholder:
-						"Write text here, style it with the options above, and the output text components will appear at the bottom!",
+						"Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",
 				}),
 			],
 			onTransaction: ({ editor: newEditor }) => {
@@ -568,9 +568,11 @@
 					<p class="font-lexend nomob text-xs text-white/60">
 						{getTextComponentCount()} components
 					</p>
+
 					<p class="font-lexend nomob text-xs text-white/60">•</p>
+
 					<p class="font-lexend text-xs text-white/60">
-						Click to change output settings:
+						click to change output settings:
 					</p>
 					<button
 						{@attach tooltip}
@@ -590,6 +592,12 @@
 						aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
 						onclick={() => (shouldOptimise = !shouldOptimise)}
 						>{shouldOptimise ? "optimised" : "expanded"}</button>
+
+					<p class="font-lexend nomob text-xs text-white/60">•</p>
+
+					<button class="font-lexend text-xs text-white/60 underline" onclick={outputDialog?.open}>
+					    other output formats
+					</button>
 				</div>
 			{/if}
 		</div>
@@ -718,8 +726,6 @@
 			bind:outputDialog
 			bind:outputVersion
 			{editor}
-			{indent}
-			{indentSize}
 			{recentlyCopied} />
 	{/await}
 

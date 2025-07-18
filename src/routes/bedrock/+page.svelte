@@ -20,7 +20,6 @@
 	import MiniEditor from "$lib/components/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
 	import Modal from "$lib/components/Modal.svelte";
-	import ColorPicker from "svelte-awesome-color-picker";
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
 	import { Editor, type JSONContent } from "@tiptap/core";
@@ -33,30 +32,24 @@
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
-	import IconGradient from "~icons/tabler/contrast-2";
 	import IconCopy from "~icons/tabler/copy";
-	import IconFont from "~icons/tabler/function";
-	import IconUploadFont from "~icons/tabler/function-filled";
-	import IconClickEvent from "~icons/tabler/hand-finger";
 	import IconKeybinds from "~icons/tabler/keyboard";
 	import IconEmoji from "~icons/tabler/mood-smile-beam";
 	import IconColor from "~icons/tabler/palette";
-	import IconEdit from "~icons/tabler/pencil";
 	import IconCustom from "~icons/tabler/plus";
-	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
 
 	import { page } from "$app/state";
 
 	import BedrockTextStyleButtons from "$lib/components/bedrock/BedrockTextStyleButtons.svelte";
-	import { bedrockColorMap, colorMap } from "$lib/text/general";
+	import { bedrockColorMap } from "$lib/text/general";
 
 	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
+	import { translateBedrockJSON } from "$lib/text/bedrock";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
-	import { translateBedrockJSON } from "$lib/text/bedrock";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -71,9 +64,6 @@
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
 
-	let indent = $state(false);
-	let indentSize = $state(2);
-
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
@@ -85,10 +75,6 @@
 	let recentlySaved = $state(false);
 	let loadDialog: Modal = $state()!;
 
-	// Dialogs
-	let gradientDialog: Modal = $state()!;
-	let gradientSteps: string[] = $state(["#ffffff"]);
-
 	let keybindDialog: Modal = $state()!;
 
 	let clickEventType = $state("");
@@ -98,10 +84,6 @@
 	let hoverEventValue: any = $state();
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
-
-	let fontDialog: Modal = $state()!;
-	let fontUploadModal: Modal = $state()!;
-	let fontName = $state("");
 
 	let customType: string | undefined = $state();
 	let customDialog: Modal = $state()!;
@@ -116,18 +98,18 @@
 	}
 
 	async function loadData() {
-		if (localStorage.getItem("content")) {
-			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
+		if (localStorage.getItem("BR_content")) {
+			tiptapJSON = JSON.parse(localStorage.getItem("BR_content")!);
 		} else {
 			tiptapJSON = [];
-			localStorage.setItem("content", "");
+			localStorage.setItem("BR_content", "");
 		}
 
-		if (localStorage.getItem("snapshots")) {
-			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
+		if (localStorage.getItem("BR_snapshots")) {
+			snapshots = JSON.parse(localStorage.getItem("BR_snapshots")!);
 		} else {
 			snapshots = [];
-			localStorage.setItem("snapshots", "");
+			localStorage.setItem("BR_snapshots", "");
 		}
 
 		const db = await openDataStore();
@@ -209,11 +191,6 @@
 		);
 	}
 
-	function customColorHandler() {
-		editor?.chain().focus().setColor(color).run();
-		colorDialog?.close();
-	}
-
 	const debounce = (callback: Function, wait: number) => {
 		let timeoutId: number;
 		return (...args: any[]) => {
@@ -242,83 +219,6 @@
 		setTimeout(() => {
 			recentlySaved = false;
 		}, 4000);
-	}
-
-	function hoverEditButtonHandler() {
-		const { from, to } = editor!.state.selection;
-		let start = from,
-			end = to;
-		const doc = editor!.state.doc;
-
-		function sameHoverEventMark(pos: number) {
-			const node = doc.nodeAt(pos);
-			return node?.marks?.find((m) => m.type.name === "hoverEvent");
-		}
-		const mark = sameHoverEventMark(from);
-		if (!mark) return;
-
-		// Expand left
-		while (
-			start > 0 &&
-			JSON.stringify(sameHoverEventMark(start - 1)?.attrs) ===
-				JSON.stringify(mark.attrs)
-		) {
-			start--;
-		}
-		// Expand right
-		while (
-			end < doc.content.size &&
-			JSON.stringify(sameHoverEventMark(end)?.attrs) ===
-				JSON.stringify(mark.attrs)
-		) {
-			end++;
-		}
-
-		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
-		const { value } = mark.attrs;
-		hoverEventDialog!.open();
-		if (hoverEventEditor) {
-			hoverEventEditor.importText(JSON.stringify(value));
-		}
-	}
-
-	function clickEditButtonHandler() {
-		// cobble if you want to move this elsewhere then please do
-		// what the heck -cbble_
-		const { from, to } = editor!.state.selection;
-		let start = from,
-			end = to;
-		const doc = editor!.state.doc;
-
-		function sameClickEventMark(pos: number) {
-			const node = doc.nodeAt(pos);
-			return node?.marks?.find((m) => m.type.name === "clickEvent");
-		}
-		const mark = sameClickEventMark(from);
-		if (!mark) return;
-
-		// Expand left
-		while (
-			start > 0 &&
-			JSON.stringify(sameClickEventMark(start - 1)?.attrs) ===
-				JSON.stringify(mark.attrs)
-		) {
-			start--;
-		}
-		// Expand right
-		while (
-			end < doc.content.size &&
-			JSON.stringify(sameClickEventMark(end)?.attrs) ===
-				JSON.stringify(mark.attrs)
-		) {
-			end++;
-		}
-
-		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
-		const { action, value } = mark.attrs;
-		clickEventType = action;
-		clickEventValue = value;
-		clickEventDialog!.open();
 	}
 
 	function clearMarksHandler(event: KeyboardEvent) {
@@ -376,11 +276,15 @@
 			class="nomob flex items-center px-3 py-2 hover:bg-white/3"
 			>Datapack Wiki</a>
 	</div>
+	<div
+		class="flex w-full items-center justify-center bg-dph p-2">
+		<p>The Bedrock editor is in beta, expect bugs. If we are missing a bedrock feature, contact us on our Discord!</p>
+	</div>
 
 	<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
 		{#if editor}
 			<BedrockTextStyleButtons {editor} />
-
+<!-- 
 			<ToolbarButton
 				Icon={IconFont}
 				onClick={() =>
@@ -388,7 +292,7 @@
 						? editor!.chain().focus().unsetFont().run()
 						: fontDialog.open()}
 				styleVar={editor.getAttributes("textStyle").font}
-				ariaLabel="Font" />
+				ariaLabel="Font" /> -->
 
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
@@ -498,11 +402,6 @@
 
 			<div class="flex-grow"></div>
 
-			<button
-				{@attach tooltip}
-				class="toolbar-btn nomob"
-				onclick={fontUploadModal?.open}
-				aria-label="Upload Font"><IconUploadFont /></button>
 			<button
 				{@attach tooltip}
 				class="toolbar-btn nomob"
@@ -668,29 +567,9 @@
 		</button>
 	</Modal>
 
-	{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
+	{#await import("$lib/components/bedrock/BedrockCustomSourceModal.svelte") then modal}
 		<modal.default bind:customDialog bind:customType {editor} {outputVersion} />
 	{/await}
-
-	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
-		<div class="flex w-full flex-col py-4">
-			<ColorPicker
-				bind:hex={color}
-				--cp-bg-color="transparent"
-				--cp-border-color="transparent"
-				--cp-text-color="white"
-				--cp-input-color="#18181b"
-				--cp-button-hover-color="#18181b"
-				isDialog={false}
-				isAlpha={false} />
-
-			<button
-				onclick={customColorHandler}
-				class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-				Done
-			</button>
-		</div>
-	</Modal>
 
 	<Modal title="Load a snapshot" bind:this={loadDialog} key="L">
 		<div class="flex w-full flex-col space-y-2">
@@ -728,8 +607,6 @@
 			bind:outputDialog
 			bind:outputVersion
 			{editor}
-			{indent}
-			{indentSize}
 			{recentlyCopied} />
 	{/await}
 
@@ -752,24 +629,9 @@
 		</div>
 	</Modal>
 
-	{#await import("$lib/components/modals/FontPickerModal.svelte") then modal}
-		<modal.default
-			bind:fontDialog
-			{fontUploadModal}
-			editor={editor!}
-			bind:fontName />
-	{/await}
-
 	{#await import("$lib/components/modals/KeybindModal.svelte") then modal}
 		<modal.default bind:keybindDialog />
 	{/await}
-	{#await import("$lib/components/modals/FontUploadModal.svelte") then modal}
-		<modal.default bind:fontUploadModal />
-	{/await}
-
-	<!-- {#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
-		<modal.default {editor} bind:gradientSteps bind:gradientDialog />
-	{/await} -->
 	{#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
 		<modal.default editor={editor!} bind:unicodeSelectorDialog />
 	{/await}

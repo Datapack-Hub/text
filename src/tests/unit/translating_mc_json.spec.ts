@@ -27,7 +27,7 @@ describe("translate", () => {
 			exportType: "standard",
 			optimise: true,
 		});
-		expect(JSON.parse(snbt)).toEqual(["", { text: "test", color: "#AA0000" }]);
+		expect(JSON.parse(snbt)).toEqual(["", { text: "test", color: "dark_red" }]);
 	});
 
 	const baseOptions: TranslateOptions = {

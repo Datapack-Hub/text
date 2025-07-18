@@ -58,14 +58,6 @@
 			<button
 				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
-					customType = "nbt";
-				}}>
-				<IconNBT class="text-2xl" />
-				<span>NBT Value</span>
-			</button>
-			<button
-				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-				onclick={() => {
 					customType = "score";
 				}}>
 				<IconScore class="text-2xl" />
@@ -78,14 +70,6 @@
 				}}>
 				<IconSelector class="text-2xl" />
 				<span>Selector</span>
-			</button>
-			<button
-				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-				onclick={() => {
-					customType = "keybind";
-				}}>
-				<IconKeybind class="text-2xl" />
-				<span>Keybind</span>
 			</button>
 		</div>
 	{:else}

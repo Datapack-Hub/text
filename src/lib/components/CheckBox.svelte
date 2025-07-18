@@ -5,7 +5,7 @@
 		$props();
 </script>
 
-<div class="mt-2 flex items-center gap-2">
+<div class="flex items-center gap-2">
 	<button
 		name={label}
 		class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"

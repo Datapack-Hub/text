@@ -9,8 +9,6 @@
 		outputVersion = $bindable(),
 		editor,
 		recentlyCopied,
-		indent,
-		indentSize,
 		shouldOptimise = true,
 	} = $props();
 
@@ -39,30 +37,36 @@
 		<option value="new">1.21.5+</option>
 		<option value="old">Before 1.21.5</option>
 	</select>
-	<div class="mt-2 flex w-full flex-col">
-		<p>For tellraw commands (send to chat):</p>
+	<div class="flex w-full flex-col">
+		{#if outputVersion == "new"}
+		<div class="flex items-center space-x-2 mt-1">
+			<CheckBox bind:value={exportAsJSON} label="json" />
+			<span>Toggle JSON mode (for use in json files)</span>
+		</div>
+		{/if}
+
+		<p class="mt-2">As {outputVersion == "new" ? " " : "JSON "}text components:</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						"/tellraw @s " +
-							convert(
-								editor.getJSON(),
-								"standard",
-								outputVersion,
-								shouldOptimise,
-							),
+						convert(
+							editor.getJSON(),
+							"standard",
+							outputVersion,
+							shouldOptimise,
+							exportAsJSON
+						),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
-			<code class="inline-block max-h-56 w-full overflow-auto"
-				><span class="text-white/60">/tellraw @s</span>
+			<code class="inline-block max-h-56 w-full overflow-auto">
 				{editor
-					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise)
+					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise, exportAsJSON)
 					: "Loading..."}
 			</code>
 		</div>
@@ -73,32 +77,24 @@
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise)}]`,
+						`[lore=${convert(editor.getJSON(), "item_lore", outputVersion, shouldOptimise, exportAsJSON)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
 				}}>
 				<IconCopy />
 			</button>
-			{#if outputVersion == "new"}
 				<code class="inline-block max-h-56 w-full overflow-auto"
-					><span class="text-white/60">[lore=</span>{editor
-						? exportThing(exportAsJSON)
-						: "Loading..."}<span class="text-white/60">]</span>
+					><span class="text-white/35">[lore=</span>{editor
+						? convert(
+							editor.getJSON(),
+							"item_lore",
+							outputVersion,
+							shouldOptimise,
+							exportAsJSON
+						)
+						: "Loading..."}<span class="text-white/35">]</span>
 				</code>
-				<CheckBox bind:value={exportAsJSON} label="json" />
-				<label for="json">Export as JSON</label>
-			{:else}
-				<code class="inline-block max-h-56 w-full overflow-auto"
-					><span class="text-white/60">[lore=</span>{editor
-						? `'${translateJSON(editor.getJSON(), {
-								exportType: "item_lore",
-								exportVersion: outputVersion,
-								optimise: shouldOptimise,
-							})}`
-						: "Loading..."}'<span class="text-white/60">]</span>
-				</code>
-			{/if}
 		</div>
 
 		<p class="mt-2">As a MOTD:</p>

@@ -319,9 +319,10 @@ export function convert(
 	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
 	optimise: boolean,
+	force_json: boolean = false
 ): string {
 	let out = translateJSON(jsonContent, { exportVersion, exportType, optimise });
-	if (exportVersion == "new") {
+	if (exportVersion == "new" && !force_json) {
 		// only remove strings
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
 			match.replace(/"/g, ""),

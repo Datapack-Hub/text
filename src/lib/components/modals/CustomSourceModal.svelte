@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
-	import IconTick from "~icons/tabler/check";
+	import type { ExternalSources } from "$lib/types";
 	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
-	import type { ExternalSources } from "$lib/types";
+	import CheckBox from "../CheckBox.svelte";
 	import MiniEditor from "../MiniEditor.svelte";
 
 	let {
@@ -214,14 +214,7 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="mt-2 flex items-center space-x-2">
-				<button
-					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
-					onclick={() =>
-						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
-					{#if customValues.nbt.interpret}
-						<IconTick class="m-auto text-lg" />
-					{/if}
-				</button>
+				<CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
 				<label for="interpret"
 					>Interpret (parse nbt value as a text component)</label>
 			</div>
@@ -258,14 +251,7 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="mt-2 flex items-center space-x-2">
-				<button
-					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
-					onclick={() =>
-						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
-					{#if customValues.nbt.interpret}
-						<IconTick class="m-auto text-lg" />
-					{/if}
-				</button>
+				<CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
 				<label for="interpret"
 					>Interpret (parse nbt value as a text component)</label>
 			</div>
@@ -302,14 +288,7 @@
 				bind:value={customValues.nbt.path} />
 
 			<div class="mt-2 flex items-center space-x-2">
-				<button
-					class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
-					onclick={() =>
-						(customValues.nbt.interpret = !customValues.nbt.interpret)}>
-					{#if customValues.nbt.interpret}
-						<IconTick class="m-auto text-lg" />
-					{/if}
-				</button>
+				<CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
 				<label for="interpret"
 					>Interpret (parse nbt value as a text component)</label>
 			</div>

@@ -1,4 +1,3 @@
-import { defaultColorReverseLUT } from "$lib/text/general";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {

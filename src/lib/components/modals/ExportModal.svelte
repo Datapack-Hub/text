@@ -39,13 +39,15 @@
 	</select>
 	<div class="flex w-full flex-col">
 		{#if outputVersion == "new"}
-		<div class="flex items-center space-x-2 mt-1">
-			<CheckBox bind:value={exportAsJSON} label="json" />
-			<span>Toggle JSON mode (for use in json files)</span>
-		</div>
+			<div class="mt-1 flex items-center space-x-2">
+				<CheckBox bind:value={exportAsJSON} label="json" />
+				<span>Toggle JSON mode (for use in json files)</span>
+			</div>
 		{/if}
 
-		<p class="mt-2">As {outputVersion == "new" ? " " : "JSON "}text components:</p>
+		<p class="mt-2">
+			As {outputVersion == "new" ? " " : "JSON "}text components:
+		</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -56,7 +58,7 @@
 							"standard",
 							outputVersion,
 							shouldOptimise,
-							exportAsJSON
+							exportAsJSON,
 						),
 					);
 					recentlyCopied = true;
@@ -66,7 +68,13 @@
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto">
 				{editor
-					? convert(editor.getJSON(), "standard", outputVersion, shouldOptimise, exportAsJSON)
+					? convert(
+							editor.getJSON(),
+							"standard",
+							outputVersion,
+							shouldOptimise,
+							exportAsJSON,
+						)
 					: "Loading..."}
 			</code>
 		</div>
@@ -84,17 +92,17 @@
 				}}>
 				<IconCopy />
 			</button>
-				<code class="inline-block max-h-56 w-full overflow-auto"
-					><span class="text-white/35">[lore=</span>{editor
-						? convert(
+			<code class="inline-block max-h-56 w-full overflow-auto"
+				><span class="text-white/35">[lore=</span>{editor
+					? convert(
 							editor.getJSON(),
 							"item_lore",
 							outputVersion,
 							shouldOptimise,
-							exportAsJSON
+							exportAsJSON,
 						)
-						: "Loading..."}<span class="text-white/35">]</span>
-				</code>
+					: "Loading..."}<span class="text-white/35">]</span>
+			</code>
 		</div>
 
 		<p class="mt-2">As a MOTD:</p>

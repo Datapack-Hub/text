@@ -3,7 +3,7 @@
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
-	import TextStyle from "@tiptap/extension-text-style";
+	import { TextStyle } from "@tiptap/extension-text-style";
 	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
@@ -42,18 +42,7 @@
 		editor = new Editor({
 			element: element,
 			extensions: [
-				StarterKit,
-				Underline,
-				Color,
-				TextStyle,
-				Obfuscation,
-				ClickEventMark,
-				HoverEventMark,
-				ShadowColorMark,
-				FontsExtension,
-				Placeholder.configure({
-					placeholder: placeholder,
-				}),
+				
 			],
 			onTransaction: ({ editor: newEditor }) => {
 				// force re-render so `editor.isActive` works as expected

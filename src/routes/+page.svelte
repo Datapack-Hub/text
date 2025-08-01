@@ -26,7 +26,6 @@
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
-	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 	// Icons
@@ -71,10 +70,7 @@
 
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
-
-	let indent = $state(false);
-	let indentSize = $state(2);
-
+	
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
@@ -162,8 +158,8 @@
 					horizontalRule: false,
 					listItem: false,
 					orderedList: false,
+					link: false,
 				}),
-				Underline,
 				Color,
 				FixedTextStyle,
 				Obfuscation,
@@ -597,8 +593,10 @@
 
 					<p class="font-lexend nomob text-xs text-white/60">•</p>
 
-					<button class="font-lexend text-xs text-white/60 underline" onclick={outputDialog?.open}>
-					    other output formats
+					<button
+						class="font-lexend text-xs text-white/60 underline"
+						onclick={outputDialog?.open}>
+						other output formats
 					</button>
 				</div>
 			{/if}

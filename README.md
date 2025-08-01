@@ -18,7 +18,7 @@ If you find a bug or have feature ideas or requests, please create an issue. It'
 
 ## Contribution
 
-Contributions are welcome! For general changes and fixes, please submit a pull request to the `main` branch. Or, if your pull request is specifically related to an indev feature, submit it to a `feature/*` branch. 
+Contributions are welcome! For general changes and fixes, please submit a pull request to the `main` branch. Or, if your pull request is specifically related to an indev feature, submit it to a `feature/*` branch.
 
 Make sure you've tested the code locally before making any pull requests!!
 

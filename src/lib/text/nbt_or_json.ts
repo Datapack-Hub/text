@@ -319,7 +319,7 @@ export function convert(
 	exportType: "standard" | "item_lore" = "standard",
 	exportVersion: "new" | "old" = "new",
 	optimise: boolean,
-	force_json: boolean = false
+	force_json: boolean = false,
 ): string {
 	let out = translateJSON(jsonContent, { exportVersion, exportType, optimise });
 	if (exportVersion == "new" && !force_json) {

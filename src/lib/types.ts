@@ -32,8 +32,8 @@ export type MinecraftText = {
 	keybind?: string;
 
 	selector?: string;
-	atlas?: string
-	sprite?: string
+	atlas?: string;
+	sprite?: string;
 
 	color?: string;
 	shadow_color?: number | number[];

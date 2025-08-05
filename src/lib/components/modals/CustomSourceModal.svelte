@@ -382,7 +382,7 @@
 		<Combobox
 			items={defaultAtlases}
 			type="single"
-			inputProps={{placeholder:"Type an alias or use a default..."}}
+			inputProps={{ placeholder: "Type an alias or use a default..." }}
 			bind:value={customValues.object.atlas} />
 		<p class="mt-2">Sprite</p>
 		<input
@@ -395,7 +395,10 @@
 				editor
 					.chain()
 					.focus()
-					.insertObject({ atlas: customValues.object.atlas, sprite: customValues.object.sprite })
+					.insertObject({
+						atlas: customValues.object.atlas,
+						sprite: customValues.object.sprite,
+					})
 					.run();
 			}}
 			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">

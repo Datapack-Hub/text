@@ -15,7 +15,7 @@
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		ObjectNode
+		ObjectNode,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -29,7 +29,7 @@
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-// Icons
+	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -69,7 +69,7 @@
 
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
-	
+
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");

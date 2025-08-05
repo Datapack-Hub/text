@@ -29,7 +29,7 @@
 		if (!key) {
 			return;
 		}
-		
+
 		if (event.key === "Escape" && opened) {
 			close();
 		}

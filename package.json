@@ -46,6 +46,7 @@
 		"@tiptap/extension-placeholder": "^3.0.9",
 		"@tiptap/pm": "^3.0.9",
 		"@tiptap/starter-kit": "^3.0.9",
+		"bits-ui": "^2.9.1",
 		"idb": "^8.0.3",
 		"svelte-awesome-color-picker": "^4.0.2",
 		"tippy.js": "^6.3.7",

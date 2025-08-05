@@ -192,6 +192,14 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 				key: source.keybind,
 			},
 		};
+	} else if (source.atlas) {
+		finalText = {
+			type: "object",
+			attrs: {
+				atlas: source.atlas,
+				sprite: source.sprite,
+			},
+		};
 	} else {
 		finalText = {
 			type: "text",

@@ -74,6 +74,10 @@ export function addTypeSpecificValues(
 		case "keybind":
 			current.keybind = c.attrs?.key;
 			break;
+		case "object":
+			current.atlas = c.attrs?.atlas;
+			current.sprite = c.attrs?.sprite;
+			break;
 		case "selector":
 			current.selector = c.attrs?.selector;
 			break;

@@ -15,11 +15,12 @@
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
+		ObjectNode
 	} from "$lib/tiptap/extensions/index";
 	// Components
-	import MiniEditor from "$lib/components/MiniEditor.svelte";
-	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
 	import Modal from "$lib/components/Modal.svelte";
+	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
+	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
@@ -28,7 +29,7 @@
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-	// Icons
+// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -48,15 +49,13 @@
 
 	import { page } from "$app/state";
 
-	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
+	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
 	import { colorMap } from "$lib/text/general";
 
-	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
+	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
-	import { translateMOTD } from "$lib/text/motd";
-	import ExportModal from "$lib/components/modals/ExportModal.svelte";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -173,6 +172,7 @@
 				EntityNBTNode,
 				KeybindNode,
 				SelectorNode,
+				ObjectNode,
 				FontsExtension,
 				Placeholder.configure({
 					placeholder:

@@ -43,6 +43,11 @@ export interface SelectorAttributes {
 	selector: string;
 }
 
+export interface ObjectAttributes {
+	atlas: string;
+	sprite: string;
+}
+
 declare module "@tiptap/core" {
 	interface Commands<ReturnType> {
 		font: {
@@ -86,6 +91,9 @@ declare module "@tiptap/core" {
 		selectorNode: {
 			insertSelector: (attrs: SelectorAttributes) => ReturnType;
 		};
+		object: {
+			insertObject: (attrs: ObjectAttributes) => ReturnType;
+		};
 	}
 }
 
@@ -105,4 +113,5 @@ export { ScoreNode } from "./nodes/ScoreNode";
 export { SelectorNode } from "./nodes/SelectorNode";
 export { StorageNBTNode } from "./nodes/StorageNBTNode";
 export { TranslateNode } from "./nodes/TranslateNode";
+export { ObjectNode } from "./nodes/ObjectNode";
 export { FontsExtension } from "./fonts";

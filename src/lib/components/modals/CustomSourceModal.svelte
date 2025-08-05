@@ -7,7 +7,8 @@
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
 	import CheckBox from "../CheckBox.svelte";
-	import MiniEditor from "../MiniEditor.svelte";
+	import MiniEditor from "../text/MiniEditor.svelte";
+	import Combobox from "../Combobox.svelte";
 
 	let {
 		customDialog = $bindable(),
@@ -24,7 +25,6 @@
 		translate: {
 			key: "",
 			params: [],
-			fallback: undefined,
 		},
 		nbt: {
 			sourceType: "",
@@ -40,7 +40,27 @@
 		selector: {
 			selector: "",
 		},
+		object: {
+			atlas: "",
+			sprite: "",
+		},
 	});
+
+	const defaultAtlases = [
+		{ label: "minecraft:armor_trims", value: "minecraft:armor_trims" },
+		{ label: "minecraft:banner_patterns", value: "minecraft:banner_patterns" },
+		{ label: "minecraft:beds", value: "minecraft:beds" },
+		{ label: "minecraft:blocks", value: "minecraft:blocks" },
+		{ label: "minecraft:chests", value: "minecraft:chests" },
+		{ label: "minecraft:decorated_pot", value: "minecraft:decorated_pot" },
+		{ label: "minecraft:gui", value: "minecraft:gui" },
+		{ label: "minecraft:map_decorations", value: "minecraft:map_decorations" },
+		{ label: "minecraft:paintings", value: "minecraft:paintings" },
+		{ label: "minecraft:particles", value: "minecraft:particles" },
+		{ label: "minecraft:shield_patterns", value: "minecraft:shield_patterns" },
+		{ label: "minecraft:shulker_boxes", value: "minecraft:shulker_boxes" },
+		{ label: "minecraft:signs", value: "minecraft:signs" },
+	];
 </script>
 
 <Modal title="Add Custom Source" bind:this={customDialog} key="W">
@@ -87,6 +107,14 @@
 				<IconKeybind class="text-2xl" />
 				<span>Keybind</span>
 			</button>
+			<button
+				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
+				onclick={() => {
+					customType = "object";
+				}}>
+				<IconKeybind class="text-2xl" />
+				<span>Object (1.22+)</span>
+			</button>
 		</div>
 	{:else}
 		<select bind:value={customType} class="rounded-md bg-zinc-900 p-2">
@@ -95,6 +123,7 @@
 			<option value="nbt">NBT Value</option>
 			<option value="selector">Selector</option>
 			<option value="keybind">Keybind</option>
+			<option value="object">Object (1.22+)</option>
 		</select>
 	{/if}
 
@@ -347,6 +376,30 @@
 			}}
 			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Selector
+		</button>
+	{:else if customType === "object"}
+		<p class="mt-2">Atlas</p>
+		<Combobox
+			items={defaultAtlases}
+			type="single"
+			inputProps={{placeholder:"Type an alias or use a default..."}}
+			bind:value={customValues.object.atlas} />
+		<p class="mt-2">Sprite</p>
+		<input
+			type="text"
+			class="rounded-md bg-zinc-900 p-2"
+			bind:value={customValues.object.sprite} />
+		<button
+			onclick={() => {
+				customDialog.close();
+				editor
+					.chain()
+					.focus()
+					.insertObject({ atlas: customValues.object.atlas, sprite: customValues.object.sprite })
+					.run();
+			}}
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+			Add Object
 		</button>
 	{/if}
 </Modal>

@@ -6,9 +6,8 @@
 		[key: string]: any;
 	};
 
-	let dialog: HTMLDialogElement = $state()!;
-
 	let {
+		opened = $bindable(false),
 		title = $bindable("Modal"),
 		small = $bindable(false),
 		nopad = $bindable(false),
@@ -19,18 +18,19 @@
 	}: Props = $props();
 
 	export function open() {
-		dialog.showModal();
+		opened = true;
 	}
 
 	export function close() {
-		dialog.close();
+		opened = false;
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (!key) {
 			return;
 		}
-		if (event.key === "Escape" && dialog.open) {
+		
+		if (event.key === "Escape" && opened) {
 			close();
 		}
 
@@ -43,29 +43,34 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<dialog
-	bind:this={dialog}
-	id={title}
-	onclick={(e) => e.target === dialog && close()}
-	class="fixed top-0 left-0 z-50 {small
-		? 'w-fit'
-		: 'w-[95%] md:w-[50%] 2xl:w-[30%]'} {big ? 'w-[95%]!' : ''} {flexible
-		? 'w-fit! max-w-[95%]'
-		: ''} m-auto bg-transparent text-zinc-100 backdrop:bg-black/65">
-	<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
-		<span class="flex-grow text-lg font-bold">{title}</span>
-		<button aria-label="close" onclick={close}><IconClose /></button>
+{#if opened}
+	<div class="absolute {opened ? '' : 'hidden'}">
+		<div
+			class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
+			style="font-family: Lexend">
+			<div
+				onclick={() => close()}
+				class="fixed top-0 left-0 h-screen w-screen"
+				style="z-index: 40; background: transparent;"
+				aria-hidden="true"
+				tabindex="-1"
+				hidden={!opened}>
+			</div>
+			<div
+				class="z-50 {small ? 'w-fit' : 'w-[95%] md:w-[50%] 2xl:w-[30%]'} {big
+					? 'w-[95%]!'
+					: ''} {flexible ? 'w-fit! max-w-[95%]' : ''} m-auto py-4">
+				<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
+					<span class="flex-grow text-lg font-bold">{title}</span>
+					<button aria-label="close" onclick={close}><IconClose /></button>
+				</div>
+				<div
+					class="rounded-b-lg {nopad
+						? ''
+						: 'p-4'} flex flex-col space-y-1 bg-zinc-800">
+					{@render children()}
+				</div>
+			</div>
+		</div>
 	</div>
-	<div
-		class="rounded-b-lg {nopad
-			? ''
-			: 'p-4'} flex flex-col space-y-1 bg-zinc-800">
-		{@render children()}
-	</div>
-</dialog>
-<!-- <div class="absolute {opened ? '' : 'hidden'}">
-	<div
-		class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
-		style="font-family: Lexend">
-	</div>
-</div> -->
+{/if}

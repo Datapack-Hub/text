@@ -12,7 +12,6 @@
 
 	let {
 		customDialog = $bindable(),
-		outputVersion = $bindable(),
 		editor,
 		customType = $bindable(),
 	} = $props();

@@ -13,22 +13,6 @@
 	} = $props();
 
 	let exportAsJSON = $state(false);
-
-	function exportThing(exportAsJSON: boolean) {
-		if (!exportAsJSON) {
-			return convert(
-				editor.getJSON(),
-				"item_lore",
-				outputVersion,
-				shouldOptimise,
-			);
-		}
-		return translateJSON(editor.getJSON(), {
-			exportType: "item_lore",
-			exportVersion: outputVersion,
-			optimise: shouldOptimise,
-		});
-	}
 </script>
 
 <Modal title="More output formats" bind:this={outputDialog} big key="E">
@@ -122,58 +106,5 @@
 				>{editor ? translateMOTD(editor.getJSON()) : "Loading..."}
 			</code>
 		</div>
-
-		<!-- <p class="mt-2">As JSON:</p>
-		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
-			<button
-				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
-				onclick={() => {
-					navigator.clipboard.writeText(
-						translateJSON(editor.getJSON(), {
-							exportType: "standard",
-							exportVersion: outputVersion,
-							indent,
-							indentSize,
-							optimise: shouldOptimise,
-						}),
-					);
-					recentlyCopied = true;
-					setTimeout(() => (recentlyCopied = false), 2000);
-				}}>
-				<IconCopy />
-			</button>
-			<code class="inline-block max-h-56 w-full overflow-auto"
-				><pre>{editor
-						? translateJSON(editor.getJSON(), {
-								exportType: "standard",
-								exportVersion: outputVersion,
-								indent,
-								indentSize,
-								optimise: shouldOptimise,
-							})
-						: "Loading..."}</pre>
-			</code>
-		</div>
-
-		<div class="mt-2 flex items-center gap-2">
-			<p>Indent?</p>
-			<button
-				class="flex aspect-square size-8 flex-col items-center rounded-md bg-zinc-900"
-				onclick={() => (indent = !indent)}>
-				{#if indent}
-					<IconTick class="m-auto text-lg" />
-				{/if}
-			</button>
-		</div>
-		{#if indent}
-			<label for="indentSize" class="mt-2">Indent Size:</label>
-			<input
-				type="number"
-				id="indentSize"
-				max="8"
-				min="1"
-				bind:value={indentSize}
-				class="w-fit rounded-md bg-zinc-900 p-2" />
-		{/if} -->
 	</div>
 </Modal>

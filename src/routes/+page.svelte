@@ -667,7 +667,7 @@
 	</Modal>
 
 	{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
-		<modal.default bind:customDialog bind:customType {editor} {outputVersion} />
+		<modal.default bind:customDialog bind:customType {editor} />
 	{/await}
 
 	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">

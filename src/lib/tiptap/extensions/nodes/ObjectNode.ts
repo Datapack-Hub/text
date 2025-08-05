@@ -47,7 +47,7 @@ export const ObjectNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
         `,
 			}),
-			["span", {}, `OBJECT: ${atlas}/${sprite}`],
+			["span", {}, `OBJECT: [${sprite}@${atlas}]`],
 		];
 	},
 

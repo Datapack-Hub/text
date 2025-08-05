@@ -3,8 +3,6 @@
 	import type { ExternalSources } from "$lib/types";
 	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
-	import IconNBT from "~icons/tabler/braces";
-	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
 	import CheckBox from "../CheckBox.svelte";
 	import MiniEditor from "../MiniEditor.svelte";

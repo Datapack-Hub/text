@@ -1,3 +1,25 @@
+export type Version = {
+	friendly: string,
+	description: string,
+	index: number
+}
+export const versions = [
+	{
+		friendly: "pre-1.21.5", 
+		description: "uses json text components",
+		index: 0
+	},
+	{
+		friendly: "1.21.5-8", 
+		description: "uses nbt as text components, changes to syntax and names",
+		index: 1
+	},
+	{
+		friendly: "1.21.9+", 
+		description: "'object' type added, allowing you to use non-character sprites",
+		index: 2
+	},
+]
 export type BaseMinecraftText = Pick<
 	MinecraftText,
 	| "text"
@@ -114,7 +136,6 @@ export type MCTextKey = keyof MinecraftText;
 export type TranslateOptions = Partial<{
 	indent: boolean;
 	indentSize: number;
-	exportVersion: "old" | "new";
 	optimise: boolean;
 	exportType: "standard" | "item_lore";
 }>;

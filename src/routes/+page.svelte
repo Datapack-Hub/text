@@ -56,6 +56,8 @@
 	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
+	import { versions, type Version } from "$lib/types";
+	import { outputVersion } from "$lib/stores";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -65,7 +67,7 @@
 	let colorDialog: Modal = $state()!;
 
 	let outputDialog: Modal = $state()!;
-	let outputVersion: "new" | "old" = $state("new");
+	let versionPopup: boolean = $state(false);
 
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
@@ -323,21 +325,6 @@
 			editor!.commands.unsetAllMarks();
 		}
 	}
-
-	function getTextComponentCount() {
-		const components = JSON.parse(
-			translateJSON(editor!.getJSON(), {
-				exportType: "standard",
-				indent: false,
-				exportVersion: outputVersion,
-				optimise: shouldOptimise,
-			}),
-		);
-		if (Array.isArray(components)) {
-			return components.length;
-		}
-		return 1;
-	}
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
@@ -533,7 +520,6 @@
 							convert(
 								editor!.getJSON(),
 								"standard",
-								outputVersion,
 								shouldOptimise,
 							),
 						);
@@ -550,14 +536,14 @@
 					<code id="outputbox" class="inline break-all">
 						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
 						{editor
-							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
+							? convert(tiptapJSON!, "standard", shouldOptimise)
 							: "Loading..."}
 					</code>
 				</p>
 			</div>
 			{#if doesContentExist}
 				<div class="mt-2 flex items-center space-x-2 select-none">
-					<p class="font-lexend nomob text-xs text-white/60">
+					<!-- <p class="font-lexend nomob text-xs text-white/60">
 						{editor
 							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
 									.length
@@ -567,23 +553,41 @@
 						{getTextComponentCount()} components
 					</p>
 
-					<p class="font-lexend nomob text-xs text-white/60">•</p>
+					<p class="font-lexend nomob text-xs text-white/60">•</p> -->
 
 					<p class="font-lexend text-xs text-white/60">
 						click to change output settings:
 					</p>
-					<button
-						{@attach tooltip}
-						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-						aria-label="Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version."
-						onclick={() => {
-							const ov = outputVersion;
-							if (ov == "new") {
-								outputVersion = "old";
-							} else {
-								outputVersion = "new";
-							}
-						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
+
+					<div class="relative inline-block">
+						{#if versionPopup}
+						<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 w-[400px] shadow-md shadow-zinc-950 px-2 py-2 rounded-md z-10 flex flex-col space-y-1">
+							<div class="flex items-center ml-[0.3rem]">
+								<span class="w-1/4 text-sm">version</span>
+								<span class="w-3/4 text-sm">description</span>
+							</div>
+							{#each versions as v}
+							<button 
+							class="rounded-md bg-zinc-800 p-2 select-none hover:bg-zinc-700 text-left flex items-center w-full"
+							onclick={() => {
+								$outputVersion = v;
+								versionPopup = false;
+							}}>
+								<b class="w-1/4">{v.friendly}</b>
+								<span class="w-3/4 text-xs">{v.description}</span>
+							</button>
+							{/each}
+						</div>
+						{/if}
+
+						<button
+							class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+							aria-label="Click to toggle the output version."
+							onclick={() => {
+								versionPopup = !versionPopup;
+						}}>{$outputVersion.friendly}</button>
+					</div>
+					
 					<button
 						{@attach tooltip}
 						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
@@ -721,13 +725,13 @@
 		</div>
 	</Modal>
 
-	{#await import("$lib/components/modals/ExportModal.svelte") then modal}
+	<!-- {#await import("$lib/components/modals/ExportModal.svelte") then modal}
 		<modal.default
 			bind:outputDialog
 			bind:outputVersion
 			{editor}
 			{recentlyCopied} />
-	{/await}
+	{/await} -->
 
 	<Modal title="Import from NBT" bind:this={importDialog} key="I">
 		<div class="flex w-full flex-col space-y-2">

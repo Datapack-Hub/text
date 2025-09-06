@@ -1,14 +1,18 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
 	import type { ExternalSources } from "$lib/types";
+
 	import IconScore from "~icons/tabler/123";
 	import IconSelector from "~icons/tabler/at";
 	import IconNBT from "~icons/tabler/braces";
 	import IconKeybind from "~icons/tabler/keyboard";
 	import IconTranslate from "~icons/tabler/language";
+	import IconObject from "~icons/tabler/box";
+
 	import CheckBox from "../CheckBox.svelte";
 	import MiniEditor from "../text/MiniEditor.svelte";
 	import Combobox from "../Combobox.svelte";
+	import { outputVersion } from "$lib/stores";
 
 	let {
 		customDialog = $bindable(),
@@ -106,14 +110,16 @@
 				<IconKeybind class="text-2xl" />
 				<span>Keybind</span>
 			</button>
+			{#if $outputVersion.index >= 2}
 			<button
 				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
 				onclick={() => {
 					customType = "object";
 				}}>
-				<IconKeybind class="text-2xl" />
-				<span>Object (1.22+)</span>
+				<IconObject class="text-2xl" />
+				<span>Object</span>
 			</button>
+			{/if}
 		</div>
 	{:else}
 		<select bind:value={customType} class="rounded-md bg-zinc-900 p-2">
@@ -122,7 +128,7 @@
 			<option value="nbt">NBT Value</option>
 			<option value="selector">Selector</option>
 			<option value="keybind">Keybind</option>
-			<option value="object">Object (1.22+)</option>
+			<option value="object">Object</option>
 		</select>
 	{/if}
 

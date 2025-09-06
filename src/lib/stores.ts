@@ -1,7 +1,4 @@
 import { writable } from "svelte/store";
+import { versions } from "./types";
 
-export const outputVersion = writable({
-    friendly: "1.21.9+", 
-    description: "'object' type added, allowing you to use non-character sprites",
-    index: 2
-})
+export const outputVersion = writable(versions[versions.length - 1])

@@ -46,6 +46,8 @@ export function addTypeSpecificValues(
 	c: JSONContent,
 	includeInteractivity = true,
 ) {
+	exportVersion = get(outputVersion)
+
 	switch (c.type) {
 		case "text":
 			current.text = unescapeUnicode(c.text!);
@@ -78,8 +80,15 @@ export function addTypeSpecificValues(
 			current.keybind = c.attrs?.key;
 			break;
 		case "object":
-			current.atlas = c.attrs?.atlas;
-			current.sprite = c.attrs?.sprite;
+			if (exportVersion.index >= 2) {
+				current.atlas = c.attrs?.atlas;
+				current.sprite = c.attrs?.sprite;
+
+				current.bold = undefined;
+				current.italic = undefined;
+			} else {
+				current.text = ""
+			}
 			break;
 		case "selector":
 			current.selector = c.attrs?.selector;
@@ -325,7 +334,9 @@ export function convert(
 	optimise: boolean,
 	force_json: boolean = false,
 ): string {
+	exportVersion = get(outputVersion)
 	let out = translateJSON(jsonContent, { exportType, optimise });
+	console.log(exportVersion)
 	if (exportVersion.index >= 1 && !force_json) {
 		// only remove strings
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>

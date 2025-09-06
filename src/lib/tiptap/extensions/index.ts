@@ -43,9 +43,16 @@ export interface SelectorAttributes {
 	selector: string;
 }
 
-export interface ObjectAttributes {
+export interface AtlasObjectAttributes {
 	atlas: string;
 	sprite: string;
+}
+
+export interface PlayerObjectAttributes {
+	player: {
+		name: string;
+	};
+	hat?: boolean;
 }
 
 declare module "@tiptap/core" {
@@ -92,7 +99,8 @@ declare module "@tiptap/core" {
 			insertSelector: (attrs: SelectorAttributes) => ReturnType;
 		};
 		object: {
-			insertObject: (attrs: ObjectAttributes) => ReturnType;
+			insertAtlasObject: (attrs: AtlasObjectAttributes) => ReturnType;
+			insertPlayerObject: (attrs: PlayerObjectAttributes) => ReturnType;
 		};
 	}
 }
@@ -113,5 +121,6 @@ export { ScoreNode } from "./nodes/ScoreNode";
 export { SelectorNode } from "./nodes/SelectorNode";
 export { StorageNBTNode } from "./nodes/StorageNBTNode";
 export { TranslateNode } from "./nodes/TranslateNode";
-export { ObjectNode } from "./nodes/ObjectNode";
+export { AtlasObjectNode } from "./nodes/AtlasObjectNode";
+export { PlayerObjectNode } from "./nodes/PlayerObjectNode";
 export { FontsExtension } from "./fonts";

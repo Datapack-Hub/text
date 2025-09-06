@@ -54,8 +54,14 @@ export type MinecraftText = {
 	keybind?: string;
 
 	selector?: string;
+
+	object?: string
 	atlas?: string;
 	sprite?: string;
+	player?: {
+		name?: string;
+	};
+	hat?: string;
 
 	color?: string;
 	shadow_color?: number | number[];
@@ -127,8 +133,14 @@ export type ExternalSources = {
 		selector: string;
 	};
 	object: {
+		object: string;
 		atlas: string;
 		sprite: string;
+		player: {
+			name: string;
+			id: string;
+		};
+		hat: boolean;
 	};
 };
 

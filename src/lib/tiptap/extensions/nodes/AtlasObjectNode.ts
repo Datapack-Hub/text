@@ -1,8 +1,8 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, ObjectAttributes } from "../index";
+import type { NodeOptions, AtlasObjectAttributes } from "../index";
 
-export const ObjectNode = Node.create<NodeOptions>({
-	name: "object",
+export const AtlasObjectNode = Node.create<NodeOptions>({
+	name: "atlas_object",
 
 	inline: true,
 	group: "inline",
@@ -14,7 +14,7 @@ export const ObjectNode = Node.create<NodeOptions>({
 		};
 	},
 
-	addAttributes(): ObjectAttributes {
+	addAttributes(): AtlasObjectAttributes {
 		return {
 			atlas: "",
 			sprite: "",
@@ -24,7 +24,7 @@ export const ObjectNode = Node.create<NodeOptions>({
 	parseHTML() {
 		return [
 			{
-				tag: "span[data-object-node]",
+				tag: "span[data-atlas-object-node]",
 			},
 		];
 	},
@@ -35,7 +35,7 @@ export const ObjectNode = Node.create<NodeOptions>({
 		return [
 			"span",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				"data-object-node": "true",
+				"data-atlas-object-node": "true",
 				contenteditable: "false",
 				style: `
             background-color: #18181b;
@@ -53,7 +53,7 @@ export const ObjectNode = Node.create<NodeOptions>({
 
 	addCommands() {
 		return {
-			insertObject:
+			insertAtlasObject:
 				(attrs) =>
 				({ commands }: CommandProps) => {
 					return commands.insertContent({

@@ -44,8 +44,14 @@
 			selector: "",
 		},
 		object: {
+			object: "",
 			atlas: "",
 			sprite: "",
+			player: {
+				name: "",
+				id:""
+			},
+			hat: true
 		},
 	});
 
@@ -383,6 +389,16 @@
 			Add Selector
 		</button>
 	{:else if customType === "object"}
+		<p class="mt-2">Object Type</p>
+		<select
+			bind:value={customValues.object.object}
+			class="rounded-md bg-zinc-900 p-2">
+			<option value="atlas">Atlas (sprite)</option>
+			<option value="player">Player Head</option>
+		</select>
+
+		
+		{#if customValues.object.object == "atlas"}
 		<p class="mt-2">Atlas</p>
 		<Combobox
 			items={defaultAtlases}
@@ -394,13 +410,14 @@
 			type="text"
 			class="rounded-md bg-zinc-900 p-2"
 			bind:value={customValues.object.sprite} />
+
 		<button
 			onclick={() => {
 				customDialog.close();
 				editor
 					.chain()
 					.focus()
-					.insertObject({
+					.insertAtlasObject({
 						atlas: customValues.object.atlas,
 						sprite: customValues.object.sprite,
 					})
@@ -409,5 +426,36 @@
 			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 			Add Object
 		</button>
+		{:else if customValues.object.object == "player"}
+		<p class="mt-2">Username</p>
+		<input
+			type="text"
+			class="rounded-md bg-zinc-900 p-2"
+			bind:value={customValues.object.player.name} />
+
+		<div class="mt-2 flex items-center space-x-2">
+			<CheckBox bind:value={customValues.object.hat} label="interpret" />
+			<label for="interpret"
+				>Render Hat (2nd skin layer)</label>
+		</div>
+
+		<button
+			onclick={() => {
+				customDialog.close();
+				editor
+					.chain()
+					.focus()
+					.insertPlayerObject({
+						player: {
+							name: customValues.object.player.name
+						},
+						hat: customValues.object.hat
+					})
+					.run();
+			}}
+			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+			Add Object
+		</button>
+		{/if}
 	{/if}
 </Modal>

@@ -15,7 +15,8 @@
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		ObjectNode,
+		AtlasObjectNode,
+		PlayerObjectNode
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -174,7 +175,8 @@
 				EntityNBTNode,
 				KeybindNode,
 				SelectorNode,
-				ObjectNode,
+				AtlasObjectNode,
+				PlayerObjectNode,
 				FontsExtension,
 				Placeholder.configure({
 					placeholder:
@@ -328,23 +330,15 @@
 
 	function removeAllNodes(editor: Editor | undefined, type: string) {
 		if (!editor) { return; }
-		editor.commands.command(({ tr, state }) => {
-			const nodeType = state.schema.nodes[type];
-			if (!nodeType) {
-				console.warn(`Node type "${type}" not found in schema.`);
-				return false;
+		let editor_json = editor.getJSON();
+		editor_json.content.forEach(paragraph => {
+			if (paragraph.content) {
+				paragraph.content = paragraph.content.filter(node => node.type !== type);
 			}
-
-			state.doc.descendants((node, pos) => {
-			if (node.type === nodeType) {
-				tr.delete(pos, pos + node.nodeSize);
-			}
-				return true;
-			});
-
-			editor.view.dispatch(tr);
-			return true;
 		});
+
+		editor?.commands.setContent(editor_json);
+		tiptapJSON = editor_json;
 	}
 
 	let versionPopupConfirmationVisible = $state(false);
@@ -365,7 +359,8 @@
 		temporaryVersionConfirmation = undefined;
 
 		if (version.index < 2) { // remove object keys
-			removeAllNodes(editor, "object")
+			removeAllNodes(editor, "atlas_object")
+			removeAllNodes(editor, "player_object")
 		}
 
 		tiptapJSON = editor!.getJSON();
@@ -586,70 +581,69 @@
 					</code>
 				</p>
 			</div>
-			{#if doesContentExist}
-				<div class="mt-2 flex items-center space-x-2 select-none">
-					<p class="font-lexend text-xs text-white/60">
-						click to change output settings:
-					</p>
+			<div class="mt-2 flex items-center space-x-2 select-none">
+				<p class="font-lexend text-xs text-white/60">
+					click to change output settings:
+				</p>
 
-					<div class="relative inline-block">
-						{#if versionPopup}
-						<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 w-[400px] shadow-md shadow-zinc-950 rounded-md z-10 flex flex-col space-y-1">
-							{#if versionPopupConfirmationVisible}
-							<div class="absolute w-full h-full bg-zinc-900 rounded-md px-4 py-4 backdrop-blur-md flex flex-col items-center">
-								<div class="m-auto flex flex-col">
-									<b>Warning:</b> 
-									<span>Changing to an earlier version could remove some elements of your text that are unsupported in this version.</span>
-									<div class="flex space-x-2 mt-2">
-										<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => changeOuptutVersion(temporaryVersionConfirmation, true)}>Change version</button>
-										<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => {
-											versionPopupConfirmationVisible = false;
-											temporaryVersionConfirmation = undefined;
-										}}>Cancel</button>
-									</div>
+				<div class="relative inline-block">
+					{#if versionPopup}
+					<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 w-[400px] shadow-md shadow-zinc-950 rounded-md z-10 flex flex-col space-y-1">
+						{#if versionPopupConfirmationVisible}
+						<div class="absolute w-full h-full bg-zinc-900 rounded-md px-4 py-4 backdrop-blur-md flex flex-col items-center">
+							<div class="m-auto flex flex-col">
+								<b>Warning:</b> 
+								<span>Changing to an earlier version could remove some elements of your text that are unsupported in this version.</span>
+								<div class="flex space-x-2 mt-2">
+									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => changeOuptutVersion(temporaryVersionConfirmation, true)}>Change version</button>
+									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => {
+										versionPopupConfirmationVisible = false;
+										temporaryVersionConfirmation = undefined;
+									}}>Cancel</button>
 								</div>
-							</div>
-							{/if}
-							<div class="px-2 py-2 space-y-1">
-								<div class="flex items-center ml-[0.3rem]">
-									<span class="w-1/4 text-sm">version</span>
-									<span class="w-3/4 text-sm">description</span>
-								</div>
-								{#each versions as v}
-								<button 
-								class="rounded-md bg-zinc-800 p-2 select-none hover:bg-zinc-700 text-left flex items-center w-full"
-								onclick={() => changeOuptutVersion(v)}>
-									<b class="w-1/4">{v.friendly}</b>
-									<span class="w-3/4 text-xs">{v.description}</span>
-								</button>
-								{/each}
-								<span class="ml-[0.3rem] text-xs text-zinc-400">* unreleased minecraft version</span>
 							</div>
 						</div>
 						{/if}
-
-						<button
-							class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-							aria-label="Click to toggle the output version."
-							onclick={() => {versionPopup = !versionPopup}}>{$outputVersion.friendly}</button>
+						<div class="px-2 py-2 space-y-1">
+							<div class="flex items-center ml-[0.3rem]">
+								<span class="w-1/4 text-sm">version</span>
+								<span class="w-3/4 text-sm">description</span>
+							</div>
+							{#each versions as v}
+							<button 
+							class="rounded-md bg-zinc-800 p-2 select-none hover:bg-zinc-700 text-left flex items-center w-full"
+							onclick={() => changeOuptutVersion(v)}>
+								<b class="w-1/4">{v.friendly}</b>
+								<span class="w-3/4 text-xs">{v.description}</span>
+							</button>
+							{/each}
+							<span class="ml-[0.3rem] text-xs text-zinc-400">* unreleased minecraft version</span>
+						</div>
 					</div>
-					
+					{/if}
+
 					<button
-						{@attach tooltip}
+					{@attach tooltip}
 						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-						aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
-						onclick={() => (shouldOptimise = !shouldOptimise)}
-						>{shouldOptimise ? "optimised" : "expanded"}</button>
-
-					<p class="font-lexend nomob text-xs text-white/60">•</p>
-
-					<button
-						class="font-lexend text-xs text-white/60 underline"
-						onclick={outputDialog?.open}>
-						other output formats
-					</button>
+						aria-label="Click to change the output version."
+						onclick={() => {versionPopup = !versionPopup}}>{$outputVersion.friendly}</button>
 				</div>
-			{/if}
+				
+				<button
+					{@attach tooltip}
+					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+					aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
+					onclick={() => (shouldOptimise = !shouldOptimise)}
+					>{shouldOptimise ? "optimised" : "expanded"}</button>
+
+				<p class="font-lexend nomob text-xs text-white/60">•</p>
+
+				<button
+					class="font-lexend text-xs text-white/60 underline"
+					onclick={outputDialog?.open}>
+					other output formats
+				</button>
+			</div>
 		</div>
 	</div>
 </div>

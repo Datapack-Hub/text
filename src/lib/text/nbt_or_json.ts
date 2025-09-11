@@ -12,6 +12,10 @@ import {
 	trueMarkOrUndefined,
 	unescapeUnicode,
 } from "./general";
+import { outputVersion } from "$lib/stores";
+import { get } from "svelte/store";
+
+let exportVersion = get(outputVersion)
 
 const styleProps = [
 	"color",
@@ -34,15 +38,16 @@ const styleProps = [
  * @param current current text component
  * @param c the current editor JSON
  * @param includeInteractivity should it have click and hover events
- * @param exportVersion the version to export to
+ * @param outputVersion the version to export to
  * @returns the current component with new properties
  */
 export function addTypeSpecificValues(
 	current: MinecraftText,
 	c: JSONContent,
 	includeInteractivity = true,
-	exportVersion: "new" | "old" = "new",
 ) {
+	exportVersion = get(outputVersion)
+
 	switch (c.type) {
 		case "text":
 			current.text = unescapeUnicode(c.text!);
@@ -74,19 +79,42 @@ export function addTypeSpecificValues(
 		case "keybind":
 			current.keybind = c.attrs?.key;
 			break;
+		case "atlas_object":
+			if (exportVersion.index >= 2) {
+				current.object = "atlas"
+				current.atlas = c.attrs?.atlas;
+				current.sprite = c.attrs?.sprite;
+
+				current.bold = undefined;
+				current.italic = undefined;
+			} else {
+				current.text = ""
+			}
+			break;
+		case "player_object":
+			if (exportVersion.index >= 2) {
+				current.object = "player"
+				current.player = {
+					name: c.attrs?.player.name
+				}
+				current.hat = c.attrs?.hat;
+
+				current.bold = undefined;
+				current.italic = undefined;
+			} else {
+				current.text = ""
+			}
+			break;
 		case "selector":
 			current.selector = c.attrs?.selector;
 			break;
 	}
 
 	if (includeInteractivity) {
-		switch (exportVersion) {
-			case "new":
-				newApplyInteractiveValues(current, c);
-				break;
-			case "old":
-				oldApplyInteractiveValues(current, c);
-				break;
+		if (exportVersion.index >= 1) {
+			newApplyInteractiveValues(current, c);
+		} else {
+			oldApplyInteractiveValues(current, c);
 		}
 	}
 
@@ -311,18 +339,19 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	return out;
 }
 
+
 /**
  * Converts the JSON content of the editor to an NBT string.
  */
 export function convert(
 	jsonContent: JSONContent,
 	exportType: "standard" | "item_lore" = "standard",
-	exportVersion: "new" | "old" = "new",
 	optimise: boolean,
 	force_json: boolean = false,
 ): string {
-	let out = translateJSON(jsonContent, { exportVersion, exportType, optimise });
-	if (exportVersion == "new" && !force_json) {
+	exportVersion = get(outputVersion)
+	let out = translateJSON(jsonContent, { exportType, optimise });
+	if (exportVersion.index >= 1 && !force_json) {
 		// only remove strings
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
 			match.replace(/"/g, ""),
@@ -368,7 +397,6 @@ export function translateJSON(
 					current,
 					c,
 					true,
-					options.exportVersion,
 				);
 				data.push(current);
 			}
@@ -418,7 +446,6 @@ export function translateJSON(
 					currentComponent,
 					c,
 					false,
-					options.exportVersion,
 				);
 				currentLine.push(currentComponent);
 			}

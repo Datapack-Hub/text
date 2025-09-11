@@ -15,11 +15,13 @@
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
+		AtlasObjectNode,
+		PlayerObjectNode
 	} from "$lib/tiptap/extensions/index";
 	// Components
-	import MiniEditor from "$lib/components/MiniEditor.svelte";
-	import MiniRenderer from "$lib/components/MiniRenderer.svelte";
 	import Modal from "$lib/components/Modal.svelte";
+	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
+	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
@@ -48,15 +50,15 @@
 
 	import { page } from "$app/state";
 
-	import TextStyleButtons from "$lib/components/TextStyleButtons.svelte";
+	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
 	import { colorMap } from "$lib/text/general";
 
-	import ToolbarButton from "$lib/components/ToolbarButton.svelte";
+	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
-	import { translateMOTD } from "$lib/text/motd";
-	import ExportModal from "$lib/components/modals/ExportModal.svelte";
+	import { versions, type Version } from "$lib/types";
+	import { outputVersion } from "$lib/stores";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -66,11 +68,11 @@
 	let colorDialog: Modal = $state()!;
 
 	let outputDialog: Modal = $state()!;
-	let outputVersion: "new" | "old" = $state("new");
+	let versionPopup: boolean = $state(false);
 
 	let doesContentExist: boolean = $state(false);
 	let shouldOptimise = $state(true);
-	
+
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
@@ -173,6 +175,8 @@
 				EntityNBTNode,
 				KeybindNode,
 				SelectorNode,
+				AtlasObjectNode,
+				PlayerObjectNode,
 				FontsExtension,
 				Placeholder.configure({
 					placeholder:
@@ -324,19 +328,42 @@
 		}
 	}
 
-	function getTextComponentCount() {
-		const components = JSON.parse(
-			translateJSON(editor!.getJSON(), {
-				exportType: "standard",
-				indent: false,
-				exportVersion: outputVersion,
-				optimise: shouldOptimise,
-			}),
-		);
-		if (Array.isArray(components)) {
-			return components.length;
+	function removeAllNodes(editor: Editor | undefined, type: string) {
+		if (!editor) { return; }
+		let editor_json = editor.getJSON();
+		editor_json.content.forEach(paragraph => {
+			if (paragraph.content) {
+				paragraph.content = paragraph.content.filter(node => node.type !== type);
+			}
+		});
+
+		editor?.commands.setContent(editor_json);
+		tiptapJSON = editor_json;
+	}
+
+	let versionPopupConfirmationVisible = $state(false);
+	let temporaryVersionConfirmation: Version | undefined = $state()
+
+	function changeOuptutVersion(version: Version | undefined, confirm = false) {
+		if (!version) { return; }
+
+		if ($outputVersion.index > version.index && confirm == false) {
+			versionPopupConfirmationVisible = true;
+			temporaryVersionConfirmation = version
+			return;
 		}
-		return 1;
+
+		outputVersion.set(version)
+		versionPopup = false;
+		versionPopupConfirmationVisible = false;
+		temporaryVersionConfirmation = undefined;
+
+		if (version.index < 2) { // remove object keys
+			removeAllNodes(editor, "atlas_object")
+			removeAllNodes(editor, "player_object")
+		}
+
+		tiptapJSON = editor!.getJSON();
 	}
 </script>
 
@@ -533,7 +560,6 @@
 							convert(
 								editor!.getJSON(),
 								"standard",
-								outputVersion,
 								shouldOptimise,
 							),
 						);
@@ -550,56 +576,74 @@
 					<code id="outputbox" class="inline break-all">
 						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
 						{editor
-							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
+							? convert(tiptapJSON!, "standard", shouldOptimise)
 							: "Loading..."}
 					</code>
 				</p>
 			</div>
-			{#if doesContentExist}
-				<div class="mt-2 flex items-center space-x-2 select-none">
-					<p class="font-lexend nomob text-xs text-white/60">
-						{editor
-							? convert(tiptapJSON!, "standard", outputVersion, shouldOptimise)
-									.length
-							: 0} characters
-					</p>
-					<p class="font-lexend nomob text-xs text-white/60">
-						{getTextComponentCount()} components
-					</p>
+			<div class="mt-2 flex items-center space-x-2 select-none">
+				<p class="font-lexend text-xs text-white/60">
+					click to change output settings:
+				</p>
 
-					<p class="font-lexend nomob text-xs text-white/60">•</p>
+				<div class="relative inline-block">
+					{#if versionPopup}
+					<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 w-[400px] shadow-md shadow-zinc-950 rounded-md z-10 flex flex-col space-y-1">
+						{#if versionPopupConfirmationVisible}
+						<div class="absolute w-full h-full bg-zinc-900 rounded-md px-4 py-4 backdrop-blur-md flex flex-col items-center">
+							<div class="m-auto flex flex-col">
+								<b>Warning:</b> 
+								<span>Changing to an earlier version could remove some elements of your text that are unsupported in this version.</span>
+								<div class="flex space-x-2 mt-2">
+									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => changeOuptutVersion(temporaryVersionConfirmation, true)}>Change version</button>
+									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => {
+										versionPopupConfirmationVisible = false;
+										temporaryVersionConfirmation = undefined;
+									}}>Cancel</button>
+								</div>
+							</div>
+						</div>
+						{/if}
+						<div class="px-2 py-2 space-y-1">
+							<div class="flex items-center ml-[0.3rem]">
+								<span class="w-1/4 text-sm">version</span>
+								<span class="w-3/4 text-sm">description</span>
+							</div>
+							{#each versions as v}
+							<button 
+							class="rounded-md bg-zinc-800 p-2 select-none hover:bg-zinc-700 text-left flex items-center w-full"
+							onclick={() => changeOuptutVersion(v)}>
+								<b class="w-1/4">{v.friendly}</b>
+								<span class="w-3/4 text-xs">{v.description}</span>
+							</button>
+							{/each}
+							<span class="ml-[0.3rem] text-xs text-zinc-400">* unreleased minecraft version</span>
+						</div>
+					</div>
+					{/if}
 
-					<p class="font-lexend text-xs text-white/60">
-						click to change output settings:
-					</p>
 					<button
-						{@attach tooltip}
+					{@attach tooltip}
 						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-						aria-label="Click to toggle the output version. 1.21.5 drastically changed the format of text components, so make sure you select the correct version."
-						onclick={() => {
-							const ov = outputVersion;
-							if (ov == "new") {
-								outputVersion = "old";
-							} else {
-								outputVersion = "new";
-							}
-						}}>{outputVersion == "new" ? "1.21.5+" : "pre 1.21.5"}</button>
-					<button
-						{@attach tooltip}
-						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-						aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
-						onclick={() => (shouldOptimise = !shouldOptimise)}
-						>{shouldOptimise ? "optimised" : "expanded"}</button>
-
-					<p class="font-lexend nomob text-xs text-white/60">•</p>
-
-					<button
-						class="font-lexend text-xs text-white/60 underline"
-						onclick={outputDialog?.open}>
-						other output formats
-					</button>
+						aria-label="Click to change the output version."
+						onclick={() => {versionPopup = !versionPopup}}>{$outputVersion.friendly}</button>
 				</div>
-			{/if}
+				
+				<button
+					{@attach tooltip}
+					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+					aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
+					onclick={() => (shouldOptimise = !shouldOptimise)}
+					>{shouldOptimise ? "optimised" : "expanded"}</button>
+
+				<p class="font-lexend nomob text-xs text-white/60">•</p>
+
+				<button
+					class="font-lexend text-xs text-white/60 underline"
+					onclick={outputDialog?.open}>
+					other output formats
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
@@ -667,7 +711,7 @@
 	</Modal>
 
 	{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
-		<modal.default bind:customDialog bind:customType {editor} {outputVersion} />
+		<modal.default bind:customDialog bind:customType {editor} />
 	{/await}
 
 	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
@@ -724,7 +768,6 @@
 	{#await import("$lib/components/modals/ExportModal.svelte") then modal}
 		<modal.default
 			bind:outputDialog
-			bind:outputVersion
 			{editor}
 			{recentlyCopied} />
 	{/await}

@@ -4,15 +4,20 @@
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import { TextStyle } from "@tiptap/extension-text-style";
-	import Underline from "@tiptap/extension-underline";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
 
 	import IconColor from "~icons/tabler/palette";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import { convertToTextOrEmpty, snbtToDocument } from "../text/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt";
 
+	import {
+		colorMap,
+		defaultColorLUT,
+		trueMarkOrUndefined,
+	} from "$lib/text/general";
+	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
 	import {
 		ClickEventMark,
 		FontsExtension,
@@ -21,12 +26,6 @@
 		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
-	import {
-		colorMap,
-		defaultColorLUT,
-		trueMarkOrUndefined,
-	} from "$lib/text/general";
-	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
 
 	let {
 		value = $bindable(),
@@ -42,7 +41,17 @@
 		editor = new Editor({
 			element: element,
 			extensions: [
-				
+				StarterKit,
+				Color,
+				TextStyle,
+				Obfuscation,
+				ClickEventMark,
+				HoverEventMark,
+				ShadowColorMark,
+				FontsExtension,
+				Placeholder.configure({
+					placeholder: placeholder,
+				}),
 			],
 			onTransaction: ({ editor: newEditor }) => {
 				// force re-render so `editor.isActive` works as expected

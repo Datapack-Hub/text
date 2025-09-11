@@ -1,8 +1,9 @@
 import { addTypeSpecificValues, translateJSON } from "$lib/text/nbt_or_json";
-import type { MinecraftText, TranslateOptions } from "$lib/types";
+import { versions, type MinecraftText, type TranslateOptions } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
+import { outputVersion } from "$lib/stores";
 
 describe("translate", () => {
 	it("should return a basic string", () => {
@@ -32,7 +33,6 @@ describe("translate", () => {
 
 	const baseOptions: TranslateOptions = {
 		exportType: "standard",
-		exportVersion: "new",
 		optimise: false,
 		indent: false,
 		indentSize: 2,
@@ -146,9 +146,9 @@ describe("translate", () => {
 		const json: JSONContent = (await readTestJSONFile(
 			"clean/json/interactives_tiptap.json",
 		)) as JSONContent;
+		outputVersion.set(versions[0])
 		const result = translateJSON(json, {
 			...baseOptions,
-			exportVersion: "old",
 		});
 		expect(JSON.parse(result)).toHaveProperty("[1].clickEvent");
 		expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");

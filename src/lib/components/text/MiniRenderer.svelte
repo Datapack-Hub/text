@@ -1,24 +1,23 @@
 <script lang="ts">
-	import { Editor } from "@tiptap/core";
-	import Color from "@tiptap/extension-color";
-	import TextStyle from "@tiptap/extension-text-style";
-	import Underline from "@tiptap/extension-underline";
-	import StarterKit from "@tiptap/starter-kit";
-	import { onMount } from "svelte";
 	import {
-		Obfuscation,
 		BlockNBTNode,
+		ClickEventMark,
 		EntityNBTNode,
+		FontsExtension,
+		HoverEventMark,
 		KeybindNode,
+		Obfuscation,
 		ScoreNode,
 		SelectorNode,
+		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		ShadowColorMark,
-		ClickEventMark,
-		HoverEventMark,
-		FontsExtension,
 	} from "$lib/tiptap/extensions/index";
+	import { Editor } from "@tiptap/core";
+	import Color from "@tiptap/extension-color";
+	import { TextStyle } from "@tiptap/extension-text-style";
+	import StarterKit from "@tiptap/starter-kit";
+	import { onMount } from "svelte";
 
 	let { value } = $props();
 
@@ -29,7 +28,6 @@
 			element: element,
 			extensions: [
 				StarterKit,
-				Underline,
 				Color,
 				TextStyle,
 				Obfuscation,

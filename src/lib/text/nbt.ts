@@ -194,10 +194,20 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 		};
 	} else if (source.atlas) {
 		finalText = {
-			type: "object",
+			type: "atlas_object",
 			attrs: {
 				atlas: source.atlas,
 				sprite: source.sprite,
+			},
+		};
+	} else if (source.player) {
+		finalText = {
+			type: "player_object",
+			attrs: {
+				hat: source.hat || true,
+				player: {
+					name: source.player.name
+				},
 			},
 		};
 	} else {

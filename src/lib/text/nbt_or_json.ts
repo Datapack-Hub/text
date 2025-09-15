@@ -15,7 +15,7 @@ import {
 import { outputVersion } from "$lib/stores";
 import { get } from "svelte/store";
 
-let exportVersion = get(outputVersion)
+let exportVersion = get(outputVersion);
 
 const styleProps = [
 	"color",
@@ -46,7 +46,7 @@ export function addTypeSpecificValues(
 	c: JSONContent,
 	includeInteractivity = true,
 ) {
-	exportVersion = get(outputVersion)
+	exportVersion = get(outputVersion);
 
 	switch (c.type) {
 		case "text":
@@ -81,28 +81,28 @@ export function addTypeSpecificValues(
 			break;
 		case "atlas_object":
 			if (exportVersion.index >= 2) {
-				current.object = "atlas"
+				current.object = "atlas";
 				current.atlas = c.attrs?.atlas;
 				current.sprite = c.attrs?.sprite;
 
 				current.bold = undefined;
 				current.italic = undefined;
 			} else {
-				current.text = ""
+				current.text = "";
 			}
 			break;
 		case "player_object":
 			if (exportVersion.index >= 2) {
-				current.object = "player"
+				current.object = "player";
 				current.player = {
-					name: c.attrs?.player.name
-				}
+					name: c.attrs?.player.name,
+				};
 				current.hat = c.attrs?.hat;
 
 				current.bold = undefined;
 				current.italic = undefined;
 			} else {
-				current.text = ""
+				current.text = "";
 			}
 			break;
 		case "selector":
@@ -339,7 +339,6 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 	return out;
 }
 
-
 /**
  * Converts the JSON content of the editor to an NBT string.
  */
@@ -349,7 +348,7 @@ export function convert(
 	optimise: boolean,
 	force_json: boolean = false,
 ): string {
-	exportVersion = get(outputVersion)
+	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
 	if (exportVersion.index >= 1 && !force_json) {
 		// only remove strings
@@ -393,11 +392,7 @@ export function translateJSON(
 					);
 				}
 
-				current = addTypeSpecificValues(
-					current,
-					c,
-					true,
-				);
+				current = addTypeSpecificValues(current, c, true);
 				data.push(current);
 			}
 			if (i < paragraphs.length - 1) data.push("\n");
@@ -442,11 +437,7 @@ export function translateJSON(
 					font: c.marks?.at(0)?.attrs?.font || undefined,
 				};
 
-				currentComponent = addTypeSpecificValues(
-					currentComponent,
-					c,
-					false,
-				);
+				currentComponent = addTypeSpecificValues(currentComponent, c, false);
 				currentLine.push(currentComponent);
 			}
 

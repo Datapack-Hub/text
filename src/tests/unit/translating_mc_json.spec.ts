@@ -1,5 +1,9 @@
 import { addTypeSpecificValues, translateJSON } from "$lib/text/nbt_or_json";
-import { versions, type MinecraftText, type TranslateOptions } from "$lib/types";
+import {
+	versions,
+	type MinecraftText,
+	type TranslateOptions,
+} from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
@@ -146,7 +150,7 @@ describe("translate", () => {
 		const json: JSONContent = (await readTestJSONFile(
 			"clean/json/interactives_tiptap.json",
 		)) as JSONContent;
-		outputVersion.set(versions[0])
+		outputVersion.set(versions[0]);
 		const result = translateJSON(json, {
 			...baseOptions,
 		});

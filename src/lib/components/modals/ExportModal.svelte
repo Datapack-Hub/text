@@ -32,12 +32,7 @@
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						convert(
-							editor.getJSON(),
-							"standard",
-							shouldOptimise,
-							exportAsJSON,
-						),
+						convert(editor.getJSON(), "standard", shouldOptimise, exportAsJSON),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -46,12 +41,7 @@
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto">
 				{editor
-					? convert(
-							editor.getJSON(),
-							"standard",
-							shouldOptimise,
-							exportAsJSON,
-						)
+					? convert(editor.getJSON(), "standard", shouldOptimise, exportAsJSON)
 					: "Loading..."}
 			</code>
 		</div>
@@ -71,12 +61,7 @@
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto"
 				><span class="text-white/35">[lore=</span>{editor
-					? convert(
-							editor.getJSON(),
-							"item_lore",
-							shouldOptimise,
-							exportAsJSON,
-						)
+					? convert(editor.getJSON(), "item_lore", shouldOptimise, exportAsJSON)
 					: "Loading..."}<span class="text-white/35">]</span>
 			</code>
 		</div>

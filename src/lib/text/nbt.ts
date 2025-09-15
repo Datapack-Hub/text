@@ -206,7 +206,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 			attrs: {
 				hat: source.hat || true,
 				player: {
-					name: source.player.name
+					name: source.player.name,
 				},
 			},
 		};

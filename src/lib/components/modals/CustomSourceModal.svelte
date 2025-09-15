@@ -49,9 +49,9 @@
 			sprite: "",
 			player: {
 				name: "",
-				id:""
+				id: "",
 			},
-			hat: true
+			hat: true,
 		},
 	});
 
@@ -117,14 +117,14 @@
 				<span>Keybind</span>
 			</button>
 			{#if $outputVersion.index >= 2}
-			<button
-				class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-				onclick={() => {
-					customType = "object";
-				}}>
-				<IconObject class="text-2xl" />
-				<span>Object</span>
-			</button>
+				<button
+					class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
+					onclick={() => {
+						customType = "object";
+					}}>
+					<IconObject class="text-2xl" />
+					<span>Object</span>
+				</button>
 			{/if}
 		</div>
 	{:else}
@@ -397,65 +397,63 @@
 			<option value="player">Player Head</option>
 		</select>
 
-		
 		{#if customValues.object.object == "atlas"}
-		<p class="mt-2">Atlas</p>
-		<Combobox
-			items={defaultAtlases}
-			type="single"
-			inputProps={{ placeholder: "Type an alias or use a default..." }}
-			bind:value={customValues.object.atlas} />
-		<p class="mt-2">Sprite</p>
-		<input
-			type="text"
-			class="rounded-md bg-zinc-900 p-2"
-			bind:value={customValues.object.sprite} />
+			<p class="mt-2">Atlas</p>
+			<Combobox
+				items={defaultAtlases}
+				type="single"
+				inputProps={{ placeholder: "Type an alias or use a default..." }}
+				bind:value={customValues.object.atlas} />
+			<p class="mt-2">Sprite</p>
+			<input
+				type="text"
+				class="rounded-md bg-zinc-900 p-2"
+				bind:value={customValues.object.sprite} />
 
-		<button
-			onclick={() => {
-				customDialog.close();
-				editor
-					.chain()
-					.focus()
-					.insertAtlasObject({
-						atlas: customValues.object.atlas,
-						sprite: customValues.object.sprite,
-					})
-					.run();
-			}}
-			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-			Add Object
-		</button>
+			<button
+				onclick={() => {
+					customDialog.close();
+					editor
+						.chain()
+						.focus()
+						.insertAtlasObject({
+							atlas: customValues.object.atlas,
+							sprite: customValues.object.sprite,
+						})
+						.run();
+				}}
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+				Add Object
+			</button>
 		{:else if customValues.object.object == "player"}
-		<p class="mt-2">Username</p>
-		<input
-			type="text"
-			class="rounded-md bg-zinc-900 p-2"
-			bind:value={customValues.object.player.name} />
+			<p class="mt-2">Username</p>
+			<input
+				type="text"
+				class="rounded-md bg-zinc-900 p-2"
+				bind:value={customValues.object.player.name} />
 
-		<div class="mt-2 flex items-center space-x-2">
-			<CheckBox bind:value={customValues.object.hat} label="interpret" />
-			<label for="interpret"
-				>Render Hat (2nd skin layer)</label>
-		</div>
+			<div class="mt-2 flex items-center space-x-2">
+				<CheckBox bind:value={customValues.object.hat} label="interpret" />
+				<label for="interpret">Render Hat (2nd skin layer)</label>
+			</div>
 
-		<button
-			onclick={() => {
-				customDialog.close();
-				editor
-					.chain()
-					.focus()
-					.insertPlayerObject({
-						player: {
-							name: customValues.object.player.name
-						},
-						hat: customValues.object.hat
-					})
-					.run();
-			}}
-			class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-			Add Object
-		</button>
+			<button
+				onclick={() => {
+					customDialog.close();
+					editor
+						.chain()
+						.focus()
+						.insertPlayerObject({
+							player: {
+								name: customValues.object.player.name,
+							},
+							hat: customValues.object.hat,
+						})
+						.run();
+				}}
+				class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+				Add Object
+			</button>
 		{/if}
 	{/if}
 </Modal>

@@ -17,9 +17,9 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 	addAttributes(): PlayerObjectAttributes {
 		return {
 			player: {
-				name: ""
+				name: "",
 			},
-			hat: true
+			hat: true,
 		};
 	},
 
@@ -32,7 +32,7 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 	},
 
 	renderHTML({ HTMLAttributes, node }) {
-		const { player, hat } = node.attrs;
+		const { player } = node.attrs;
 
 		return [
 			"span",

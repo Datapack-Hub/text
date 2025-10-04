@@ -15,7 +15,7 @@ export const versions = [
 		index: 1
 	},
 	{
-		friendly: "1.21.9*", 
+		friendly: "1.21.9+", 
 		description: "'object' type added, allowing you to use non-character sprites",
 		index: 2
 	},

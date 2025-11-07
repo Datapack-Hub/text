@@ -16,7 +16,7 @@
 		StorageNBTNode,
 		TranslateNode,
 		AtlasObjectNode,
-		PlayerObjectNode
+		PlayerObjectNode,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -119,14 +119,14 @@
 			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
 			tiptapJSON = [];
-			localStorage.setItem("content", "");
+			localStorage.setItem("content", "[]");
 		}
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
 		} else {
 			snapshots = [];
-			localStorage.setItem("snapshots", "");
+			localStorage.setItem("snapshots", "[]");
 		}
 
 		const db = await openDataStore();
@@ -186,9 +186,7 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
-				editor!.getText() === ""
-					? (doesContentExist = false)
-					: (doesContentExist = true);
+				doesContentExist = !(editor!.getText() === "");
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();
@@ -329,11 +327,15 @@
 	}
 
 	function removeAllNodes(editor: Editor | undefined, type: string) {
-		if (!editor) { return; }
+		if (!editor) {
+			return;
+		}
 		let editor_json = editor.getJSON();
-		editor_json.content.forEach(paragraph => {
+		editor_json.content.forEach((paragraph) => {
 			if (paragraph.content) {
-				paragraph.content = paragraph.content.filter(node => node.type !== type);
+				paragraph.content = paragraph.content.filter(
+					(node) => node.type !== type,
+				);
 			}
 		});
 
@@ -342,25 +344,28 @@
 	}
 
 	let versionPopupConfirmationVisible = $state(false);
-	let temporaryVersionConfirmation: Version | undefined = $state()
+	let temporaryVersionConfirmation: Version | undefined = $state();
 
 	function changeOuptutVersion(version: Version | undefined, confirm = false) {
-		if (!version) { return; }
-
-		if ($outputVersion.index > version.index && confirm == false) {
-			versionPopupConfirmationVisible = true;
-			temporaryVersionConfirmation = version
+		if (!version) {
 			return;
 		}
 
-		outputVersion.set(version)
+		if ($outputVersion.index > version.index && confirm == false) {
+			versionPopupConfirmationVisible = true;
+			temporaryVersionConfirmation = version;
+			return;
+		}
+
+		outputVersion.set(version);
 		versionPopup = false;
 		versionPopupConfirmationVisible = false;
 		temporaryVersionConfirmation = undefined;
 
-		if (version.index < 2) { // remove object keys
-			removeAllNodes(editor, "atlas_object")
-			removeAllNodes(editor, "player_object")
+		if (version.index < 2) {
+			// remove object keys
+			removeAllNodes(editor, "atlas_object");
+			removeAllNodes(editor, "player_object");
 		}
 
 		tiptapJSON = editor!.getJSON();
@@ -391,7 +396,7 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3"
 			onclick={loadDialog?.open}>Load</button>
-		<div class="flex-grow"></div>
+		<div class="grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
 			class="nomob flex items-center px-3 py-2 hover:bg-white/3">Discord</a>
@@ -520,7 +525,7 @@
 				ariaLabel="Redo"
 				Icon={IconRedo} />
 
-			<div class="flex-grow"></div>
+			<div class="grow"></div>
 
 			<button
 				{@attach tooltip}
@@ -536,7 +541,7 @@
 	</div>
 
 	<div
-		class="font-minecraft w-full flex-grow overflow-auto bg-zinc-800 first:focus:outline-none"
+		class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
@@ -557,11 +562,7 @@
 					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
 						navigator.clipboard.writeText(
-							convert(
-								editor!.getJSON(),
-								"standard",
-								shouldOptimise,
-							),
+							convert(editor!.getJSON(), "standard", shouldOptimise),
 						);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
@@ -588,47 +589,62 @@
 
 				<div class="relative inline-block">
 					{#if versionPopup}
-					<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 w-[400px] shadow-md shadow-zinc-950 rounded-md z-10 flex flex-col space-y-1">
-						{#if versionPopupConfirmationVisible}
-						<div class="absolute w-full h-full bg-zinc-900 rounded-md px-4 py-4 backdrop-blur-md flex flex-col items-center">
-							<div class="m-auto flex flex-col">
-								<b>Warning:</b> 
-								<span>Changing to an earlier version could remove some elements of your text that are unsupported in this version.</span>
-								<div class="flex space-x-2 mt-2">
-									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => changeOuptutVersion(temporaryVersionConfirmation, true)}>Change version</button>
-									<button class="bg-zinc-800 px-2 py-1 rounded-md hover:bg-zinc-700" onclick={() => {
-										versionPopupConfirmationVisible = false;
-										temporaryVersionConfirmation = undefined;
-									}}>Cancel</button>
+						<div
+							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-[400px] -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
+							{#if versionPopupConfirmationVisible}
+								<div
+									class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">
+									<div class="m-auto flex flex-col">
+										<b>Warning:</b>
+										<span
+											>Changing to an earlier version could remove some elements
+											of your text that are unsupported in this version.</span>
+										<div class="mt-2 flex space-x-2">
+											<button
+												class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
+												onclick={() =>
+													changeOuptutVersion(
+														temporaryVersionConfirmation,
+														true,
+													)}>Change version</button>
+											<button
+												class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
+												onclick={() => {
+													versionPopupConfirmationVisible = false;
+													temporaryVersionConfirmation = undefined;
+												}}>Cancel</button>
+										</div>
+									</div>
 								</div>
+							{/if}
+							<div class="space-y-1 px-2 py-2">
+								<div class="ml-[0.3rem] flex items-center">
+									<span class="w-1/4 text-sm">version</span>
+									<span class="w-3/4 text-sm">description</span>
+								</div>
+								{#each versions as v}
+									<button
+										class="flex w-full items-center rounded-md bg-zinc-800 p-2 text-left select-none hover:bg-zinc-700"
+										onclick={() => changeOuptutVersion(v)}>
+										<b class="w-1/4">{v.friendly}</b>
+										<span class="w-3/4 text-xs">{v.description}</span>
+									</button>
+								{/each}
+								<span class="ml-[0.3rem] text-xs text-zinc-400"
+									>* unreleased minecraft version</span>
 							</div>
 						</div>
-						{/if}
-						<div class="px-2 py-2 space-y-1">
-							<div class="flex items-center ml-[0.3rem]">
-								<span class="w-1/4 text-sm">version</span>
-								<span class="w-3/4 text-sm">description</span>
-							</div>
-							{#each versions as v}
-							<button 
-							class="rounded-md bg-zinc-800 p-2 select-none hover:bg-zinc-700 text-left flex items-center w-full"
-							onclick={() => changeOuptutVersion(v)}>
-								<b class="w-1/4">{v.friendly}</b>
-								<span class="w-3/4 text-xs">{v.description}</span>
-							</button>
-							{/each}
-							<span class="ml-[0.3rem] text-xs text-zinc-400">* unreleased minecraft version</span>
-						</div>
-					</div>
 					{/if}
 
 					<button
-					{@attach tooltip}
+						{@attach tooltip}
 						class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
 						aria-label="Click to change the output version."
-						onclick={() => {versionPopup = !versionPopup}}>{$outputVersion.friendly}</button>
+						onclick={() => {
+							versionPopup = !versionPopup;
+						}}>{$outputVersion.friendly}</button>
 				</div>
-				
+
 				<button
 					{@attach tooltip}
 					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
@@ -656,8 +672,7 @@
 			<div class="z-50 m-auto w-[95%] py-4 md:w-[70%] 2xl:w-[50%]">
 				<div class="flex items-center space-x-2 rounded-t-lg bg-zinc-900 p-4">
 					<img src="/dph.svg" class="h-5" alt="logo" />
-					<span class="flex-grow text-lg font-bold"
-						>Datapack Hub Text Editor</span>
+					<span class="grow text-lg font-bold">Datapack Hub Text Editor</span>
 				</div>
 				<div class="flex flex-col space-y-2 rounded-b-lg bg-zinc-800 p-4">
 					<p>
@@ -766,10 +781,7 @@
 	</Modal>
 
 	{#await import("$lib/components/modals/ExportModal.svelte") then modal}
-		<modal.default
-			bind:outputDialog
-			{editor}
-			{recentlyCopied} />
+		<modal.default bind:outputDialog {editor} {recentlyCopied} />
 	{/await}
 
 	<Modal title="Import from NBT" bind:this={importDialog} key="I">

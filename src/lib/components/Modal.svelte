@@ -61,7 +61,7 @@
 					? 'w-[95%]!'
 					: ''} {flexible ? 'w-fit! max-w-[95%]' : ''} m-auto py-4">
 				<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
-					<span class="flex-grow text-lg font-bold">{title}</span>
+					<span class="grow text-lg font-bold">{title}</span>
 					<button aria-label="close" onclick={close}><IconClose /></button>
 				</div>
 				<div

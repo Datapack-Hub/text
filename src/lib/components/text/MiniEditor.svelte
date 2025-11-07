@@ -33,7 +33,7 @@
 		placeholder = "Write text here, and style it with the options above!",
 	} = $props();
 
-	let element: HTMLElement;
+	let element: HTMLElement = $state()!;
 	let editor: Editor | undefined = $state();
 	let color = $state("");
 
@@ -168,7 +168,7 @@
 	</div>
 
 	<div
-		class="font-minecraft w-full flex-grow rounded-b-md bg-black/30 first:focus:outline-none"
+		class="font-minecraft w-full grow rounded-b-md bg-black/30 first:focus:outline-none"
 		bind:this={element}>
 	</div>
 </div>

@@ -40,23 +40,27 @@
 			return;
 		}
 
-		for (const file of files) {
-			const type = await fileTypeFromBlob(file);
-
-			if (
-				!type ||
-				!["font/ttf", "font/otf", "font/woff", "font/woff2"].includes(type.mime)
-			) {
-				continue;
-			}
-
-			const fileName = crypto.randomUUID();
-			const font = new FontFace(fileName, await file.arrayBuffer());
-			document.fonts.add(font);
-			fontAlias = fileName;
-			await font.load();
-			fontData = file;
+		const file = files[0];
+		if (!file) {
+			return;
 		}
+
+		const type = await fileTypeFromBlob(file);
+
+		if (
+			!type ||
+			!["font/ttf", "font/otf", "font/woff", "font/woff2"].includes(type.mime)
+		) {
+			return;
+		}
+
+		const fileName = crypto.randomUUID();
+		const font = new FontFace(fileName, await file.arrayBuffer());
+		document.fonts.add(font);
+		fontAlias = fileName;
+		await font.load();
+		fontData = file;
+
 		step = 2;
 	}
 

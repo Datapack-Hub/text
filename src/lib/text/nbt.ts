@@ -23,6 +23,7 @@ export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 	}
 
 	baseDocument = fixBrokenNewLines(baseDocument);
+
 	return baseDocument;
 }
 
@@ -70,7 +71,6 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 				text: text,
 			},
 		];
-
 		return;
 	}
 
@@ -369,6 +369,11 @@ function fixBrokenNewLines(doc: JSONContent) {
 		let currentParagraph = [];
 
 		for (const child of node.content) {
+			if (child.type === "text" && child.text === "") {
+				// Remove empty text nodes
+				continue;
+			}
+
 			if (child.type !== "text" || !child.text!.includes("\n")) {
 				// No newline — add to current paragraph
 				currentParagraph.push(child);

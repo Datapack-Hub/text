@@ -119,14 +119,14 @@
 			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
 			tiptapJSON = [];
-			localStorage.setItem("content", "");
+			localStorage.setItem("content", "[]");
 		}
 
 		if (localStorage.getItem("snapshots")) {
 			snapshots = JSON.parse(localStorage.getItem("snapshots")!);
 		} else {
 			snapshots = [];
-			localStorage.setItem("snapshots", "");
+			localStorage.setItem("snapshots", "[]");
 		}
 
 		const db = await openDataStore();
@@ -186,9 +186,7 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
-				editor!.getText() === ""
-					? (doesContentExist = false)
-					: (doesContentExist = true);
+				doesContentExist = !(editor!.getText() === "");
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();
@@ -398,7 +396,7 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3"
 			onclick={loadDialog?.open}>Load</button>
-		<div class="flex-grow"></div>
+		<div class="grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
 			class="nomob flex items-center px-3 py-2 hover:bg-white/3">Discord</a>
@@ -527,7 +525,7 @@
 				ariaLabel="Redo"
 				Icon={IconRedo} />
 
-			<div class="flex-grow"></div>
+			<div class="grow"></div>
 
 			<button
 				{@attach tooltip}
@@ -543,7 +541,7 @@
 	</div>
 
 	<div
-		class="font-minecraft w-full flex-grow overflow-auto bg-zinc-800 first:focus:outline-none"
+		class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
 		spellcheck="false"
 		bind:this={element}>
 	</div>
@@ -674,8 +672,7 @@
 			<div class="z-50 m-auto w-[95%] py-4 md:w-[70%] 2xl:w-[50%]">
 				<div class="flex items-center space-x-2 rounded-t-lg bg-zinc-900 p-4">
 					<img src="/dph.svg" class="h-5" alt="logo" />
-					<span class="flex-grow text-lg font-bold"
-						>Datapack Hub Text Editor</span>
+					<span class="grow text-lg font-bold">Datapack Hub Text Editor</span>
 				</div>
 				<div class="flex flex-col space-y-2 rounded-b-lg bg-zinc-800 p-4">
 					<p>

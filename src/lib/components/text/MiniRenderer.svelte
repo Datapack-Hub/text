@@ -21,7 +21,7 @@
 
 	let { value } = $props();
 
-	let element: HTMLElement;
+	let element: HTMLElement = $state()!;
 
 	onMount(() => {
 		new Editor({

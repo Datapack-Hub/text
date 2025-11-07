@@ -19,7 +19,7 @@
 		<div class="flex flex-col space-y-1">
 			{#each gradientSteps ?? [] as _, i}
 				<div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
-					<div class="flex-grow">
+					<div class="grow">
 						<ColorPicker
 							bind:hex={gradientSteps[i]}
 							position="responsive"

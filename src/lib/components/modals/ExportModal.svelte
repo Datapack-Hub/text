@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
 	import { translateMOTD } from "$lib/text/motd";
-	import { convert, translateJSON } from "$lib/text/nbt_or_json";
+	import { convert, translateJSON } from "$lib/text/nbt/nbt_or_json";
 	import IconCopy from "~icons/tabler/copy";
 	import CheckBox from "../CheckBox.svelte";
 	import { outputVersion } from "$lib/stores";

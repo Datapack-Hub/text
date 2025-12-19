@@ -1,4 +1,7 @@
-import { addTypeSpecificValues, translateJSON } from "$lib/text/nbt_or_json";
+import {
+	addTypeSpecificValues,
+	translateJSON,
+} from "$lib/text/nbt/nbt_or_json";
 import {
 	versions,
 	type MinecraftText,

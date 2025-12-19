@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { convert, translateJSON } from "$lib/text/nbt_or_json";
+	import { convert } from "$lib/text/nbt/nbt_or_json";
 
 	import {
+		AtlasObjectNode,
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
@@ -10,13 +11,12 @@
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
+		PlayerObjectNode,
 		ScoreNode,
 		SelectorNode,
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		AtlasObjectNode,
-		PlayerObjectNode,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -24,7 +24,7 @@
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/nbt";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -47,18 +47,20 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
+	import IconDelete from "~icons/tabler/trash";
+	import IconLoad from "~icons/tabler/upload";
 
 	import { page } from "$app/state";
 
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
-	import { colorMap } from "$lib/text/general";
+	import { colorMap } from "$lib/text/utils";
 
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
+	import { outputVersion } from "$lib/stores";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-	import { outputVersion } from "$lib/stores";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -70,7 +72,9 @@
 	let outputDialog: Modal = $state()!;
 	let versionPopup: boolean = $state(false);
 
-	let doesContentExist: boolean = $state(false);
+	let doesContentExist: boolean = $derived(
+		editor ? !(editor.getText() === "") : false,
+	);
 	let shouldOptimise = $state(true);
 
 	// Import
@@ -107,14 +111,21 @@
 
 	let unicodeSelectorDialog: Modal = $state()!;
 
+	let finalOutput = $derived(
+		editor ? convert(tiptapJSON, "standard", shouldOptimise) : "Loading...",
+	);
+
 	function importToEditor() {
+		console.time("importToEditor");
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor?.commands.setContent(jsonContent);
 		tiptapJSON = jsonContent;
 		importDialog?.close();
+		console.timeEnd("importToEditor");
 	}
 
 	async function loadData() {
+		console.time("loadData");
 		if (localStorage.getItem("content")) {
 			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
@@ -128,6 +139,7 @@
 			snapshots = [];
 			localStorage.setItem("snapshots", "[]");
 		}
+		console.timeLog("loadData", "Loaded local storage");
 
 		const db = await openDataStore();
 		const fontStore = await db.getAll("fonts");
@@ -138,10 +150,14 @@
 			data: File;
 		};
 
-		fontStore.forEach(async ({ identifier, alias, data }: FontStoreSchema) => {
-			fontLUT.set(identifier, alias);
-			document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
-		});
+		await Promise.all(
+			fontStore.map(async ({ identifier, alias, data }: FontStoreSchema) => {
+				fontLUT.set(identifier, alias);
+				document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
+			}),
+		);
+		console.timeLog("loadData", "Loaded fonts from IndexedDB");
+		console.timeEnd("loadData");
 	}
 
 	onMount(async () => {
@@ -186,7 +202,6 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
-				doesContentExist = !(editor!.getText() === "");
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();
@@ -374,17 +389,20 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex h-screen max-h-screen flex-col">
+<main class="flex h-screen max-h-screen flex-col">
 	<div
 		class="flex w-full items-center bg-zinc-950 text-zinc-300"
 		style="font-family: Lexend">
 		<div class="flex items-center px-3 py-2 hover:bg-white/3">
-			<img src="/dph.svg" class="h-5" alt="logo" />
+			<img src="/dph.svg" class="size-5" alt="logo" height="20" width="20" />
 			<span class="nomob ml-3">Minecraft Text Editor</span>
 		</div>
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3"
 			onclick={importDialog?.open}>Import</button>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={loadDialog?.open}>Load</button>
 		{#if doesContentExist}
 			<button
 				class="flex items-center px-3 py-2 hover:bg-white/3"
@@ -393,9 +411,6 @@
 				class="flex items-center px-3 py-2 hover:bg-white/3"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3"
-			onclick={loadDialog?.open}>Load</button>
 		<div class="grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
@@ -561,9 +576,7 @@
 					{@attach tooltip}
 					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
-						navigator.clipboard.writeText(
-							convert(editor!.getJSON(), "standard", shouldOptimise),
-						);
+						navigator.clipboard.writeText(finalOutput);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
 					}}
@@ -576,9 +589,7 @@
 				<p>
 					<code id="outputbox" class="inline break-all">
 						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-						{editor
-							? convert(tiptapJSON!, "standard", shouldOptimise)
-							: "Loading..."}
+						{editor ? finalOutput : "Loading..."}
 					</code>
 				</p>
 			</div>
@@ -590,7 +601,7 @@
 				<div class="relative inline-block">
 					{#if versionPopup}
 						<div
-							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-[400px] -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
+							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-100 -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
 							{#if versionPopupConfirmationVisible}
 								<div
 									class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">
@@ -659,10 +670,16 @@
 					onclick={outputDialog?.open}>
 					other output formats
 				</button>
+
+				<p class="font-lexend nomob text-xs text-white/60">•</p>
+
+				<p class="font-lexend nomob text-xs text-white/60">
+					{finalOutput.length} characters
+				</p>
 			</div>
 		</div>
 	</div>
-</div>
+</main>
 
 <noscript>
 	<div class="absolute">
@@ -755,25 +772,29 @@
 				<p>You have not saved anything yet!</p>
 			{/if}
 			{#each snapshots as snapshot (snapshot)}
-				<div class="flex flex-col space-y-0">
+				<div class="flex flex-col">
 					<div class="rounded-t-md rounded-br-md bg-zinc-900">
 						<MiniRenderer value={snapshot} />
 					</div>
 					<div class="flex w-fit rounded-b-md bg-zinc-950">
 						<button
-							class="px-3 py-2 hover:bg-white/3"
+							{@attach tooltip}
+							aria-label="Load snapshot"
+							class="border-r border-zinc-800 px-3 py-2 hover:bg-white/3"
 							onclick={() => {
 								editor?.commands.setContent(snapshot);
 								editor?.commands.focus();
-							}}>Load</button>
+							}}><IconLoad /></button>
 						<button
+							{@attach tooltip}
+							aria-label="Delete snapshot"
 							class="px-3 py-2 hover:bg-white/3"
 							onclick={() => {
 								snapshots = snapshots.filter(
 									(_, index) => index !== snapshots.indexOf(snapshot),
 								);
 								localStorage.setItem("snapshots", JSON.stringify(snapshots));
-							}}>Delete</button>
+							}}><IconDelete /></button>
 					</div>
 				</div>
 			{/each}

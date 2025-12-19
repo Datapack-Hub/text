@@ -1,18 +1,39 @@
+import type { MinecraftText } from "$lib/types";
 import type { Editor, JSONContent } from "@tiptap/core";
 import { generateGradient } from "typescript-color-gradient";
 
+export const colorMap = [
+	{ name: "dark_red", value: "#AA0000", code: "4" },
+	{ name: "red", value: "#FF5555", code: "c" },
+	{ name: "gold", value: "#FFAA00", code: "6" },
+	{ name: "yellow", value: "#FFFF55", code: "e" },
+	{ name: "green", value: "#55FF55", code: "2" },
+	{ name: "dark_green", value: "#00AA00", code: "a" },
+	{ name: "aqua", value: "#55FFFF", code: "b" },
+	{ name: "dark_aqua", value: "#00AAAA", code: "3" },
+	{ name: "blue", value: "#5555FF", code: "1" },
+	{ name: "dark_blue", value: "#0000AA", code: "9" },
+	{ name: "dark_purple", value: "#AA00AA", code: "d" },
+	{ name: "light_purple", value: "#FF55FF", code: "5" },
+	{ name: "white", value: "#FFFFFF", code: "f" },
+	{ name: "gray", value: "#AAAAAA", code: "7" },
+	{ name: "dark_gray", value: "#555555", code: "8" },
+	{ name: "black", value: "#000000", code: "0" },
+];
+
 /**
+ * Returns true if the specified mark is present in the content's marks, otherwise undefined.
+ *
  * @param content the node to check
  * @param mark the mark to check
  * @returns the mark if true, undefined otherwise
  */
-
 export function trueMarkOrUndefined(
 	content: JSONContent,
 	mark: string,
 ): true | undefined {
-	const value = content.marks?.some((e) => e.type === mark);
-	return value === true ? value : undefined;
+	const value = content.marks?.some((e) => e.type === mark) || false;
+	return value ? value : undefined;
 }
 /**
  * A LUT to find the name of a color
@@ -124,21 +145,23 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 	chain.run();
 }
 
-export const colorMap = [
-	{ name: "dark_red", value: "#AA0000", code: "4" },
-	{ name: "red", value: "#FF5555", code: "c" },
-	{ name: "gold", value: "#FFAA00", code: "6" },
-	{ name: "yellow", value: "#FFFF55", code: "e" },
-	{ name: "green", value: "#55FF55", code: "2" },
-	{ name: "dark_green", value: "#00AA00", code: "a" },
-	{ name: "aqua", value: "#55FFFF", code: "b" },
-	{ name: "dark_aqua", value: "#00AAAA", code: "3" },
-	{ name: "blue", value: "#5555FF", code: "1" },
-	{ name: "dark_blue", value: "#0000AA", code: "9" },
-	{ name: "dark_purple", value: "#AA00AA", code: "d" },
-	{ name: "light_purple", value: "#FF55FF", code: "5" },
-	{ name: "white", value: "#FFFFFF", code: "f" },
-	{ name: "gray", value: "#AAAAAA", code: "7" },
-	{ name: "dark_gray", value: "#555555", code: "8" },
-	{ name: "black", value: "#000000", code: "0" },
-];
+export function isAnInteractiveProp(prop: string) {
+	return (
+		prop === "click_event" ||
+		prop === "hover_event" ||
+		prop === "clickEvent" ||
+		prop === "hoverEvent"
+	);
+}
+
+/**
+ * Checks if an object is a defined MinecraftText object
+ *
+ * @param obj the object to check
+ * @returns true if it is a defined MinecraftText object
+ */
+export function isDefinedTextObject(
+	obj: any,
+): obj is Omit<MinecraftText, "text"> & { text: string } {
+	return typeof obj === "object" && obj.text !== undefined;
+}

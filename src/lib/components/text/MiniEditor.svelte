@@ -10,14 +10,14 @@
 	import IconColor from "~icons/tabler/palette";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt/nbt";
 
 	import {
 		colorMap,
 		defaultColorLUT,
 		trueMarkOrUndefined,
-	} from "$lib/text/general";
-	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
+	} from "$lib/text/utils";
+	import { addTypeSpecificValues } from "$lib/text/nbt/nbt_or_json";
 	import {
 		ClickEventMark,
 		FontsExtension,

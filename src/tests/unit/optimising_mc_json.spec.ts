@@ -1,4 +1,4 @@
-import { optimise } from "$lib/text/nbt_or_json";
+import { optimise } from "$lib/text/nbt/optimiser";
 import { describe, it, expect } from "vitest";
 
 // Minimal mock types for test compatibility
@@ -7,6 +7,10 @@ type StringyMCText = string | { [key: string]: any };
 describe("optimise", () => {
 	it("returns empty string array if input is empty", () => {
 		expect(optimise([])).toEqual([""]);
+	});
+
+	it("returns empty string array if input is just an empty string", () => {
+		expect(optimise([""])).toEqual([""]);
 	});
 
 	it("removes undefined properties and flattens objects with only text", () => {
@@ -20,6 +24,21 @@ describe("optimise", () => {
 	it("merges consecutive strings", () => {
 		const input: StringyMCText[] = ["Hello ", "World", "!", { text: "Test" }];
 		expect(optimise(input)).toEqual(["Hello World!Test"]);
+	});
+
+	it("merges whitespace with previous component", () => {
+		const input: StringyMCText[] = [{ text: "Test" }, " ", { text: "World" }];
+		expect(optimise(input)).toEqual(["Test World"]);
+	});
+
+	it("merges whitespace forwards", () => {
+		const input: StringyMCText[] = [" ", { text: "World" }];
+		expect(optimise(input)).toEqual([" World"]);
+	});
+
+	it("merges whitespace backwards", () => {
+		const input: StringyMCText[] = [{ text: "Test" }, " "];
+		expect(optimise(input)).toEqual(["Test "]);
 	});
 
 	it("groups objects with shared style properties", () => {

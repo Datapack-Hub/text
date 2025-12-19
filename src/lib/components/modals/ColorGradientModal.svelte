@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Modal from "$lib/components/Modal.svelte";
-	import { applyGradient } from "$lib/text/general";
+	import { applyGradient } from "$lib/text/utils";
 	import ColorPicker from "svelte-awesome-color-picker";
 
 	import IconDelete from "~icons/tabler/trash";

@@ -1,5 +1,4 @@
 import type {
-	MCTextKey,
 	MinecraftText,
 	OldMinecraftText,
 	StringyMCText,
@@ -11,26 +10,12 @@ import {
 	isMarkType,
 	trueMarkOrUndefined,
 	unescapeUnicode,
-} from "./general";
+} from "../utils";
 import { outputVersion } from "$lib/stores";
 import { get } from "svelte/store";
+import { optimise } from "./optimiser";
 
 let exportVersion = get(outputVersion);
-
-const styleProps = [
-	"color",
-	"font",
-	"bold",
-	"italic",
-	"underlined",
-	"strikethrough",
-	"obfuscated",
-	"shadow_color",
-	"click_event",
-	"hover_event",
-	"clickEvent",
-	"hoverEvent",
-];
 
 /**
  * Applies the specific properties for a type of source or provider
@@ -178,168 +163,6 @@ function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
 }
 
 /**
- * Optimises the final outputted component string to reduce characters
- *
- * @param arr An array of strings or text components
- * @returns
- */
-export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
-	let out: StringyMCText[] = [];
-
-	if (!lore) {
-		out.push("");
-	}
-
-	// 1: Remove undefineds, flatten MinecraftText with only text
-	for (const comp of arr) {
-		if (typeof comp === "string") {
-			out.push(comp);
-			continue;
-		}
-		if ("text" in comp) {
-			Object.keys(comp).forEach(
-				(k) =>
-					comp[k as MCTextKey] === undefined && delete comp[k as MCTextKey],
-			);
-		}
-		out.push(Object.keys(comp).length === 1 ? comp.text! : comp);
-	}
-
-	// 2: Merge adjacent strings and whitespace, group objects with shared style
-	for (let i = 0; i < out.length - 1; i++) {
-		const curr = out[i],
-			next = out[i + 1];
-
-		// Merge whitespace to prev component
-		// todo fix
-		// if (typeof curr === "object" && curr?.text && typeof next === "string" && (next.trim() === "" || next.trim() === "\n")) {
-		// 	curr.text += next;
-		// 	out.splice(i + 1, 1); i--;
-		// 	continue;
-		// }
-		// Merge consecutive strings
-		if (typeof curr === "string" && typeof next === "string") {
-			out[i] = curr + next;
-			out.splice(i + 1, 1);
-			i--;
-			continue;
-		}
-
-		// Find shared style/interactivity properties between consecutive objects
-		if (typeof curr === "object" && typeof next === "object") {
-			const shared: Record<string, any> = {};
-			for (const prop of styleProps) {
-				const p = prop as MCTextKey;
-				if (
-					curr[p] !== undefined &&
-					next[p] !== undefined &&
-					curr[p] === next[p]
-				) {
-					shared[prop] = curr[p];
-				}
-			}
-			// Merge all properties in styleProps that are identical across the group
-			const allProps = [...styleProps];
-			const sharedAll: Record<string, any> = {};
-			for (const prop of allProps) {
-				const p = prop as MCTextKey;
-				if (
-					curr[p] !== undefined &&
-					next[p] !== undefined &&
-					(prop === "hover_event" ||
-					prop === "click_event" ||
-					prop === "hoverEvent" ||
-					prop === "clickEvent"
-						? JSON.stringify(curr[p]) === JSON.stringify(next[p])
-						: curr[p] === next[p])
-				) {
-					sharedAll[p] = curr[p];
-				}
-			}
-			if (Object.keys(sharedAll).length > 0) {
-				// Find how many consecutive objects share these properties
-				let j = i;
-				let group = [curr];
-
-				while (
-					j + 1 < out.length &&
-					typeof out[j + 1] === "object" &&
-					Object.keys(sharedAll).every(
-						(prop) =>
-							out[j + 1][prop as keyof StringyMCText] !== undefined &&
-							(prop === "hover_event" ||
-							prop === "click_event" ||
-							prop === "hoverEvent" ||
-							prop === "clickEvent"
-								? JSON.stringify(out[j + 1][prop as keyof StringyMCText]) ===
-									JSON.stringify(sharedAll[prop])
-								: out[j + 1][prop as keyof StringyMCText] === sharedAll[prop]),
-					)
-				) {
-					group.push(out[j + 1] as MinecraftText);
-					j++;
-				}
-				if (group.length > 1) {
-					// Remove shared properties from each group member for "extra"
-					let extras: StringyMCText[] = group.map((comp) => {
-						const c = { ...comp };
-						for (const prop of Object.keys(sharedAll)) {
-							delete c[prop as MCTextKey];
-						}
-						return c;
-					});
-
-					// Optimise extra
-					extras = optimise(extras);
-					const first = extras.shift();
-					let merged;
-					if (typeof first == "string") {
-						if (extras[0]) {
-							merged = { ...sharedAll, text: first, extra: extras };
-						} else {
-							merged = { ...sharedAll, text: first };
-						}
-					} else {
-						if (extras[0]) {
-							merged = { ...sharedAll, ...first, extra: extras };
-						} else {
-							merged = { ...sharedAll, ...first };
-						}
-					}
-					out.splice(i, group.length, merged);
-					i--; // recheck at this position
-					continue;
-				}
-			}
-		}
-	}
-
-	// 3: Remove leading empty string if followed by a string
-	if (out.length >= 2 && out[0] === "" && typeof out[1] === "string")
-		out.shift();
-
-	// 4: If out[1] is a string, or an object without any style properties, then remove out[0]
-	if (
-		out.length >= 2 &&
-		out[0] == "" &&
-		(typeof out[1] === "string" ||
-			(typeof out[1] === "object" &&
-				!styleProps.some(
-					(prop) => out[1][prop as keyof StringyMCText] !== undefined,
-				)))
-	) {
-		out.shift();
-	}
-
-	// 5: If it is item lore then override
-	if (lore) {
-		out.unshift({ italic: false, color: "white", text: "" });
-	}
-
-	return out;
-}
-
-/**
  * Converts the JSON content of the editor to an NBT string.
  */
 export function convert(
@@ -348,6 +171,7 @@ export function convert(
 	optimise: boolean,
 	force_json: boolean = false,
 ): string {
+	console.time("convert");
 	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
 	if (exportVersion.index >= 1 && !force_json) {
@@ -356,6 +180,7 @@ export function convert(
 			match.replace(/"/g, ""),
 		);
 	}
+	console.timeEnd("convert");
 	return out;
 }
 
@@ -366,6 +191,7 @@ export function translateJSON(
 	json: JSONContent,
 	options: TranslateOptions,
 ): string {
+	console.time("translateJSON");
 	const paragraphs = json.content ?? [];
 
 	if (options.exportType === "standard") {
@@ -399,23 +225,28 @@ export function translateJSON(
 		}
 
 		if (data.length === 0) {
+			console.timeEnd("translateJSON");
 			return Math.random() < 0.002
-				? "🤓 <- james is waiting for you to type something"
+				? "🤓 <- kevin is waiting for you to type something"
 				: "waiting for input...";
 		}
 
 		if (options.optimise) {
+			console.time("optimise");
 			data = optimise(data);
+			console.timeEnd("optimise");
 		} else {
 			data.unshift("");
 		}
 
 		if (data.length === 1) {
+			console.timeEnd("translateJSON");
 			return options.indent
 				? JSON.stringify(data[0], null, options.indentSize)
 				: JSON.stringify(data[0]);
 		}
 
+		console.timeEnd("translateJSON");
 		return options.indent
 			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
@@ -445,13 +276,17 @@ export function translateJSON(
 		}
 
 		if (Array.isArray(data) && options.optimise) {
+			console.time("optimise");
 			data = data.map((d) => (Array.isArray(d) ? optimise(d, true) : d));
+			console.timeEnd("optimise");
 		}
 
+		console.timeEnd("translateJSON");
 		return options.indent
 			? JSON.stringify(data, null, options.indentSize)
 			: JSON.stringify(data);
 	}
 
+	console.timeEnd("translateJSON");
 	return "[]";
 }

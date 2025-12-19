@@ -1,7 +1,7 @@
 import type { JSONContent } from "@tiptap/core";
-import { defaultColorReverseLUT } from "./general";
-import { type MinecraftText, type OldMinecraftText } from "../types";
-import { type StringyMCText } from "../types";
+import { defaultColorReverseLUT } from "../utils";
+import { type MinecraftText, type OldMinecraftText } from "../../types";
+import { type StringyMCText } from "../../types";
 
 export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 	let baseDocument: JSONContent = {
@@ -78,53 +78,27 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 	finalText = applyStyling(text, finalText);
 
 	let paragraphContent = baseDocument.content?.at(-1)?.content;
-
-	if (!paragraphContent) {
-		baseDocument.content!.at(-1)!.content = [];
-		paragraphContent = baseDocument.content!.at(-1)!.content;
-	}
-
 	paragraphContent!.push(finalText);
 
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
-			if (typeof txt == "object") {
-				Object.assign(txt, {
-					bold: txt.bold ?? text.bold,
-					italic: txt.italic ?? text.italic,
-					underlined: txt.underlined ?? text.underlined,
-					obfuscated: txt.obfuscated ?? text.obfuscated,
-					strikethrough: txt.strikethrough ?? text.strikethrough,
-					color: txt.color ?? text.color,
-					shadow_color: txt.shadow_color ?? text.shadow_color,
-					click_event: txt.click_event ?? text.click_event,
-					clickEvent: txt.clickEvent ?? text.clickEvent,
-					hover_event: txt.hover_event ?? text.hover_event,
-					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
-					font: txt.font ?? text.font,
-				});
-				processTextComponent(txt, baseDocument);
-			} else {
-				let newComponent = {
-					text: txt,
-				};
-				Object.assign(newComponent, {
-					bold: text.bold,
-					italic: text.italic,
-					underlined: text.underlined,
-					obfuscated: text.obfuscated,
-					strikethrough: text.strikethrough,
-					color: text.color,
-					shadow_color: text.shadow_color,
-					click_event: text.click_event,
-					clickEvent: text.clickEvent,
-					hover_event: text.hover_event,
-					hoverEvent: text.hoverEvent,
-					font: text.font,
-				});
-				processTextComponent(newComponent, baseDocument);
-			}
+			const newText = typeof txt === "object" ? { ...txt } : { text: txt };
+			Object.assign(newText, {
+				bold: text.bold,
+				italic: text.italic,
+				underlined: text.underlined,
+				obfuscated: text.obfuscated,
+				strikethrough: text.strikethrough,
+				color: text.color,
+				shadow_color: text.shadow_color,
+				click_event: text.click_event,
+				clickEvent: text.clickEvent,
+				hover_event: text.hover_event,
+				hoverEvent: text.hoverEvent,
+				font: text.font,
+			});
+			processTextComponent(newText, baseDocument);
 		});
 	}
 }
@@ -238,9 +212,9 @@ function applyStyling(
 	}
 
 	if (text.font) {
-		if (finalText.marks.some((mark) => mark.type === "textStyle")) {
-			finalText.marks.find((mark) => mark.type === "textStyle")!.attrs!.font =
-				text.font;
+		const textStyle = finalText.marks.find((mark) => mark.type === "textStyle");
+		if (textStyle) {
+			textStyle.attrs!.font = text.font;
 		} else {
 			finalText.marks?.push({
 				type: "textStyle",

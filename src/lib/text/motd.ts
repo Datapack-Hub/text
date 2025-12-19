@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorMap, trueMarkOrUndefined, unescapeUnicode } from "./general";
+import { colorMap, trueMarkOrUndefined, unescapeUnicode } from "./utils";
 
 function hexToRgb(hex: string): [number, number, number] {
 	hex = hex.replace(/^#/, "");

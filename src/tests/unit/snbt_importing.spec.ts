@@ -43,7 +43,7 @@ it("should apply a hex color to a text node", async () => {
 it("should throw an error if the format is invalid", async () => {
 	const broken = await readTestDataFile("bad/broken.snbt");
 	const converted = convertToTextOrEmpty(broken);
-	expect(converted.toString()).toContain(
+	expect(JSON.stringify(converted)).toContain(
 		/An error occurred while parsing the SNBT/,
 	);
 });

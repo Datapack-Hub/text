@@ -19,11 +19,9 @@
 	} from "$lib/text/general";
 	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
 	import {
-		ClickEventMark,
 		FontsExtension,
-		HoverEventMark,
 		Obfuscation,
-		ShadowColorMark,
+		ShadowColorMark
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
@@ -45,8 +43,6 @@
 				Color,
 				TextStyle,
 				Obfuscation,
-				ClickEventMark,
-				HoverEventMark,
 				ShadowColorMark,
 				FontsExtension,
 				Placeholder.configure({

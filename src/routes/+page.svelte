@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { convert, translateJSON } from "$lib/text/nbt_or_json";
+	import { convert } from "$lib/text/nbt_or_json";
 
 	import {
+		AtlasObjectNode,
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
@@ -10,13 +11,12 @@
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
+		PlayerObjectNode,
 		ScoreNode,
 		SelectorNode,
 		ShadowColorMark,
 		StorageNBTNode,
-		TranslateNode,
-		AtlasObjectNode,
-		PlayerObjectNode,
+		TranslateNode
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -30,7 +30,7 @@
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-	// Icons
+// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -55,10 +55,10 @@
 
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
+	import { outputVersion } from "$lib/stores";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-	import { outputVersion } from "$lib/stores";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -94,9 +94,9 @@
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
 
-	let hoverEventValue: any = $state();
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
+	let hoverEventValue = $state("");
 
 	let fontDialog: Modal = $state()!;
 	let fontUploadModal: Modal = $state()!;
@@ -548,7 +548,7 @@
 
 	<div>
 		{#if page.url.searchParams.has("dev")}
-			<code class="inline-block overflow-x-scroll p-3"
+			<code class="inline-block overflow-x-scroll p-3 text-xs"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
 					: "Loading..."}</code>
@@ -590,7 +590,7 @@
 				<div class="relative inline-block">
 					{#if versionPopup}
 						<div
-							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-[400px] -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
+							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-100 -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
 							{#if versionPopupConfirmationVisible}
 								<div
 									class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">

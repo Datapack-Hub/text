@@ -30,7 +30,12 @@ export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
+	// convert unquoted keys to quoted keys and unquoted string values to quoted string values
 	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
+	raw = raw.replace(
+		/(?<=[{,]\s*"[a-zA-Z_$][a-zA-Z0-9_$]*"\s*:\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)/g,
+		'"$1"',
+	);
 
 	if (raw.match(/^"\w*"/)) {
 		return [raw.replace(/"/g, "")];
@@ -47,12 +52,12 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	} catch (err) {
 		return [
 			"",
-			{color:"red",text:"An error occurred while parsing the SNBT."},
-			{color:"yellow",text:" Please send the "},
-			{color:"gold",text:"following error message"},
-			{color:"yellow",text:" to Datapack Hub staff:\n"},
-			{color:"white",bold:true,text:"Error: "},
-			{color:"gray",text:err!.toString()}
+			{ color: "red", text: "An error occurred while parsing the SNBT." },
+			{ color: "yellow", text: " Please send the " },
+			{ color: "gold", text: "following error message" },
+			{ color: "yellow", text: " to Datapack Hub staff:\n" },
+			{ color: "white", bold: true, text: "Error: " },
+			{ color: "gray", text: err!.toString() },
 		];
 	}
 
@@ -84,53 +89,44 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 	finalText = applyStyling(text, finalText);
 
 	let paragraphContent = baseDocument.content?.at(-1)?.content;
-
-	if (!paragraphContent) {
-		baseDocument.content!.at(-1)!.content = [];
-		paragraphContent = baseDocument.content!.at(-1)!.content;
-	}
-
 	paragraphContent!.push(finalText);
 
 	// Extra property
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
-			if (typeof txt == "object") {
-				Object.assign(txt, {
-					bold: txt.bold ?? text.bold,
-					italic: txt.italic ?? text.italic,
-					underlined: txt.underlined ?? text.underlined,
-					obfuscated: txt.obfuscated ?? text.obfuscated,
-					strikethrough: txt.strikethrough ?? text.strikethrough,
-					color: txt.color ?? text.color,
-					shadow_color: txt.shadow_color ?? text.shadow_color,
-					click_event: txt.click_event ?? text.click_event,
-					clickEvent: txt.clickEvent ?? text.clickEvent,
-					hover_event: txt.hover_event ?? text.hover_event,
-					hoverEvent: txt.hoverEvent ?? text.hoverEvent,
-					font: txt.font ?? text.font,
-				});
-				processTextComponent(txt, baseDocument);
-			} else {
-				let newComponent = {
-					text: txt,
-				};
-				Object.assign(newComponent, {
-					bold: text.bold,
-					italic: text.italic,
-					underlined: text.underlined,
-					obfuscated: text.obfuscated,
-					strikethrough: text.strikethrough,
-					color: text.color,
-					shadow_color: text.shadow_color,
-					click_event: text.click_event,
-					clickEvent: text.clickEvent,
-					hover_event: text.hover_event,
-					hoverEvent: text.hoverEvent,
-					font: text.font,
-				});
-				processTextComponent(newComponent, baseDocument);
-			}
+			const newText = typeof txt === "object" ? { ...txt } : { text: txt };
+			// Object.assign(newText, {
+			// 	bold: text.bold,
+			// 	italic: text.italic,
+			// 	underlined: text.underlined,
+			// 	obfuscated: text.obfuscated,
+			// 	strikethrough: text.strikethrough,
+			// 	color: text.color,
+			// 	shadow_color: text.shadow_color,
+			// 	click_event: text.click_event,
+			// 	clickEvent: text.clickEvent,
+			// 	hover_event: text.hover_event,
+			// 	hoverEvent: text.hoverEvent,
+			// 	font: text.font,
+			// });
+
+			Object.assign(newText, {
+				bold: text.bold ?? newText.bold,
+				italic: text.italic ?? newText.italic,
+				underlined: text.underlined ?? newText.underlined,
+				obfuscated: text.obfuscated ?? newText.obfuscated,
+				strikethrough: text.strikethrough ?? newText.strikethrough,
+				color: text.color ?? newText.color,
+				shadow_color: text.shadow_color ?? newText.shadow_color,
+				click_event: text.click_event ?? newText.click_event,
+				clickEvent: text.clickEvent ?? newText.clickEvent,
+				hover_event: text.hover_event ?? newText.hover_event,
+				hoverEvent: text.hoverEvent ?? newText.hoverEvent,
+				font: text.font ?? newText.font,
+			});
+
+			console.log(newText);
+			processTextComponent(newText, baseDocument);
 		});
 	}
 }
@@ -244,9 +240,9 @@ function applyStyling(
 	}
 
 	if (text.font) {
-		if (finalText.marks.some((mark) => mark.type === "textStyle")) {
-			finalText.marks.find((mark) => mark.type === "textStyle")!.attrs!.font =
-				text.font;
+		const textStyle = finalText.marks.find((mark) => mark.type === "textStyle");
+		if (textStyle) {
+			textStyle.attrs!.font = text.font;
 		} else {
 			finalText.marks?.push({
 				type: "textStyle",

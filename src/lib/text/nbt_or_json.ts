@@ -301,7 +301,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 						}
 					} else {
 						if (extras[0]) {
-							merged = { ...sharedAll, ...first, extra: extras };
+							if (!merged?.extra) merged = { ...sharedAll, ...first, extra: extras };
+							else merged.extra = [...merged.extra, ...extras];
 						} else {
 							merged = { ...sharedAll, ...first };
 						}

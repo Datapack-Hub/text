@@ -44,9 +44,15 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 
 	try {
 		parsed = JSON.parse(raw);
-	} catch {
+	} catch (err) {
 		return [
-			"An error occurred while parsing the SNBT. If this is a bug, please report it to DPH staff!",
+			"",
+			{color:"red",text:"An error occurred while parsing the SNBT."},
+			{color:"yellow",text:" Please send the "},
+			{color:"gold",text:"following error message"},
+			{color:"yellow",text:" to Datapack Hub staff:\n"},
+			{color:"white",bold:true,text:"Error: "},
+			{color:"gray",text:err!.toString()}
 		];
 	}
 

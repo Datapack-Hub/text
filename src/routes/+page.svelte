@@ -276,6 +276,7 @@
 		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { value } = mark.attrs;
 		hoverEventDialog!.open().then(() => {
+			if (!value) return;
 			hoverEventEditor.importText(JSON.stringify(value));
 		});
 	}

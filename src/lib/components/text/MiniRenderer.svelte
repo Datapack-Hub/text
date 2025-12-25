@@ -62,9 +62,4 @@
 	});
 </script>
 
-<div
-	bind:this={element}
-	onkeypress={(e) => e.stopImmediatePropagation()}
-	role="textbox"
-	tabindex="0">
-</div>
+<div bind:this={element} role="textbox" tabindex="0"></div>

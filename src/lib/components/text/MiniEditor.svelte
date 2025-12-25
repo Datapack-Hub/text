@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type MinecraftText } from "$lib/types";
+	import { type MinecraftText, type StringyMCText } from "$lib/types";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -55,7 +55,7 @@
 				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
-				if (value === undefined || value.length === 0) return;
+				// TODO: fix the JSON parsing errors that can happen here
 				value = JSON.stringify(editor.getJSON());
 				output = JSON.parse(translate(editor.getJSON()));
 			},
@@ -71,7 +71,7 @@
 	function translate(json: JSONContent): string {
 		const paragraphs = json.content!;
 
-		let data: (MinecraftText | string)[] = [""];
+		let data: StringyMCText[] = [""];
 
 		paragraphs.forEach((p, i) => {
 			const content = p.content || [];

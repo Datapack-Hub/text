@@ -16,7 +16,7 @@
 		SelectorNode,
 		ShadowColorMark,
 		StorageNBTNode,
-		TranslateNode
+		TranslateNode,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -30,7 +30,7 @@
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
-// Icons
+	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -275,10 +275,9 @@
 
 		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { value } = mark.attrs;
-		hoverEventDialog!.open();
-		if (hoverEventEditor) {
+		hoverEventDialog!.open().then(() => {
 			hoverEventEditor.importText(JSON.stringify(value));
-		}
+		});
 	}
 
 	function clickEditButtonHandler() {
@@ -320,8 +319,15 @@
 		clickEventDialog!.open();
 	}
 
+	function modifierPressed(event: KeyboardEvent) {
+		return navigator.platform.startsWith("Mac") ||
+			navigator.platform.includes("iPhone")
+			? event.metaKey
+			: event.ctrlKey;
+	}
+
 	function clearMarksHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.shiftKey && event.key === "X") {
+		if (modifierPressed(event) && event.shiftKey && event.key === "X") {
 			editor!.commands.unsetAllMarks();
 		}
 	}
@@ -517,11 +523,11 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				onClick={() => editor?.chain().undo().run()}
+				onClick={() => editor?.commands.undo()}
 				ariaLabel="Undo"
 				Icon={IconUndo} />
 			<ToolbarButton
-				onClick={() => editor?.chain().redo().run()}
+				onClick={() => editor?.commands.redo()}
 				ariaLabel="Redo"
 				Icon={IconRedo} />
 

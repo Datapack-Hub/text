@@ -30,13 +30,16 @@ export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
-	// convert unquoted keys to quoted keys and unquoted string values to quoted string values
-	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
-	raw = raw.replace(
-		/(?<=[{,]\s*"[a-zA-Z_$][a-zA-Z0-9_$]*"\s*:\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)/g,
-		'"$1"',
-	);
-
+	raw = raw
+		.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":') // quote unquoted keys
+		.replace(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/g, (_, p1) => {
+			// quote unquoted strings, ignoring booleans
+			const protectedValues = ["true", "false", "1b", "0b"];
+			if (protectedValues.includes(p1.toLowerCase())) {
+				return `: ${p1.toLowerCase()}`;
+			}
+			return `: "${p1}"`;
+		});
 	if (raw.match(/^"\w*"/)) {
 		return [raw.replace(/"/g, "")];
 	}
@@ -125,7 +128,6 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 				font: text.font ?? newText.font,
 			});
 
-			console.log(newText);
 			processTextComponent(newText, baseDocument);
 		});
 	}

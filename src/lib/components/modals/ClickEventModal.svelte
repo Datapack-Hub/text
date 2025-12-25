@@ -23,9 +23,10 @@
 	{#if clickEventType == "open_url"}
 		<p class="mt-2">URL:</p>
 		<input
-			type="text"
-			class="rounded-md bg-zinc-900 p-2"
+			type="url"
+			class="rounded-md bg-zinc-900 p-2 invalid:outline-2 invalid:outline-red-500"
 			placeholder="https://example.com"
+			pattern="https?://.*"
 			bind:value={clickEventValue} />
 	{:else if clickEventType == "run_command"}
 		<p class="mt-2">Command:</p>

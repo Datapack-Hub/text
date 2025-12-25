@@ -21,7 +21,7 @@
 	import {
 		FontsExtension,
 		Obfuscation,
-		ShadowColorMark
+		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
 	import TextStyleButtons from "./TextStyleButtons.svelte";
 
@@ -55,6 +55,7 @@
 				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
+				if (value === undefined || value.length === 0) return;
 				value = JSON.stringify(editor.getJSON());
 				output = JSON.parse(translate(editor.getJSON()));
 			},

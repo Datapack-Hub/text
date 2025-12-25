@@ -301,7 +301,8 @@ export function optimise(arr: StringyMCText[], lore = false): StringyMCText[] {
 						}
 					} else {
 						if (extras[0]) {
-							if (!merged?.extra) merged = { ...sharedAll, ...first, extra: extras };
+							if (!merged?.extra)
+								merged = { ...sharedAll, ...first, extra: extras };
 							else merged.extra = [...merged.extra, ...extras];
 						} else {
 							merged = { ...sharedAll, ...first };
@@ -412,14 +413,10 @@ export function translateJSON(
 		}
 
 		if (data.length === 1) {
-			return options.indent
-				? JSON.stringify(data[0], null, options.indentSize)
-				: JSON.stringify(data[0]);
+			return JSON.stringify(data[0]);
 		}
 
-		return options.indent
-			? JSON.stringify(data, null, options.indentSize)
-			: JSON.stringify(data);
+		return JSON.stringify(data);
 	} else if (options.exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
@@ -449,9 +446,7 @@ export function translateJSON(
 			data = data.map((d) => (Array.isArray(d) ? optimise(d, true) : d));
 		}
 
-		return options.indent
-			? JSON.stringify(data, null, options.indentSize)
-			: JSON.stringify(data);
+		return JSON.stringify(data);
 	}
 
 	return "[]";

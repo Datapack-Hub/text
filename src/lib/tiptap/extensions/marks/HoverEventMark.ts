@@ -55,7 +55,7 @@ export const HoverEventMark = Mark.create({
 				(attributes: HoverEventAttributes) =>
 				({ chain }) => {
 					return chain().setMark(this.name, attributes).run();
-					},
+				},
 			unsetHoverEvent:
 				() =>
 				({ chain }) => {

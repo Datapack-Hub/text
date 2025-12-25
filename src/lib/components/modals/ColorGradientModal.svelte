@@ -3,8 +3,8 @@
 	import { applyGradient } from "$lib/text/general";
 	import ColorPicker from "svelte-awesome-color-picker";
 
-	import IconDelete from "~icons/tabler/trash";
 	import IconCustom from "~icons/tabler/plus";
+	import IconDelete from "~icons/tabler/trash";
 
 	let {
 		gradientDialog = $bindable(),

@@ -147,8 +147,6 @@ export type ExternalSources = {
 
 export type MCTextKey = keyof MinecraftText;
 export type TranslateOptions = Partial<{
-	indent: boolean;
-	indentSize: number;
 	optimise: boolean;
 	exportType: "standard" | "item_lore";
 }>;

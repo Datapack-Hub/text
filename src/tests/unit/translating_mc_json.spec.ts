@@ -41,8 +41,6 @@ describe("translate", () => {
 	const baseOptions: TranslateOptions = {
 		exportType: "standard",
 		optimise: false,
-		indent: false,
-		indentSize: 2,
 	};
 
 	it("returns waiting message for empty content", () => {
@@ -161,22 +159,6 @@ describe("translate", () => {
 		expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");
 		expect(JSON.parse(result)).toHaveProperty("[1].hoverEvent");
 		expect(JSON.parse(result)).not.toHaveProperty("[1].hover_event");
-	});
-
-	it("returns indented JSON when indent=true", () => {
-		const json: JSONContent = {
-			content: [
-				{
-					content: [{ type: "text", text: "Indented", marks: [] }],
-				},
-			],
-		};
-		const result = translateJSON(json, {
-			...baseOptions,
-			indent: true,
-			indentSize: 4,
-		});
-		expect(result.includes("\n")).toBe(true);
 	});
 
 	it("handles exportType=item_lore", () => {

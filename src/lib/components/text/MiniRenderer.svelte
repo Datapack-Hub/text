@@ -1,12 +1,15 @@
 <script lang="ts">
 	import {
+		AtlasObjectNode,
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
+		FixedTextStyle,
 		FontsExtension,
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
+		PlayerObjectNode,
 		ScoreNode,
 		SelectorNode,
 		ShadowColorMark,
@@ -15,7 +18,6 @@
 	} from "$lib/tiptap/extensions/index";
 	import { Editor } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
-	import { TextStyle } from "@tiptap/extension-text-style";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onMount } from "svelte";
 
@@ -27,20 +29,32 @@
 		new Editor({
 			element: element,
 			extensions: [
-				StarterKit,
+				StarterKit.configure({
+					blockquote: false,
+					bulletList: false,
+					codeBlock: false,
+					hardBreak: false,
+					heading: false,
+					horizontalRule: false,
+					listItem: false,
+					orderedList: false,
+					link: false,
+				}),
 				Color,
-				TextStyle,
+				FixedTextStyle,
 				Obfuscation,
 				ClickEventMark,
 				HoverEventMark,
+				ShadowColorMark,
 				BlockNBTNode,
 				EntityNBTNode,
 				KeybindNode,
 				ScoreNode,
 				SelectorNode,
+				AtlasObjectNode,
+				PlayerObjectNode,
 				StorageNBTNode,
 				TranslateNode,
-				ShadowColorMark,
 				FontsExtension,
 			],
 			content: value,
@@ -48,4 +62,4 @@
 	});
 </script>
 
-<div bind:this={element}></div>
+<div bind:this={element} role="textbox" tabindex="0"></div>

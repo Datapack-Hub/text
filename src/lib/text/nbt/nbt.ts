@@ -30,8 +30,16 @@ export function snbtToDocument(raw: StringyMCText[]): JSONContent {
 export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
-	raw = raw.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":');
-
+	raw = raw
+		.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":') // quote unquoted keys
+		.replace(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/g, (_, p1) => {
+			// quote unquoted strings, ignoring booleans
+			const protectedValues = ["true", "false", "1b", "0b"];
+			if (protectedValues.includes(p1.toLowerCase())) {
+				return `: ${p1.toLowerCase()}`;
+			}
+			return `: "${p1}"`;
+		});
 	if (raw.match(/^"\w*"/)) {
 		return [raw.replace(/"/g, "")];
 	}
@@ -47,12 +55,12 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	} catch (err) {
 		return [
 			"",
-			{color:"red",text:"An error occurred while parsing the SNBT."},
-			{color:"yellow",text:" Please send the "},
-			{color:"gold",text:"following error message"},
-			{color:"yellow",text:" to Datapack Hub staff:\n"},
-			{color:"white",bold:true,text:"Error: "},
-			{color:"gray",text:err!.toString()}
+			{ color: "red", text: "An error occurred while parsing the SNBT." },
+			{ color: "yellow", text: " Please send the " },
+			{ color: "gold", text: "following error message" },
+			{ color: "yellow", text: " to Datapack Hub staff:\n" },
+			{ color: "white", bold: true, text: "Error: " },
+			{ color: "gray", text: err!.toString() },
 		];
 	}
 
@@ -90,20 +98,22 @@ function processTextComponent(text: StringyMCText, baseDocument: JSONContent) {
 	if (text.extra) {
 		text.extra!.forEach((txt) => {
 			const newText = typeof txt === "object" ? { ...txt } : { text: txt };
+
 			Object.assign(newText, {
-				bold: text.bold,
-				italic: text.italic,
-				underlined: text.underlined,
-				obfuscated: text.obfuscated,
-				strikethrough: text.strikethrough,
-				color: text.color,
-				shadow_color: text.shadow_color,
-				click_event: text.click_event,
-				clickEvent: text.clickEvent,
-				hover_event: text.hover_event,
-				hoverEvent: text.hoverEvent,
-				font: text.font,
+				bold: text.bold ?? newText.bold,
+				italic: text.italic ?? newText.italic,
+				underlined: text.underlined ?? newText.underlined,
+				obfuscated: text.obfuscated ?? newText.obfuscated,
+				strikethrough: text.strikethrough ?? newText.strikethrough,
+				color: text.color ?? newText.color,
+				shadow_color: text.shadow_color ?? newText.shadow_color,
+				click_event: text.click_event ?? newText.click_event,
+				clickEvent: text.clickEvent ?? newText.clickEvent,
+				hover_event: text.hover_event ?? newText.hover_event,
+				hoverEvent: text.hoverEvent ?? newText.hoverEvent,
+				font: text.font ?? newText.font,
 			});
+
 			processTextComponent(newText, baseDocument);
 		});
 	}

@@ -98,9 +98,9 @@
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
 
-	let hoverEventValue: any = $state();
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
+	let hoverEventValue = $state("");
 
 	let fontDialog: Modal = $state()!;
 	let fontUploadModal: Modal = $state()!;
@@ -116,16 +116,13 @@
 	);
 
 	function importToEditor() {
-		console.time("importToEditor");
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
 		editor?.commands.setContent(jsonContent);
 		tiptapJSON = jsonContent;
 		importDialog?.close();
-		console.timeEnd("importToEditor");
 	}
 
 	async function loadData() {
-		console.time("loadData");
 		if (localStorage.getItem("content")) {
 			tiptapJSON = JSON.parse(localStorage.getItem("content")!);
 		} else {
@@ -139,7 +136,6 @@
 			snapshots = [];
 			localStorage.setItem("snapshots", "[]");
 		}
-		console.timeLog("loadData", "Loaded local storage");
 
 		const db = await openDataStore();
 		const fontStore = await db.getAll("fonts");
@@ -156,8 +152,6 @@
 				document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
 			}),
 		);
-		console.timeLog("loadData", "Loaded fonts from IndexedDB");
-		console.timeEnd("loadData");
 	}
 
 	onMount(async () => {
@@ -290,10 +284,10 @@
 
 		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { value } = mark.attrs;
-		hoverEventDialog!.open();
-		if (hoverEventEditor) {
+		hoverEventDialog!.open().then(() => {
+			if (!value) return;
 			hoverEventEditor.importText(JSON.stringify(value));
-		}
+		});
 	}
 
 	function clickEditButtonHandler() {
@@ -335,8 +329,15 @@
 		clickEventDialog!.open();
 	}
 
+	function modifierPressed(event: KeyboardEvent) {
+		return navigator.platform.startsWith("Mac") ||
+			navigator.platform.includes("iPhone")
+			? event.metaKey
+			: event.ctrlKey;
+	}
+
 	function clearMarksHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.shiftKey && event.key === "X") {
+		if (modifierPressed(event) && event.shiftKey && event.key === "X") {
 			editor!.commands.unsetAllMarks();
 		}
 	}
@@ -532,11 +533,11 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				onClick={() => editor?.chain().undo().run()}
+				onClick={() => editor?.commands.undo()}
 				ariaLabel="Undo"
 				Icon={IconUndo} />
 			<ToolbarButton
-				onClick={() => editor?.chain().redo().run()}
+				onClick={() => editor?.commands.redo()}
 				ariaLabel="Redo"
 				Icon={IconRedo} />
 
@@ -563,7 +564,7 @@
 
 	<div>
 		{#if page.url.searchParams.has("dev")}
-			<code class="inline-block overflow-x-scroll p-3"
+			<code class="inline-block overflow-x-scroll p-3 text-xs"
 				>DEV ONLY: {editor
 					? JSON.stringify(editor.getJSON())
 					: "Loading..."}</code>

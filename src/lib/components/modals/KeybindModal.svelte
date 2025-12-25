@@ -4,28 +4,34 @@
 
 	let { keybindDialog = $bindable() } = $props();
 
+	let modifierKey =
+		navigator.platform.startsWith("Mac") ||
+		navigator.platform.includes("iPhone")
+			? "⌘"
+			: "Ctrl";
+
 	const keysAndActions = [
-		{ keys: ["Ctrl", "B"], action: "Bold" },
-		{ keys: ["Ctrl", "I"], action: "Italic" },
-		{ keys: ["Ctrl", "U"], action: "Underline" },
-		{ keys: ["Ctrl", "Shift", "S"], action: "Strikethrough" },
-		{ keys: ["Ctrl", "O"], action: "Obfuscate" },
-		{ keys: ["Ctrl", "Z"], action: "Undo" },
-		{ keys: ["Ctrl", "Y"], action: "Redo" },
-		{ keys: ["Ctrl", "Shift", "X"], action: "Clear all formatting" },
+		{ keys: [modifierKey, "B"], action: "Bold" },
+		{ keys: [modifierKey, "I"], action: "Italic" },
+		{ keys: [modifierKey, "U"], action: "Underline" },
+		{ keys: [modifierKey, "Shift", "S"], action: "Strikethrough" },
+		{ keys: [modifierKey, "O"], action: "Obfuscate" },
+		{ keys: [modifierKey, "Z"], action: "Undo" },
+		{ keys: [modifierKey, "Y"], action: "Redo" },
+		{ keys: [modifierKey, "Shift", "X"], action: "Clear all formatting" },
 	];
 	const modalKeybinds = [
-		{ keys: ["Ctrl", "Shift", "G"], action: "Add Color Gradient" },
-		{ keys: ["Ctrl", "Shift", "K"], action: "View Keybinds" },
-		{ keys: ["Ctrl", "Shift", "T"], action: "Add Click Event" },
-		{ keys: ["Ctrl", "Shift", "H"], action: "Add Hover Event" },
-		{ keys: ["Ctrl", "Shift", "C"], action: "Add Custom Color" },
-		{ keys: ["Ctrl", "Shift", "F"], action: "Add a font" },
-		{ keys: ["Ctrl", "Shift", "W"], action: "Add Custom Source" },
-		{ keys: ["Ctrl", "Shift", "U"], action: "Unicode Menu" },
-		{ keys: ["Ctrl", "Shift", "I"], action: "Import Menu" },
-		{ keys: ["Ctrl", "Shift", "E"], action: "Export Menu" },
-		{ keys: ["Ctrl", "Shift", "L"], action: "Load a snapshot" },
+		{ keys: [modifierKey, "Shift", "G"], action: "Add Color Gradient" },
+		{ keys: [modifierKey, "Shift", "K"], action: "View Keybinds" },
+		{ keys: [modifierKey, "Shift", "T"], action: "Add Click Event" },
+		{ keys: [modifierKey, "Shift", "H"], action: "Add Hover Event" },
+		{ keys: [modifierKey, "Shift", "C"], action: "Add Custom Color" },
+		{ keys: [modifierKey, "Shift", "F"], action: "Add a font" },
+		{ keys: [modifierKey, "Shift", "W"], action: "Add Custom Source" },
+		{ keys: [modifierKey, "Shift", "U"], action: "Unicode Menu" },
+		{ keys: [modifierKey, "Shift", "I"], action: "Import Menu" },
+		{ keys: [modifierKey, "Shift", "E"], action: "Export Menu" },
+		{ keys: [modifierKey, "Shift", "L"], action: "Load a snapshot" },
 	];
 </script>
 

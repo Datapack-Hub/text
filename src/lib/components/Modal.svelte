@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { tick } from "svelte";
 	import IconClose from "~icons/tabler/x";
 
 	type Props = {
@@ -17,12 +18,21 @@
 		key,
 	}: Props = $props();
 
-	export function open() {
+	export async function open() {
 		opened = true;
+		await tick();
 	}
 
-	export function close() {
+	export async function close() {
 		opened = false;
+		await tick();
+	}
+
+	function modifierPressed(event: KeyboardEvent) {
+		return navigator.platform.startsWith("Mac") ||
+			navigator.platform.includes("iPhone")
+			? event.metaKey
+			: event.ctrlKey;
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -34,7 +44,7 @@
 			close();
 		}
 
-		if (event.shiftKey && event.ctrlKey && event.key === key) {
+		if (event.shiftKey && modifierPressed(event) && event.key === key) {
 			event.preventDefault();
 			open();
 		}
@@ -49,10 +59,9 @@
 			class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
 			style="font-family: Lexend">
 			<div
-				onclick={() => close()}
-				class="fixed top-0 left-0 h-screen w-screen"
-				style="z-index: 40; background: transparent;"
 				aria-hidden="true"
+				onclick={() => close()}
+				class="fixed top-0 left-0 z-40 h-screen w-screen bg-transparent"
 				tabindex="-1"
 				hidden={!opened}>
 			</div>

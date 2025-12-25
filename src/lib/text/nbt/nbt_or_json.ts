@@ -171,7 +171,6 @@ export function convert(
 	optimise: boolean,
 	force_json: boolean = false,
 ): string {
-	console.time("convert");
 	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
 	if (exportVersion.index >= 1 && !force_json) {
@@ -180,7 +179,6 @@ export function convert(
 			match.replace(/"/g, ""),
 		);
 	}
-	console.timeEnd("convert");
 	return out;
 }
 
@@ -191,7 +189,6 @@ export function translateJSON(
 	json: JSONContent,
 	options: TranslateOptions,
 ): string {
-	console.time("translateJSON");
 	const paragraphs = json.content ?? [];
 
 	if (options.exportType === "standard") {
@@ -225,31 +222,22 @@ export function translateJSON(
 		}
 
 		if (data.length === 0) {
-			console.timeEnd("translateJSON");
 			return Math.random() < 0.002
 				? "🤓 <- kevin is waiting for you to type something"
 				: "waiting for input...";
 		}
 
 		if (options.optimise) {
-			console.time("optimise");
 			data = optimise(data);
-			console.timeEnd("optimise");
 		} else {
 			data.unshift("");
 		}
 
 		if (data.length === 1) {
-			console.timeEnd("translateJSON");
-			return options.indent
-				? JSON.stringify(data[0], null, options.indentSize)
-				: JSON.stringify(data[0]);
+			return JSON.stringify(data[0]);
 		}
 
-		console.timeEnd("translateJSON");
-		return options.indent
-			? JSON.stringify(data, null, options.indentSize)
-			: JSON.stringify(data);
+		return JSON.stringify(data);
 	} else if (options.exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
@@ -276,17 +264,11 @@ export function translateJSON(
 		}
 
 		if (Array.isArray(data) && options.optimise) {
-			console.time("optimise");
 			data = data.map((d) => (Array.isArray(d) ? optimise(d, true) : d));
-			console.timeEnd("optimise");
 		}
 
-		console.timeEnd("translateJSON");
-		return options.indent
-			? JSON.stringify(data, null, options.indentSize)
-			: JSON.stringify(data);
+		return JSON.stringify(data);
 	}
 
-	console.timeEnd("translateJSON");
 	return "[]";
 }

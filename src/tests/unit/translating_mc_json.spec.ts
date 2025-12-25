@@ -48,7 +48,7 @@ describe("translate", () => {
 		const result = translateJSON(json, baseOptions);
 		expect(result).toBeOneOf([
 			"waiting for input...",
-			"🤓 <- james is waiting for you to type something",
+			"🤓 <- kevin is waiting for you to type something",
 		]);
 	});
 

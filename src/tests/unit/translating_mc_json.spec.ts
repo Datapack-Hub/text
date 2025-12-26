@@ -111,7 +111,7 @@ describe("translate", () => {
 			],
 		};
 		const result = translateJSON(json, baseOptions);
-		expect(result).toContain('"shadow_color":16711935');
+		expect(result).toContain('"shadow_color":-65281');
 	});
 
 	it("handles multiple paragraphs with newlines", () => {

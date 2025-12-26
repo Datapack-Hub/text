@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { convert, translateJSON } from "$lib/text/nbt_or_json";
+	import { convert } from "$lib/text/nbt/nbt_or_json";
 
 	import {
+		AtlasObjectNode,
 		BlockNBTNode,
 		ClickEventMark,
 		EntityNBTNode,
@@ -10,13 +11,12 @@
 		HoverEventMark,
 		KeybindNode,
 		Obfuscation,
+		PlayerObjectNode,
 		ScoreNode,
 		SelectorNode,
 		ShadowColorMark,
 		StorageNBTNode,
 		TranslateNode,
-		AtlasObjectNode,
-		PlayerObjectNode,
 	} from "$lib/tiptap/extensions/index";
 	// Components
 	import Modal from "$lib/components/Modal.svelte";
@@ -24,7 +24,7 @@
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/nbt";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -47,18 +47,20 @@
 	import IconHoverEvent from "~icons/tabler/pointer";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
+	import IconDelete from "~icons/tabler/trash";
+	import IconLoad from "~icons/tabler/upload";
 
 	import { page } from "$app/state";
 
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
-	import { colorMap } from "$lib/text/general";
+	import { colorMap } from "$lib/text/utils";
 
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
+	import { outputVersion } from "$lib/stores";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-	import { outputVersion } from "$lib/stores";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -70,7 +72,9 @@
 	let outputDialog: Modal = $state()!;
 	let versionPopup: boolean = $state(false);
 
-	let doesContentExist: boolean = $state(false);
+	let doesContentExist: boolean = $derived(
+		editor ? !(editor.getText() === "") : false,
+	);
 	let shouldOptimise = $state(true);
 
 	// Import
@@ -94,9 +98,9 @@
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
 
-	let hoverEventValue: any = $state();
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
+	let hoverEventValue = $state("");
 
 	let fontDialog: Modal = $state()!;
 	let fontUploadModal: Modal = $state()!;
@@ -106,6 +110,10 @@
 	let customDialog: Modal = $state()!;
 
 	let unicodeSelectorDialog: Modal = $state()!;
+
+	let finalOutput = $derived(
+		editor ? convert(tiptapJSON, "standard", shouldOptimise) : "Loading...",
+	);
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
@@ -138,10 +146,12 @@
 			data: File;
 		};
 
-		fontStore.forEach(async ({ identifier, alias, data }: FontStoreSchema) => {
-			fontLUT.set(identifier, alias);
-			document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
-		});
+		await Promise.all(
+			fontStore.map(async ({ identifier, alias, data }: FontStoreSchema) => {
+				fontLUT.set(identifier, alias);
+				document.fonts.add(new FontFace(alias, await data.arrayBuffer()));
+			}),
+		);
 	}
 
 	onMount(async () => {
@@ -186,7 +196,6 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
-				doesContentExist = !(editor!.getText() === "");
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();
@@ -275,10 +284,10 @@
 
 		editor!.chain().focus().setTextSelection({ from: start, to: end }).run();
 		const { value } = mark.attrs;
-		hoverEventDialog!.open();
-		if (hoverEventEditor) {
+		hoverEventDialog!.open().then(() => {
+			if (!value) return;
 			hoverEventEditor.importText(JSON.stringify(value));
-		}
+		});
 	}
 
 	function clickEditButtonHandler() {
@@ -320,8 +329,15 @@
 		clickEventDialog!.open();
 	}
 
+	function modifierPressed(event: KeyboardEvent) {
+		return navigator.platform.startsWith("Mac") ||
+			navigator.platform.includes("iPhone")
+			? event.metaKey
+			: event.ctrlKey;
+	}
+
 	function clearMarksHandler(event: KeyboardEvent) {
-		if (event.ctrlKey && event.shiftKey && event.key === "X") {
+		if (modifierPressed(event) && event.shiftKey && event.key === "X") {
 			editor!.commands.unsetAllMarks();
 		}
 	}
@@ -346,7 +362,7 @@
 	let versionPopupConfirmationVisible = $state(false);
 	let temporaryVersionConfirmation: Version | undefined = $state();
 
-	function changeOuptutVersion(version: Version | undefined, confirm = false) {
+	function updateOutputVersion(version: Version | undefined, confirm = false) {
 		if (!version) {
 			return;
 		}
@@ -374,17 +390,20 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<div class="flex h-screen max-h-screen flex-col">
+<main class="flex h-screen max-h-screen flex-col">
 	<div
 		class="flex w-full items-center bg-zinc-950 text-zinc-300"
 		style="font-family: Lexend">
 		<div class="flex items-center px-3 py-2 hover:bg-white/3">
-			<img src="/dph.svg" class="h-5" alt="logo" />
+			<img src="/dph.svg" class="size-5" alt="logo" height="20" width="20" />
 			<span class="nomob ml-3">Minecraft Text Editor</span>
 		</div>
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3"
 			onclick={importDialog?.open}>Import</button>
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={loadDialog?.open}>Load</button>
 		{#if doesContentExist}
 			<button
 				class="flex items-center px-3 py-2 hover:bg-white/3"
@@ -393,9 +412,6 @@
 				class="flex items-center px-3 py-2 hover:bg-white/3"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3"
-			onclick={loadDialog?.open}>Load</button>
 		<div class="grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"
@@ -517,11 +533,11 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				onClick={() => editor?.chain().undo().run()}
+				onClick={() => editor?.commands.undo()}
 				ariaLabel="Undo"
 				Icon={IconUndo} />
 			<ToolbarButton
-				onClick={() => editor?.chain().redo().run()}
+				onClick={() => editor?.commands.redo()}
 				ariaLabel="Redo"
 				Icon={IconRedo} />
 
@@ -548,10 +564,10 @@
 
 	<div>
 		{#if page.url.searchParams.has("dev")}
-			<code class="inline-block overflow-x-scroll p-3"
-				>DEV ONLY: {editor
-					? JSON.stringify(editor.getJSON())
-					: "Loading..."}</code>
+			<code class="inline-block overflow-x-scroll p-3 text-xs"
+				><pre>
+					DEV ONLY: {editor ? JSON.stringify(editor.getJSON()) : "Loading..."}
+				</pre></code>
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">
@@ -561,9 +577,7 @@
 					{@attach tooltip}
 					class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 					onclick={() => {
-						navigator.clipboard.writeText(
-							convert(editor!.getJSON(), "standard", shouldOptimise),
-						);
+						navigator.clipboard.writeText(finalOutput);
 						recentlyCopied = true;
 						setTimeout(() => (recentlyCopied = false), 2000);
 					}}
@@ -573,14 +587,12 @@
 					{:else}
 						<IconCopy />
 					{/if}</button>
-				<p>
-					<code id="outputbox" class="inline break-all">
-						<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-						{editor
-							? convert(tiptapJSON!, "standard", shouldOptimise)
-							: "Loading..."}
-					</code>
-				</p>
+				<code id="outputbox">
+					<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
+					<pre class="inline break-all whitespace-pre-wrap">{editor
+							? finalOutput
+							: "Loading..."}</pre>
+				</code>
 			</div>
 			<div class="mt-2 flex items-center space-x-2 select-none">
 				<p class="font-lexend text-xs text-white/60">
@@ -590,7 +602,7 @@
 				<div class="relative inline-block">
 					{#if versionPopup}
 						<div
-							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-[400px] -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
+							class="absolute bottom-full left-1/2 z-10 mb-2 flex w-100 -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
 							{#if versionPopupConfirmationVisible}
 								<div
 									class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">
@@ -603,7 +615,7 @@
 											<button
 												class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
 												onclick={() =>
-													changeOuptutVersion(
+													updateOutputVersion(
 														temporaryVersionConfirmation,
 														true,
 													)}>Change version</button>
@@ -625,7 +637,7 @@
 								{#each versions as v}
 									<button
 										class="flex w-full items-center rounded-md bg-zinc-800 p-2 text-left select-none hover:bg-zinc-700"
-										onclick={() => changeOuptutVersion(v)}>
+										onclick={() => updateOutputVersion(v)}>
 										<b class="w-1/4">{v.friendly}</b>
 										<span class="w-3/4 text-xs">{v.description}</span>
 									</button>
@@ -648,7 +660,7 @@
 				<button
 					{@attach tooltip}
 					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-					aria-label="Click to toggle whether the output should be optimised (shortest possible output), or expanded (easier to edit manually)."
+					aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
 					onclick={() => (shouldOptimise = !shouldOptimise)}
 					>{shouldOptimise ? "optimised" : "expanded"}</button>
 
@@ -659,10 +671,16 @@
 					onclick={outputDialog?.open}>
 					other output formats
 				</button>
+
+				<p class="font-lexend nomob text-xs text-white/60">•</p>
+
+				<p class="font-lexend nomob text-xs text-white/60">
+					{finalOutput.length} characters
+				</p>
 			</div>
 		</div>
 	</div>
-</div>
+</main>
 
 <noscript>
 	<div class="absolute">
@@ -755,25 +773,29 @@
 				<p>You have not saved anything yet!</p>
 			{/if}
 			{#each snapshots as snapshot (snapshot)}
-				<div class="flex flex-col space-y-0">
+				<div class="flex flex-col">
 					<div class="rounded-t-md rounded-br-md bg-zinc-900">
 						<MiniRenderer value={snapshot} />
 					</div>
 					<div class="flex w-fit rounded-b-md bg-zinc-950">
 						<button
-							class="px-3 py-2 hover:bg-white/3"
+							{@attach tooltip}
+							aria-label="Load snapshot"
+							class="border-r border-zinc-800 px-3 py-2 hover:bg-white/3"
 							onclick={() => {
 								editor?.commands.setContent(snapshot);
 								editor?.commands.focus();
-							}}>Load</button>
+							}}><IconLoad /></button>
 						<button
+							{@attach tooltip}
+							aria-label="Delete snapshot"
 							class="px-3 py-2 hover:bg-white/3"
 							onclick={() => {
 								snapshots = snapshots.filter(
 									(_, index) => index !== snapshots.indexOf(snapshot),
 								);
 								localStorage.setItem("snapshots", JSON.stringify(snapshots));
-							}}>Delete</button>
+							}}><IconDelete /></button>
 					</div>
 				</div>
 			{/each}

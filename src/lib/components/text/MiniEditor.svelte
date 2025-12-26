@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { type MinecraftText } from "$lib/types";
+	import { type MinecraftText, type StringyMCText } from "$lib/types";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
@@ -10,18 +10,16 @@
 	import IconColor from "~icons/tabler/palette";
 	import IconSquare from "~icons/tabler/square-filled";
 	import IconHollow from "~icons/tabler/square-x";
-	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt/nbt";
 
 	import {
 		colorMap,
 		defaultColorLUT,
 		trueMarkOrUndefined,
-	} from "$lib/text/general";
-	import { addTypeSpecificValues } from "$lib/text/nbt_or_json";
+	} from "$lib/text/utils";
+	import { addTypeSpecificValues } from "$lib/text/nbt/nbt_or_json";
 	import {
-		ClickEventMark,
 		FontsExtension,
-		HoverEventMark,
 		Obfuscation,
 		ShadowColorMark,
 	} from "$lib/tiptap/extensions/index";
@@ -45,8 +43,6 @@
 				Color,
 				TextStyle,
 				Obfuscation,
-				ClickEventMark,
-				HoverEventMark,
 				ShadowColorMark,
 				FontsExtension,
 				Placeholder.configure({
@@ -59,6 +55,7 @@
 				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
+				// TODO: fix the JSON parsing errors that can happen here
 				value = JSON.stringify(editor.getJSON());
 				output = JSON.parse(translate(editor.getJSON()));
 			},
@@ -74,7 +71,7 @@
 	function translate(json: JSONContent): string {
 		const paragraphs = json.content!;
 
-		let data: (MinecraftText | string)[] = [""];
+		let data: StringyMCText[] = [""];
 
 		paragraphs.forEach((p, i) => {
 			const content = p.content || [];

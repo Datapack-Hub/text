@@ -1,4 +1,7 @@
-import { addTypeSpecificValues, translateJSON } from "$lib/text/nbt_or_json";
+import {
+	addTypeSpecificValues,
+	translateJSON,
+} from "$lib/text/nbt/nbt_or_json";
 import {
 	versions,
 	type MinecraftText,
@@ -38,8 +41,6 @@ describe("translate", () => {
 	const baseOptions: TranslateOptions = {
 		exportType: "standard",
 		optimise: false,
-		indent: false,
-		indentSize: 2,
 	};
 
 	it("returns waiting message for empty content", () => {
@@ -47,7 +48,7 @@ describe("translate", () => {
 		const result = translateJSON(json, baseOptions);
 		expect(result).toBeOneOf([
 			"waiting for input...",
-			"🤓 <- james is waiting for you to type something",
+			"🤓 <- kevin is waiting for you to type something",
 		]);
 	});
 
@@ -110,7 +111,7 @@ describe("translate", () => {
 			],
 		};
 		const result = translateJSON(json, baseOptions);
-		expect(result).toContain('"shadow_color":16711935');
+		expect(result).toContain('"shadow_color":-65281');
 	});
 
 	it("handles multiple paragraphs with newlines", () => {
@@ -158,22 +159,6 @@ describe("translate", () => {
 		expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");
 		expect(JSON.parse(result)).toHaveProperty("[1].hoverEvent");
 		expect(JSON.parse(result)).not.toHaveProperty("[1].hover_event");
-	});
-
-	it("returns indented JSON when indent=true", () => {
-		const json: JSONContent = {
-			content: [
-				{
-					content: [{ type: "text", text: "Indented", marks: [] }],
-				},
-			],
-		};
-		const result = translateJSON(json, {
-			...baseOptions,
-			indent: true,
-			indentSize: 4,
-		});
-		expect(result.includes("\n")).toBe(true);
 	});
 
 	it("handles exportType=item_lore", () => {

@@ -1,4 +1,4 @@
-import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt";
+import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/nbt";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
 
@@ -7,6 +7,12 @@ it("should return a basic document", async () => {
 	const expectedDocument = await readTestJSONFile(
 		"clean/json/simple_text_tiptap.json",
 	);
+	expect(document).toEqual(expectedDocument);
+});
+
+it("should return a basic document (empty str)", async () => {
+	const document = snbtToDocument(convertToTextOrEmpty(""));
+	const expectedDocument = { content: [], type: "doc" };
 	expect(document).toEqual(expectedDocument);
 });
 
@@ -40,12 +46,48 @@ it("should apply a hex color to a text node", async () => {
 	expect(mark?.attrs?.color).toMatch("#c0bb1e");
 });
 
+it("should apply a decimal shadow color to a text node", async () => {
+	const basicColorSNBT = await readTestDataFile(
+		"clean/snbt/base10_shadow_color.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(basicColorSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks).toBeDefined();
+	expect(textNode?.marks).toHaveLength(1);
+
+	const mark = textNode?.marks?.at(0);
+
+	expect(mark?.type).toMatch("shadowColor");
+
+	expect(mark?.attrs?.shadowColor).toBeDefined();
+	expect(mark?.attrs?.shadowColor).toMatch("#ff0000");
+});
+
+it("should apply a hexadecimal shadow color to a text node", async () => {
+	const basicColorSNBT = await readTestDataFile(
+		"clean/snbt/base16_shadow_color.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(basicColorSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks).toBeDefined();
+	expect(textNode?.marks).toHaveLength(1);
+
+	const mark = textNode?.marks?.at(0);
+
+	expect(mark?.type).toMatch("shadowColor");
+
+	expect(mark?.attrs?.shadowColor).toBeDefined();
+	expect(mark?.attrs?.shadowColor).toMatch("#ff0000");
+});
+
 it("should throw an error if the format is invalid", async () => {
 	const broken = await readTestDataFile("bad/broken.snbt");
 	const converted = convertToTextOrEmpty(broken);
-	expect(converted.toString()).toMatch(
-		/An error occurred while parsing the SNBT/,
-	);
+	expect(
+		JSON.stringify(converted).includes(
+			"An error occurred while parsing the SNBT",
+		),
+	).toBe(true);
 });
 
 it("should return a one length array if passed with a single component", async () => {
@@ -104,6 +146,18 @@ describe("handling text styling marks", () => {
 		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
 
 		expect(textNode?.marks).toContainEqual({ type: "underline" });
+	});
+
+	it("should strike text styling to a text node", async () => {
+		const allTextStyleSNBT = await readTestDataFile(
+			"clean/snbt/all_text_style_marks.snbt",
+		);
+		const document = snbtToDocument(convertToTextOrEmpty(allTextStyleSNBT));
+		const textNode = document.content?.[0]?.content?.[0];
+		expect(textNode?.marks).toBeDefined();
+		expect(textNode?.marks?.length).toBeGreaterThanOrEqual(1);
+
+		expect(textNode?.marks).toContainEqual({ type: "strike" });
 	});
 
 	it("should strike text styling to a text node", async () => {
@@ -300,6 +354,41 @@ describe("applying source props", () => {
 		expect(node[7].attrs).toBeDefined();
 		expect(attrs.key).toBeDefined();
 		expect(attrs.key).toMatch("key.jump");
+	});
+
+	it("should properly apply atlas object properties", async () => {
+		const sourceSNBT = await readTestDataFile("clean/snbt/source.snbt");
+		const document = snbtToDocument(convertToTextOrEmpty(sourceSNBT));
+		const textNode = document.content![0];
+		expect(textNode).toBeDefined();
+		expect(textNode.type).toMatch("paragraph");
+
+		const node = textNode.content!;
+		const attrs = node[8].attrs!;
+
+		expect(node[8].type).toMatch("atlas_object");
+		expect(node[8].attrs).toBeDefined();
+		expect(attrs.atlas).toBeDefined();
+		expect(attrs.atlas).toMatch("Banana");
+		expect(attrs.sprite).toMatch("blah");
+	});
+
+	it("should properly apply player object properties", async () => {
+		const sourceSNBT = await readTestDataFile("clean/snbt/source.snbt");
+		const document = snbtToDocument(convertToTextOrEmpty(sourceSNBT));
+		const textNode = document.content![0];
+		expect(textNode).toBeDefined();
+		expect(textNode.type).toMatch("paragraph");
+
+		const node = textNode.content!;
+		const attrs = node[9].attrs!;
+
+		expect(node[9].type).toMatch("player_object");
+		expect(node[9].attrs).toBeDefined();
+		expect(attrs.player).toBeDefined();
+		expect(attrs.player.name).toBeDefined();
+		expect(attrs.player.name).toMatch("Cbble_");
+		expect(attrs.hat).toEqual(true);
 	});
 });
 

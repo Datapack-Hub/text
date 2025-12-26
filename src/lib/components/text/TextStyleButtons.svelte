@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { colorMap, defaultColorLUT } from "$lib/text/utils";
 	import { tooltip } from "$lib/tooltip";
+	import type { Editor } from "@tiptap/core";
+	import ColorPicker from "svelte-awesome-color-picker";
 	import IconBold from "~icons/tabler/bold";
 	import IconItalic from "~icons/tabler/italic";
 	import IconObfuscate from "~icons/tabler/password";
@@ -7,7 +10,8 @@
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
 
-	const { editor, small = false } = $props();
+	const { editor, small = false }: { editor: Editor; small?: boolean } =
+		$props();
 	let shadowColorValue = $state("#ffffff");
 </script>
 
@@ -76,6 +80,7 @@
 		: ''}">
 	<IconObfuscate />
 </button>
+<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 {#if editor.isActive("shadowColor")}
 	<button
 		aria-label="Shadow Color"
@@ -88,20 +93,29 @@
 		<IconShadow />
 	</button>
 {:else}
-	<label
-		for="shadow_color"
+	<button
 		aria-label="Shadow Color"
+		name="shadow_color"
 		{@attach tooltip}
 		class="p-1 {small
 			? 'text-sm'
-			: 'text-lg'} rounded-md font-medium hover:bg-white/3">
+			: 'text-lg'} rounded-md font-medium hover:bg-white/3"
+		onclick={() => {
+			editor.chain().focus().setShadowColor(shadowColorValue).run();
+		}}>
 		<IconShadow />
-	</label>
-	<input
-		type="color"
-		id="shadow_color"
-		class="w-0"
-		bind:value={shadowColorValue}
-		onchange={() =>
-			editor.chain().focus().setShadowColor(shadowColorValue).run()} />
+	</button>
 {/if}
+<!-- isAlpha is off because ARGB != RGBA and i want to get the update out -->
+<ColorPicker
+	isAlpha={false}
+	bind:hex={shadowColorValue}
+	--cp-bg-color="#18181b"
+	--cp-text-color="white"
+	--cp-input-color="#0C0C0E"
+	--cp-button-hover-color="#18181b"
+	--input-size="20px"
+	textInputModes={["hex"]}
+	swatches={Object.values(colorMap).map((c) => c.value)}
+	label="" />
+<div class="mx-2 h-5 w-px bg-zinc-600"></div>

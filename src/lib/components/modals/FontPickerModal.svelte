@@ -3,8 +3,10 @@
 	import IconFont from "~icons/tabler/function";
 	import IconUploadFont from "~icons/tabler/function-filled";
 	import IconCustom from "~icons/tabler/file-plus";
+	import IconClose from "~icons/tabler/x";
 	import type { Editor } from "@tiptap/core";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
+	import { openDataStore } from "$lib/db";
 
 	let {
 		editor,
@@ -17,6 +19,13 @@
 		fontUploadModal: Modal;
 		fontName: string;
 	}>();
+
+	async function deleteFont(identifier: string) {
+		const db = await openDataStore();
+
+		await db.delete("fonts", identifier);
+		fontLUT.delete(identifier);
+	}
 </script>
 
 <Modal title="Set font" bind:this={fontDialog} key="F">
@@ -59,15 +68,21 @@
 		</p>
 		<div class="flex flex-col space-y-1">
 			{#each fontLUT as [identifier, _]}
-				<button
-					onclick={() => {
-						editor?.chain().focus().setFont(identifier).run();
-						fontDialog?.close();
-					}}
-					class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-					<IconUploadFont />
-					<span class="font-mono text-white">{identifier}</span>
-				</button>
+				<div
+					class="flex h-full w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+					<button
+						onclick={() => {
+							editor?.chain().focus().setFont(identifier).run();
+							fontDialog?.close();
+						}}
+						class="flex flex-1 items-center space-x-2">
+						<IconUploadFont />
+						<span class="font-mono text-white">{identifier}</span>
+					</button>
+					<button
+						class="font-mono text-white"
+						onclick={() => deleteFont(identifier)}><IconClose /></button>
+				</div>
 			{/each}
 			<button
 				onclick={() => {

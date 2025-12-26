@@ -231,44 +231,47 @@ function mergeTextComponents(output: StringyMCText[]) {
 
 		// Find shared style/interactivity properties between consecutive objects
 		if (typeof current === "object" && typeof next === "object") {
-			// Merge all properties in styleProps that are identical across the group
 			const sharedProperties = getSharedStyleProps(current, next);
+			console.log("Shared Properties:", sharedProperties);
 
 			if (Object.keys(sharedProperties).length > 0) {
-				// Find how many consecutive objects share these properties
 				let group = [current];
-
 				collectAllFromIndex(i, group, output, sharedProperties);
-				if (group.length > 1) {
-					// Remove shared properties from each group member for "extra"
-					let extras: StringyMCText[] = group.map((comp) => {
-						const copy = { ...comp };
-						for (const prop of Object.keys(sharedProperties)) {
-							delete copy[prop as MCTextKey];
-						}
-						return copy;
-					});
+				console.log("Group Collected:", group);
 
-					// Optimise extra
-					extras = optimise(extras);
-					const first = extras.shift();
-					let merged = { ...sharedProperties };
-
-					// Rebuild merged component
-					if (typeof first == "string") {
-						merged.text = first;
-						if (extras.length > 0) merged.extra = extras;
-					} else {
-						Object.assign(merged, { ...first });
-						if (extras.length > 0) {
-							if (!merged.extra) merged.extra = extras;
-							else merged.extra = merged.extra.concat(extras); // this single line cost me 20 minutes
-						}
-					}
-					output.splice(i, group.length, merged);
-					i--; // recheck at this position
+				if (group.length < 1) {
 					continue;
 				}
+
+				// Remove shared properties from each group member for "extra"
+				let extras: StringyMCText[] = group.map((comp) => {
+					const copy = { ...comp };
+					for (const prop of Object.keys(sharedProperties)) {
+						delete copy[prop as MCTextKey];
+					}
+					return copy;
+				});
+
+				// Optimise extra
+				extras = optimise(extras);
+				const first = extras.shift();
+				let merged = { ...sharedProperties };
+				// Rebuild merged component
+				if (typeof first == "string") {
+					merged.text = first;
+					if (extras.length > 0) {
+						if (!merged.extra) merged.extra = extras;
+						else merged.extra = merged.extra.concat(extras);
+					}
+				} else {
+					Object.assign(merged, { ...first });
+					if (extras.length > 0) {
+						if (!merged.extra) merged.extra = extras;
+						else merged.extra = merged.extra.concat(extras);
+					}
+				}
+				output.splice(i, group.length, merged);
+				// i--; // TODO: actually fix the bug caused by checking again
 			}
 		}
 	}

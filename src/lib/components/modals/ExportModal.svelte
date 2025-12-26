@@ -40,9 +40,14 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto">
-				{editor
-					? convert(editor.getJSON(), "standard", shouldOptimise, exportAsJSON)
-					: "Loading..."}
+				<pre class="inline break-all whitespace-pre-wrap">{editor
+						? convert(
+								editor.getJSON(),
+								"standard",
+								shouldOptimise,
+								exportAsJSON,
+							)
+						: "Loading..."}</pre>
 			</code>
 		</div>
 
@@ -60,9 +65,16 @@
 				<IconCopy />
 			</button>
 			<code class="inline-block max-h-56 w-full overflow-auto"
-				><span class="text-white/35">[lore=</span>{editor
-					? convert(editor.getJSON(), "item_lore", shouldOptimise, exportAsJSON)
-					: "Loading..."}<span class="text-white/35">]</span>
+				><span class="text-white/35">[lore=</span>
+				<pre class="inline break-all whitespace-pre-wrap">{editor
+						? convert(
+								editor.getJSON(),
+								"item_lore",
+								shouldOptimise,
+								exportAsJSON,
+							)
+						: "Loading..."}</pre>
+				<span class="text-white/35">]</span>
 			</code>
 		</div>
 
@@ -79,8 +91,10 @@
 				}}>
 				<IconCopy />
 			</button>
-			<code class="inline-block max-h-56 w-full overflow-auto"
-				>{editor ? translateMOTD(editor.getJSON()) : "Loading..."}
+			<code class="max-h-56 w-full overflow-auto">
+				<pre class="inline break-all whitespace-pre-wrap">{editor
+						? translateMOTD(editor.getJSON())
+						: "Loading..."}</pre>
 			</code>
 		</div>
 	</div>

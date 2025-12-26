@@ -209,10 +209,9 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					current.shadow_color = parseInt(
-						shadowColorMark.attrs?.shadowColor.replace(/^#/, ""),
-						16,
-					);
+					current.shadow_color =
+						parseInt(shadowColorMark.attrs?.shadowColor.replace(/^#/, ""), 16) +
+						(0xff << 24); // TODO: transparency coming eventually?
 				}
 
 				current = addTypeSpecificValues(current, c, true);

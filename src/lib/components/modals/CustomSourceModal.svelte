@@ -402,7 +402,7 @@
 			<Combobox
 				items={defaultAtlases}
 				type="single"
-				inputProps={{ placeholder: "Type an alias or use a default..." }}
+				inputProps={{ placeholder: "Defaults to minecraft:blocks" }}
 				bind:value={customValues.object.atlas} />
 			<p class="mt-2">Sprite</p>
 			<input

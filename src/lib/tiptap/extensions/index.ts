@@ -44,7 +44,7 @@ export interface SelectorAttributes {
 }
 
 export interface AtlasObjectAttributes {
-	atlas: string;
+	atlas?: string;
 	sprite: string;
 }
 

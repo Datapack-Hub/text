@@ -2,7 +2,7 @@
 	import Modal from "$lib/components/Modal.svelte";
 	import { outputVersion } from "$lib/stores";
 	import { translateMOTD } from "$lib/text/motd";
-	import { convert } from "$lib/text/nbt/nbt_or_json";
+	import { convert } from "$lib/text/nbt/export";
 	import IconCopy from "~icons/tabler/copy";
 	import CheckBox from "../CheckBox.svelte";
 	let {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { convert } from "$lib/text/nbt/nbt_or_json";
+	import { convert } from "$lib/text/nbt/export";
 
 	import {
 		AtlasObjectNode,
@@ -24,7 +24,7 @@
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/nbt";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
 	import { Editor, type JSONContent } from "@tiptap/core";
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";

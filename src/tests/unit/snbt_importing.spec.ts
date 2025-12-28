@@ -1,4 +1,4 @@
-import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/nbt";
+import { convertToTextOrEmpty, snbtToDocument } from "../../lib/text/nbt/import";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
 

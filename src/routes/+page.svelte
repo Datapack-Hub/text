@@ -559,6 +559,7 @@
 	<div
 		class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
 		spellcheck="false"
+		id="wysiwyg-box"
 		bind:this={element}>
 	</div>
 

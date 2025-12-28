@@ -26,13 +26,13 @@
 	}: Props = $props();
 </script>
 
-<label bind:this={labelElement} {dir}>
-	<button
-		aria-label="Shadow Color"
-		{@attach tooltip}
-		class="p-1 {small
-			? 'text-sm'
-			: 'text-lg'} rounded-md bg-zinc-800 font-medium hover:bg-white/3">
+<button
+	aria-label="Shadow Color"
+	{@attach tooltip}
+	class="p-1 {small
+		? 'text-sm'
+		: 'text-lg'} rounded-md font-medium hover:bg-white/3">
+	<label bind:this={labelElement} {dir}>
 		<IconShadow />
-	</button>
-</label>
+	</label>
+</button>

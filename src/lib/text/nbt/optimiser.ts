@@ -232,12 +232,10 @@ function mergeTextComponents(output: StringyMCText[]) {
 		// Find shared style/interactivity properties between consecutive objects
 		if (typeof current === "object" && typeof next === "object") {
 			const sharedProperties = getSharedStyleProps(current, next);
-			console.log("Shared Properties:", sharedProperties);
 
 			if (Object.keys(sharedProperties).length > 0) {
 				let group = [current];
 				collectAllFromIndex(i, group, output, sharedProperties);
-				console.log("Group Collected:", group);
 
 				if (group.length < 1) {
 					continue;

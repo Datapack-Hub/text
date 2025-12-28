@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { colorMap, defaultColorLUT } from "$lib/text/utils";
+	import { colorMap } from "$lib/text/utils";
 	import { tooltip } from "$lib/tooltip";
 	import type { Editor } from "@tiptap/core";
 	import ColorPicker from "svelte-awesome-color-picker";
@@ -9,10 +9,13 @@
 	import IconShadow from "~icons/tabler/shadow";
 	import IconStrikethrough from "~icons/tabler/strikethrough";
 	import IconUnderline from "~icons/tabler/underline";
+	import ShadowColorButton from "./ShadowColorButton.svelte";
 
 	const { editor, small = false }: { editor: Editor; small?: boolean } =
 		$props();
 	let shadowColorValue = $state("#ffffff");
+	let shouldIgnoreInitInput = true;
+	let isColorPickerOpen = $state(false);
 </script>
 
 <button
@@ -80,42 +83,36 @@
 		: ''}">
 	<IconObfuscate />
 </button>
-<div class="mx-2 h-5 w-px bg-zinc-600"></div>
-{#if editor.isActive("shadowColor")}
-	<button
-		aria-label="Shadow Color"
-		name="shadow_color"
-		{@attach tooltip}
-		class="p-1 {small
-			? 'text-sm'
-			: 'text-lg'} rounded-md bg-zinc-800 font-medium hover:bg-white/3"
-		onclick={() => editor.chain().focus().unsetShadowColor().run()}>
-		<IconShadow />
-	</button>
+
+{#if !editor.isActive("shadowColor") || isColorPickerOpen}
+	<ColorPicker
+		isAlpha={false}
+		bind:hex={shadowColorValue}
+		bind:isOpen={isColorPickerOpen}
+		--cp-bg-color="#18181b"
+		--cp-text-color="white"
+		--cp-input-color="#0C0C0E"
+		--cp-button-hover-color="#18181b"
+		textInputModes={["hex"]}
+		onInput={(c) => {
+			if (isColorPickerOpen) {
+				c.hex && editor.chain().focus().setShadowColor(c.hex).run();
+			}
+		}}
+		swatches={Object.values(colorMap).map((c) => c.value)}
+		components={{ input: ShadowColorButton }} />
 {:else}
 	<button
-		aria-label="Shadow Color"
-		name="shadow_color"
+		aria-label="Unset Shadow Color"
 		{@attach tooltip}
+		onclick={() => {
+			shouldIgnoreInitInput = true;
+			shadowColorValue = "#ffffff";
+			editor.chain().focus().unsetShadowColor().run();
+		}}
 		class="p-1 {small
 			? 'text-sm'
-			: 'text-lg'} rounded-md font-medium hover:bg-white/3"
-		onclick={() => {
-			editor.chain().focus().setShadowColor(shadowColorValue).run();
-		}}>
+			: 'text-lg'} rounded-md bg-zinc-800 font-medium hover:bg-white/3">
 		<IconShadow />
 	</button>
 {/if}
-<!-- isAlpha is off because ARGB != RGBA and i want to get the update out -->
-<ColorPicker
-	isAlpha={false}
-	bind:hex={shadowColorValue}
-	--cp-bg-color="#18181b"
-	--cp-text-color="white"
-	--cp-input-color="#0C0C0E"
-	--cp-button-hover-color="#18181b"
-	--input-size="20px"
-	textInputModes={["hex"]}
-	swatches={Object.values(colorMap).map((c) => c.value)}
-	label="" />
-<div class="mx-2 h-5 w-px bg-zinc-600"></div>

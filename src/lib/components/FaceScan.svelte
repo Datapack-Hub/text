@@ -116,11 +116,25 @@
 			track.stop();
 		}
 	}
+
+	function forceClose(
+		e: KeyboardEvent & {
+			currentTarget: EventTarget & Window;
+		},
+	) {
+		if(e.ctrlKey && e.key === "Enter") {
+			notDone = false;
+			e.preventDefault();
+		}
+	}
 </script>
+
+<svelte:window
+	onkeydown={forceClose} />
 
 {#if notDone}
 	<div
-		class="fixed z-50 flex h-full w-screen items-center justify-center bg-black/80">
+		class="fixed z-50 flex h-full w-screen items-center justify-center bg-black/80 overflow-y-auto">
 		<div class="z-50 m-auto w-3/4 py-4 lg:w-2/3 xl:w-1/2">
 			<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
 				<span class="grow text-lg font-bold">Age Verification Required</span>

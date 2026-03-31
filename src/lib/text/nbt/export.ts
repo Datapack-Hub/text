@@ -67,8 +67,8 @@ export function addTypeSpecificValues(
 		case "atlas_object":
 			if (exportVersion.index >= 2) {
 				current.object = "atlas";
-				if(current.atlas) {
-					current.atlas = c.attrs?.atlas;	
+				if (current.atlas) {
+					current.atlas = c.attrs?.atlas;
 				}
 				current.sprite = c.attrs?.sprite;
 

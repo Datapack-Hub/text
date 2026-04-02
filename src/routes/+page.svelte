@@ -61,7 +61,6 @@
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-	import FaceScan from "$lib/components/FaceScan.svelte";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -392,7 +391,6 @@
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col">
-	<FaceScan />
 	<div
 		class="flex w-full items-center bg-zinc-950 text-zinc-300"
 		style="font-family: Lexend">

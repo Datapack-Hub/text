@@ -94,10 +94,6 @@ button {
 }
 
 .tippy-box[data-theme~="dph"] {
-	background-color: var(--color-zinc-700);
+	@apply bg-zinc-700;
 	font-family: "Lexend", sans-serif;
-}
-
-.text-very-sm {
-	font-size: 0.625rem;
 }

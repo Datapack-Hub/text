@@ -196,7 +196,6 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
-				console.log(editor.getJSON())
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();

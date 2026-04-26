@@ -73,7 +73,7 @@
 	let versionPopup: boolean = $state(false);
 
 	let doesContentExist: boolean = $derived(
-		editor ? !(editor.getText() === "") : false,
+		editor ? !editor.isEmpty : false,
 	);
 	let shouldOptimise = $state(true);
 
@@ -196,6 +196,7 @@
 			onTransaction: ({ editor: newEditor }) => {
 				editor = undefined;
 				editor = newEditor;
+				console.log(editor.getJSON())
 			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();

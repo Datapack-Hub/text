@@ -3,8 +3,11 @@
 	import { outputVersion } from "$lib/stores";
 	import { translateMOTD } from "$lib/text/motd";
 	import { convert } from "$lib/text/nbt/export";
+	import IconDownload from "~icons/tabler/download";
 	import IconCopy from "~icons/tabler/copy";
 	import CheckBox from "../CheckBox.svelte";
+	import html2canvas from "html2canvas-pro";
+
 	let {
 		outputDialog = $bindable(),
 		editor,
@@ -13,6 +16,22 @@
 	} = $props();
 
 	let exportAsJSON = $state(false);
+
+	async function exportAsImage() {
+		const canvas = document.createElement("canvas");
+		canvas.width = document.querySelector(".ProseMirror")!.clientWidth;
+		canvas.height = document.querySelector(".ProseMirror")!.clientHeight;
+		await html2canvas(document.querySelector(".ProseMirror")!, {
+			backgroundColor: null,
+			scale: 2,
+			canvas: canvas,
+		});
+		const dataUrl = canvas.toDataURL("image/png");
+		const link = document.createElement("a");
+		link.download = "tellraw-output.png";
+		link.href = dataUrl;
+		link.click();
+	}
 </script>
 
 <Modal title="More output formats" bind:this={outputDialog} big key="E">
@@ -24,7 +43,7 @@
 			</div>
 		{/if}
 
-		<p class="mt-2">
+		<p class="mt-4">
 			As {$outputVersion.index > 0 ? " " : "JSON "}text components:
 		</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
@@ -51,7 +70,7 @@
 			</code>
 		</div>
 
-		<p class="mt-2">As a lore component:</p>
+		<p class="mt-4">As a lore component:</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -78,7 +97,7 @@
 			</code>
 		</div>
 
-		<p class="mt-2">As a MOTD:</p>
+		<p class="mt-4">As a MOTD:</p>
 		<div class="flex items-start space-x-3 rounded-lg bg-zinc-950 p-3">
 			<button
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -97,5 +116,14 @@
 						: "Loading..."}</pre>
 			</code>
 		</div>
+		<p class="mt-4">(BETA) As a image:</p>
+		<p class="text-sm text-white/50">
+			Accuracy may not be great! You have been warned!
+		</p>
+		<button
+			class="my-2 w-fit rounded-sm bg-zinc-600 p-2 text-lg font-medium text-white hover:brightness-90 active:brightness-75"
+			onclick={exportAsImage}>
+			<IconDownload />
+		</button>
 	</div>
 </Modal>

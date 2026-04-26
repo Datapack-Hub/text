@@ -21,6 +21,8 @@ export const colorMap = [
 	{ name: "black", value: "#000000", code: "0" },
 ];
 
+export const sourceKeys = ["atlas_object", "player_object", "selector", "block_nbt", "entity_nbt", "storage_nbt", "keybind", "score", "translate"] as const;
+
 /**
  * Returns true if the specified mark is present in the content's marks, otherwise undefined.
  *
@@ -164,4 +166,8 @@ export function isDefinedTextObject(
 	obj: any,
 ): obj is Omit<MinecraftText, "text"> & { text: string } {
 	return typeof obj === "object" && obj.text !== undefined;
+}
+
+export function getNodeAtSelection(editor: Editor) {
+	return editor.state.selection.$head.nodeBefore;
 }

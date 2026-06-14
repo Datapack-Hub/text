@@ -53,7 +53,7 @@
 	import { page } from "$app/state";
 
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
-	import { colorMap } from "$lib/text/utils";
+	import { colorMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
 
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
 	import { openDataStore } from "$lib/db";
@@ -73,7 +73,7 @@
 	let versionPopup: boolean = $state(false);
 
 	let doesContentExist: boolean = $derived(
-		editor ? !(editor.getText() === "") : false,
+		editor ? !editor.isEmpty : false,
 	);
 	let shouldOptimise = $state(true);
 
@@ -291,8 +291,6 @@
 	}
 
 	function clickEditButtonHandler() {
-		// cobble if you want to move this elsewhere then please do
-		// what the heck -cbble_
 		const { from, to } = editor!.state.selection;
 		let start = from,
 			end = to;
@@ -480,6 +478,18 @@
 				aria-label="Add Custom Source">
 				<IconCustom />
 			</button>
+			{#if sourceKeys.some((key) => editor!.isActive(key))}
+				<ToolbarButton
+					onClick={async () => {
+						customType = getNodeAtSelection(editor!)?.type.name;
+						if (customType === "player_object" || customType === "selector") {
+							customType = "object";
+						}
+						await customDialog.open();
+					}}
+					ariaLabel="Edit Source"
+					Icon={IconEdit} />
+			{/if}
 
 			<ToolbarButton
 				Icon={IconEmoji}

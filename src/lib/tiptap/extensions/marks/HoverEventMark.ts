@@ -21,7 +21,7 @@ export const HoverEventMark = Mark.create({
 					}
 					const el = element as HTMLElement;
 					const action = el.getAttribute("data-hover-event-action");
-					const value = el.getAttribute("data-hover-event-value");
+					const value = JSON.parse(el.getAttribute("data-hover-event-value")!);
 					if (!action) {
 						return false;
 					}
@@ -40,10 +40,9 @@ export const HoverEventMark = Mark.create({
 			mergeAttributes(
 				{
 					"data-hover-event-action": HTMLAttributes.action,
-					"data-hover-event-value": HTMLAttributes.value,
+					"data-hover-event-value": JSON.stringify(HTMLAttributes.value),
 					class: "hoverEvent",
 				},
-				HTMLAttributes,
 			),
 			0,
 		];

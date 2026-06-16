@@ -244,8 +244,11 @@ export function translateJSON(
 		for (const match of shadowColorMatches) {
 			if (match[1]) {
 				const num = parseInt(match[1]);
-				if (num > 2**31 - 1 || num < (-2)**31) {
-					finalResult = finalResult.replaceAll(match[0], `shadow_color:${num}L`)
+				if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
+					finalResult = finalResult.replaceAll(
+						match[0],
+						`shadow_color:${num}L`,
+					);
 				}
 			}
 		}

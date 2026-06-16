@@ -22,4 +22,3 @@
 	class="toolbar-btn {styleVar ? 'bg-zinc-800' : ''}">
 	<Icon />
 </button>
-

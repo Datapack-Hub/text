@@ -21,7 +21,17 @@ export const colorMap = [
 	{ name: "black", value: "#000000", code: "0" },
 ];
 
-export const sourceKeys = ["atlas_object", "player_object", "selector", "block_nbt", "entity_nbt", "storage_nbt", "keybind", "score", "translate"] as const;
+export const sourceKeys = [
+	"atlas_object",
+	"player_object",
+	"selector",
+	"block_nbt",
+	"entity_nbt",
+	"storage_nbt",
+	"keybind",
+	"score",
+	"translate",
+] as const;
 
 /**
  * Returns true if the specified mark is present in the content's marks, otherwise undefined.

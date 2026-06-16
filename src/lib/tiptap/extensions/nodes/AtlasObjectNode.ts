@@ -32,7 +32,7 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 	renderHTML({ HTMLAttributes, node }) {
 		let { atlas, sprite } = node.attrs;
 		if (!atlas) {
-			atlas = "minecraft:blocks"
+			atlas = "minecraft:blocks";
 		}
 
 		return [

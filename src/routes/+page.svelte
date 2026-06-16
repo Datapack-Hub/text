@@ -72,9 +72,7 @@
 	let outputDialog: Modal = $state()!;
 	let versionPopup: boolean = $state(false);
 
-	let doesContentExist: boolean = $derived(
-		editor ? !editor.isEmpty : false,
-	);
+	let doesContentExist: boolean = $derived(editor ? !editor.isEmpty : false);
 	let shouldOptimise = $state(true);
 
 	// Import

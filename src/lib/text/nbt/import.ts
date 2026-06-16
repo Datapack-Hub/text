@@ -182,7 +182,7 @@ function mapPropertiesToType(source: MinecraftText): JSONContent {
 				key: source.keybind,
 			},
 		};
-	} else if (source.atlas) {
+	} else if (source.sprite || source.atlas) {
 		finalText = {
 			type: "atlas_object",
 			attrs: {
@@ -242,7 +242,7 @@ function applyStyling(
 	}
 
 	if (text.shadow_color) {
-		const hex = "#" + text.shadow_color.toString(16).padStart(6, "0");
+		const hex = "#" + text.shadow_color.toString(16).padStart(8, "0");
 		finalText.marks?.push({
 			type: "shadowColor",
 			attrs: {

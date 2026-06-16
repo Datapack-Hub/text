@@ -44,7 +44,6 @@
 			selector: "",
 		},
 		object: {
-			object: "",
 			atlas: "",
 			sprite: "",
 			player: {
@@ -397,7 +396,7 @@
 			<option value="player">Player Head</option>
 		</select>
 
-		{#if customValues.object.object == "atlas"}
+		{#if customValues.object.object || customValues.object.object == "atlas"}
 			<p class="mt-2">Atlas</p>
 			<Combobox
 				items={defaultAtlases}

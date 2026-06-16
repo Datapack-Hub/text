@@ -397,9 +397,6 @@
 		<button
 			class="flex items-center px-3 py-2 hover:bg-white/3"
 			onclick={importDialog?.open}>Import</button>
-		<button
-			class="flex items-center px-3 py-2 hover:bg-white/3"
-			onclick={loadDialog?.open}>Load</button>
 		{#if doesContentExist}
 			<button
 				class="flex items-center px-3 py-2 hover:bg-white/3"
@@ -408,6 +405,9 @@
 				class="flex items-center px-3 py-2 hover:bg-white/3"
 				onclick={saveSnapshot}>Save{recentlySaved ? "d!" : ""}</button>
 		{/if}
+		<button
+			class="flex items-center px-3 py-2 hover:bg-white/3"
+			onclick={loadDialog?.open}>Load</button>
 		<div class="grow"></div>
 		<a
 			href="https://discord.datapackhub.net/"

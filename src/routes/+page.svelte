@@ -23,6 +23,9 @@
 	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
+	import { Highlight } from "svelte-highlight";
+	import typescript from "svelte-highlight/languages/typescript";
+	import "svelte-highlight/styles/github-dark.css";
 
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
 	import { Editor, type JSONContent } from "@tiptap/core";
@@ -30,6 +33,7 @@
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
 	import { onDestroy, onMount } from "svelte";
+
 	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
@@ -598,9 +602,10 @@
 					{/if}</button>
 				<code id="outputbox">
 					<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-					<pre class="inline break-all whitespace-pre-wrap">{editor
+					<!-- <pre class="inline break-all whitespace-pre-wrap">{editor
 							? finalOutput
-							: "Loading..."}</pre>
+							: "Loading..."}</pre> -->
+					<Highlight language={typescript} code={finalOutput} />
 				</code>
 			</div>
 			<div class="mt-2 flex items-center space-x-2 select-none">

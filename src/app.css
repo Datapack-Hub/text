@@ -98,3 +98,16 @@ button {
 	background-color: var(--color-zinc-700);
 	font-family: "Lexend", sans-serif;
 }
+
+pre code.hljs {
+	background: transparent !important;
+	padding: 0 !important;
+	@apply break-all whitespace-pre-wrap;
+}
+
+.hljs-attr { color: #55FFFF !important; }
+.hljs-string { color: #55FF55 !important; }
+.hljs-number { color: #FFAA00 !important; }
+.hljs-literal { color: #FFAA00 !important; }
+.hljs-params { color: #ffb86c !important; } 
+.hljs-comment { color: #6272a4 !important; font-style: italic; } 

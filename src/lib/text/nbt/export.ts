@@ -73,6 +73,7 @@ export function addTypeSpecificValues(
 
 				current.bold = undefined;
 				current.italic = undefined;
+				current.obfuscated = undefined;
 			} else {
 				current.text = "";
 			}
@@ -87,6 +88,7 @@ export function addTypeSpecificValues(
 
 				current.bold = undefined;
 				current.italic = undefined;
+				current.obfuscated = undefined;
 			} else {
 				current.text = "";
 			}

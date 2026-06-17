@@ -21,23 +21,23 @@
 }
 
 /* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
-*[style*="font-family: MinecraftEnchanting"] strong,
-*[style*="font-family: 'MinecraftEnchanting'"] strong,
-*[style*='font-family: "MinecraftEnchanting"'] strong {
+*[style*="font-family: MinecraftEnchanting"] strong:not(:has([data-atlas-object-node],[data-player-object-node])),
+*[style*="font-family: 'MinecraftEnchanting'"] strong:not(:has([data-atlas-object-node],[data-player-object-node])),
+*[style*='font-family: "MinecraftEnchanting"'] strong:not(:has([data-atlas-object-node],[data-player-object-node])) {
 	font-family: MinecraftEnchantingBold;
 	font-weight: 100;
 }
 
 /* Use MinecraftIllagerBold if parent uses MinecraftIllager font */
-*[style*="font-family: MinecraftIllager"] strong,
-*[style*="font-family: 'MinecraftIllager'"] strong,
-*[style*='font-family: "MinecraftIllager"'] strong {
+*[style*="font-family: MinecraftIllager"] strong:not(:has([data-atlas-object-node],[data-player-object-node])),
+*[style*="font-family: 'MinecraftIllager'"] strong:not(:has([data-atlas-object-node],[data-player-object-node])),
+*[style*='font-family: "MinecraftIllager"'] strong:not(:has([data-atlas-object-node],[data-player-object-node])) {
 	font-family: MinecraftIllagerBold;
 	font-weight: 100;
 }
 
 /* Use MinecraftBold if not MinecraftEnchanting or MinecraftIllager */
-strong {
+strong:not(:has([data-atlas-object-node],[data-player-object-node])) {
 	font-family: MinecraftBold;
 	font-weight: 100;
 }
@@ -78,7 +78,7 @@ button {
 	--custom-source-align: top;
 }
 
-.obfuscated {
+.obfuscated:not(:has([data-atlas-object-node],[data-player-object-node])) {
 	filter: blur(2px);
 }
 

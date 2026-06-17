@@ -37,7 +37,7 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 		return [
 			"span",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				"data-player-object-node": "true",
+				"data-player-object-node": "",
 				contenteditable: "false",
 				style: `
             background-color: #18181b;
@@ -46,6 +46,8 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
             font-size: 0.9rem;
             display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
+			font-style: normal !important;
+			font-weight: normal !important;
 			text-decoration: inherit;
         `,
 			}),

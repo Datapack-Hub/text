@@ -1,5 +1,20 @@
-import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, AtlasObjectAttributes } from "../index";
+import {
+	ClickEventMark,
+	FixedTextStyle,
+	FontsExtension,
+	HoverEventMark,
+	Obfuscation,
+	ShadowColorMark,
+} from "$lib/tiptap/extensions/index";
+import {
+	Node,
+	getSchema,
+	mergeAttributes,
+	type CommandProps,
+} from "@tiptap/core";
+import Color from "@tiptap/extension-color";
+import StarterKit from "@tiptap/starter-kit";
+import type { AtlasObjectAttributes, NodeOptions } from "../index";
 
 export const AtlasObjectNode = Node.create<NodeOptions>({
 	name: "atlas_object",
@@ -38,7 +53,7 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 		return [
 			"span",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				"data-atlas-object-node": "true",
+				"data-atlas-object-node": "",
 				contenteditable: "false",
 				style: `
             background-color: #18181b;
@@ -47,6 +62,8 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
             font-size: 0.9rem;
             display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
+			font-style: normal !important;
+			font-weight: normal !important;
 			text-decoration: inherit;
         `,
 			}),

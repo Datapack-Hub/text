@@ -1,6 +1,30 @@
 <script lang="ts">
 	import { convert } from "$lib/text/nbt/export";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
+	import { colorMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
+	import { openDataStore } from "$lib/db";
+	import { outputVersion } from "$lib/stores";
+	import { tooltip } from "$lib/tooltip";
+	import { versions, type Version } from "$lib/types";
 
+	// Local components
+	import Modal from "$lib/components/Modal.svelte";
+	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
+	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
+	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
+	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
+
+	// External components
+	import ColorPicker from "svelte-awesome-color-picker";
+	import { Highlight } from "svelte-highlight";
+	import typescript from "svelte-highlight/languages/typescript";
+
+	// Tiptap
+	import { Editor, type JSONContent } from "@tiptap/core";
+	import Color from "@tiptap/extension-color";
+	import Placeholder from "@tiptap/extension-placeholder";
+	import StarterKit from "@tiptap/starter-kit";
+	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import {
 		AtlasObjectNode,
 		BlockNBTNode,
@@ -18,18 +42,7 @@
 		StorageNBTNode,
 		TranslateNode,
 	} from "$lib/tiptap/extensions/index";
-	// Components
-	import Modal from "$lib/components/Modal.svelte";
-	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
-	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
-	import ColorPicker from "svelte-awesome-color-picker";
 
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
-	import { Editor, type JSONContent } from "@tiptap/core";
-	import Color from "@tiptap/extension-color";
-	import Placeholder from "@tiptap/extension-placeholder";
-	import StarterKit from "@tiptap/starter-kit";
-	import { onDestroy, onMount } from "svelte";
 	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
@@ -50,17 +63,9 @@
 	import IconDelete from "~icons/tabler/trash";
 	import IconLoad from "~icons/tabler/upload";
 
+	// Svelte
+	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/state";
-
-	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
-	import { colorMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
-
-	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
-	import { openDataStore } from "$lib/db";
-	import { outputVersion } from "$lib/stores";
-	import { fontLUT } from "$lib/tiptap/extensions/fonts";
-	import { tooltip } from "$lib/tooltip";
-	import { versions, type Version } from "$lib/types";
 
 	let tiptapJSON: JSONContent = $state()!;
 
@@ -598,9 +603,10 @@
 					{/if}</button>
 				<code id="outputbox">
 					<!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-					<pre class="inline break-all whitespace-pre-wrap">{editor
+					<!-- <pre class="inline break-all whitespace-pre-wrap">{editor
 							? finalOutput
-							: "Loading..."}</pre>
+							: "Loading..."}</pre> -->
+					<Highlight language={typescript} code={finalOutput} />
 				</code>
 			</div>
 			<div class="mt-2 flex items-center space-x-2 select-none">

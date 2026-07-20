@@ -1,3 +1,15 @@
+import {
+	ClickEventMark,
+	FixedTextStyle,
+	FontsExtension,
+	HoverEventMark,
+	Obfuscation,
+	ShadowColorMark,
+} from "$lib/tiptap/extensions/index";
+import { getSchema } from "@tiptap/core";
+import Color from "@tiptap/extension-color";
+import StarterKit from "@tiptap/starter-kit";
+
 export interface ClickEventAttributes {
 	action: string | null;
 	value: string | null;
@@ -109,18 +121,39 @@ export interface NodeOptions {
 	HTMLAttributes: Record<string, any>;
 }
 
+export const markSchema = getSchema([
+	StarterKit.configure({
+		blockquote: false,
+		bulletList: false,
+		codeBlock: false,
+		hardBreak: false,
+		heading: false,
+		horizontalRule: false,
+		listItem: false,
+		orderedList: false,
+		link: false,
+	}),
+	Color,
+	FixedTextStyle,
+	Obfuscation,
+	ClickEventMark,
+	HoverEventMark,
+	ShadowColorMark,
+	FontsExtension,
+]);
+
 export { FixedTextStyle } from "./FixedTextStyle";
+export { FontsExtension } from "./fonts";
 export { ClickEventMark } from "./marks/ClickEventMark";
 export { HoverEventMark } from "./marks/HoverEventMark";
 export { Obfuscation } from "./marks/ObfuscationMark";
 export { ShadowColorMark } from "./marks/ShadowColorMark";
+export { AtlasObjectNode } from "./nodes/AtlasObjectNode";
 export { BlockNBTNode } from "./nodes/BlockNBTNode";
 export { EntityNBTNode } from "./nodes/EntityNBTNode";
 export { KeybindNode } from "./nodes/KeybindNode";
+export { PlayerObjectNode } from "./nodes/PlayerObjectNode";
 export { ScoreNode } from "./nodes/ScoreNode";
 export { SelectorNode } from "./nodes/SelectorNode";
 export { StorageNBTNode } from "./nodes/StorageNBTNode";
 export { TranslateNode } from "./nodes/TranslateNode";
-export { AtlasObjectNode } from "./nodes/AtlasObjectNode";
-export { PlayerObjectNode } from "./nodes/PlayerObjectNode";
-export { FontsExtension } from "./fonts";

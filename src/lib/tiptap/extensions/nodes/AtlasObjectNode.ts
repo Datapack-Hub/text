@@ -1,19 +1,4 @@
-import {
-	ClickEventMark,
-	FixedTextStyle,
-	FontsExtension,
-	HoverEventMark,
-	Obfuscation,
-	ShadowColorMark,
-} from "$lib/tiptap/extensions/index";
-import {
-	Node,
-	getSchema,
-	mergeAttributes,
-	type CommandProps,
-} from "@tiptap/core";
-import Color from "@tiptap/extension-color";
-import StarterKit from "@tiptap/starter-kit";
+import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
 import type { AtlasObjectAttributes, NodeOptions } from "../index";
 
 export const AtlasObjectNode = Node.create<NodeOptions>({

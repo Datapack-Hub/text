@@ -74,7 +74,7 @@ button {
 	--custom-source-align: top;
 }
 
-.obfuscated:not(:has([data-atlas-object-node], [data-player-object-node])) {
+.obfuscated {
 	filter: blur(2px);
 }
 

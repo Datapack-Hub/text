@@ -1,5 +1,9 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { AtlasObjectAttributes, NodeOptions } from "../index";
+import {
+	markSchema,
+	type AtlasObjectAttributes,
+	type NodeOptions,
+} from "../index";
 
 export const AtlasObjectNode = Node.create<NodeOptions>({
 	name: "atlas_object",
@@ -7,6 +11,12 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 	inline: true,
 	group: "inline",
 	atom: true,
+
+	marks() {
+		const blocklist = new Set(["bold", "italic", "obfuscated"]);
+		const allMarks = Object.keys(markSchema.marks || {});
+		return allMarks.filter((mark) => !blocklist.has(mark)).join(" ");
+	},
 
 	addOptions() {
 		return {
@@ -49,6 +59,7 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 			vertical-align: var(--custom-source-align, middle);
 			font-style: normal !important;
 			font-weight: normal !important;
+			font-family: Minecraft !important;
 			text-decoration: inherit;
         `,
 			}),

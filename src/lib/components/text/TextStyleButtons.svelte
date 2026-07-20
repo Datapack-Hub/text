@@ -86,7 +86,6 @@
 
 {#if !editor.isActive("shadowColor") || isColorPickerOpen}
 	<ColorPicker
-		isAlpha={false}
 		bind:hex={shadowColorValue}
 		bind:isOpen={isColorPickerOpen}
 		--cp-bg-color="#18181b"

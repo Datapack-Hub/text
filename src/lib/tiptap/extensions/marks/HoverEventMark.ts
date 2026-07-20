@@ -37,13 +37,11 @@ export const HoverEventMark = Mark.create({
 	renderHTML({ HTMLAttributes }) {
 		return [
 			"span",
-			mergeAttributes(
-				{
-					"data-hover-event-action": HTMLAttributes.action,
-					"data-hover-event-value": JSON.stringify(HTMLAttributes.value),
-					class: "hoverEvent",
-				},
-			),
+			mergeAttributes({
+				"data-hover-event-action": HTMLAttributes.action,
+				"data-hover-event-value": JSON.stringify(HTMLAttributes.value),
+				class: "hoverEvent",
+			}),
 			0,
 		];
 	},

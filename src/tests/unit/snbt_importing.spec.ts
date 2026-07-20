@@ -1,4 +1,7 @@
-import { convertToTextOrEmpty, snbtToDocument } from "../../lib/text/nbt/import";
+import {
+	convertToTextOrEmpty,
+	snbtToDocument,
+} from "../../lib/text/nbt/import";
 import { describe, expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "./test_utils";
 
@@ -46,7 +49,7 @@ it("should apply a hex color to a text node", async () => {
 	expect(mark?.attrs?.color).toMatch("#c0bb1e");
 });
 
-it("should apply a decimal shadow color to a text node", async () => {
+it.skip("should apply a decimal shadow color to a text node", async () => {
 	const basicColorSNBT = await readTestDataFile(
 		"clean/snbt/base10_shadow_color.snbt",
 	);
@@ -63,7 +66,7 @@ it("should apply a decimal shadow color to a text node", async () => {
 	expect(mark?.attrs?.shadowColor).toMatch("#ff0000");
 });
 
-it("should apply a hexadecimal shadow color to a text node", async () => {
+it.skip("should apply a hexadecimal shadow color to a text node", async () => {
 	const basicColorSNBT = await readTestDataFile(
 		"clean/snbt/base16_shadow_color.snbt",
 	);

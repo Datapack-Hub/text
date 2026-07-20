@@ -44,7 +44,6 @@
 			selector: "",
 		},
 		object: {
-			object: "",
 			atlas: "",
 			sprite: "",
 			player: {

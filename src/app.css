@@ -21,17 +21,13 @@
 }
 
 /* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
-*[style*="font-family: MinecraftEnchanting"] strong,
-*[style*="font-family: 'MinecraftEnchanting'"] strong,
-*[style*='font-family: "MinecraftEnchanting"'] strong {
+*[style*="font-family: MinecraftEnchanting"] strong {
 	font-family: MinecraftEnchantingBold;
 	font-weight: 100;
 }
 
 /* Use MinecraftIllagerBold if parent uses MinecraftIllager font */
-*[style*="font-family: MinecraftIllager"] strong,
-*[style*="font-family: 'MinecraftIllager'"] strong,
-*[style*='font-family: "MinecraftIllager"'] strong {
+*[style*="font-family: MinecraftIllager"] strong {
 	font-family: MinecraftIllagerBold;
 	font-weight: 100;
 }
@@ -78,7 +74,7 @@ button {
 	--custom-source-align: top;
 }
 
-.obfuscated {
+.obfuscated:not(:has([data-atlas-object-node], [data-player-object-node])) {
 	filter: blur(2px);
 }
 
@@ -97,4 +93,30 @@ button {
 .tippy-box[data-theme~="dph"] {
 	background-color: var(--color-zinc-700);
 	font-family: "Lexend", sans-serif;
+}
+
+pre code.hljs {
+	background: transparent !important;
+	padding: 0 !important;
+	@apply break-all whitespace-pre-wrap;
+}
+
+.hljs-attr {
+	color: #55ffff !important;
+}
+.hljs-string {
+	color: #55ff55 !important;
+}
+.hljs-number {
+	color: #ffaa00 !important;
+}
+.hljs-literal {
+	color: #ffaa00 !important;
+}
+.hljs-params {
+	color: #ffb86c !important;
+}
+.hljs-comment {
+	color: #6272a4 !important;
+	font-style: italic;
 }

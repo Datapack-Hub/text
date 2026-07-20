@@ -1,5 +1,9 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import type { NodeOptions, PlayerObjectAttributes } from "../index";
+import {
+	markSchema,
+	type NodeOptions,
+	type PlayerObjectAttributes,
+} from "../index";
 
 export const PlayerObjectNode = Node.create<NodeOptions>({
 	name: "player_object",
@@ -7,6 +11,12 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 	inline: true,
 	group: "inline",
 	atom: true,
+
+	marks() {
+		const blocklist = new Set(["bold", "italic", "obfuscated"]);
+		const allMarks = Object.keys(markSchema.marks || {});
+		return allMarks.filter((mark) => !blocklist.has(mark)).join(" ");
+	},
 
 	addOptions() {
 		return {
@@ -37,7 +47,7 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 		return [
 			"span",
 			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				"data-player-object-node": "true",
+				"data-player-object-node": "",
 				contenteditable: "false",
 				style: `
             background-color: #18181b;
@@ -46,6 +56,8 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
             font-size: 0.9rem;
             display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
+			font-style: normal !important;
+			font-weight: normal !important;
 			text-decoration: inherit;
         `,
 			}),

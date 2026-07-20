@@ -66,14 +66,14 @@ export function addTypeSpecificValues(
 			break;
 		case "atlas_object":
 			if (exportVersion.index >= 2) {
-				current.object = "atlas";
-				if(current.atlas) {
-					current.atlas = c.attrs?.atlas;	
+				if (c.attrs?.atlas && c.attrs?.atlas !== "") {
+					current.atlas = c.attrs?.atlas;
 				}
 				current.sprite = c.attrs?.sprite;
 
 				current.bold = undefined;
 				current.italic = undefined;
+				current.obfuscated = undefined;
 			} else {
 				current.text = "";
 			}
@@ -88,6 +88,7 @@ export function addTypeSpecificValues(
 
 				current.bold = undefined;
 				current.italic = undefined;
+				current.obfuscated = undefined;
 			} else {
 				current.text = "";
 			}
@@ -211,9 +212,10 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					current.shadow_color =
-						parseInt(shadowColorMark.attrs?.shadowColor.replace(/^#/, ""), 16) +
-						(0xff << 24); // TODO: transparency coming eventually?
+					current.shadow_color = parseInt(
+						rgbaToArgbHex(shadowColorMark.attrs?.shadowColor).replace(/^#/, ""),
+						16,
+					);
 				}
 
 				current = addTypeSpecificValues(current, c, true);
@@ -238,7 +240,22 @@ export function translateJSON(
 			return JSON.stringify(data[0]);
 		}
 
-		return JSON.stringify(data);
+		let finalResult = JSON.stringify(data);
+
+		const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/g);
+		for (const match of shadowColorMatches) {
+			if (match[1]) {
+				const num = parseInt(match[1]);
+				if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
+					finalResult = finalResult.replaceAll(
+						match[0],
+						`shadow_color:${num}L`,
+					);
+				}
+			}
+		}
+
+		return finalResult;
 	} else if (options.exportType === "item_lore") {
 		let data: (StringyMCText[] | StringyMCText)[] = [];
 
@@ -272,4 +289,16 @@ export function translateJSON(
 	}
 
 	return "[]";
+}
+
+function rgbaToArgbHex(rgbaHex: string): string {
+	// Remove the leading '#' if it exists
+	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
+
+	// Extract RGB and Alpha components
+	const rgb = hex.slice(0, 6);
+	const alpha = hex.slice(6, 8);
+
+	// Return with alpha placed at the beginning
+	return `#${alpha}${rgb}`;
 }

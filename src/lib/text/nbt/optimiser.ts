@@ -208,12 +208,12 @@ function mergeTextComponents(output: StringyMCText[]) {
 		// Merge whitespace objects to next component
 		if (isDefinedTextObject(current) && isDefinedTextObject(next)) {
 			// which direction to merge
-			if (next.text.match(/^\s*$/)) {
+			if (next.text.match(/^\s+$/)) {
 				current.text += next.text;
 				output.splice(i + 1, 1);
 				i--;
 				continue;
-			} else if (current.text.match(/^\s*$/)) {
+			} else if (current.text.match(/^\s+$/)) {
 				next.text = current.text + next.text;
 				output.splice(i, 1);
 				i--;

@@ -1,5 +1,5 @@
 import { optimise } from "$lib/text/nbt/optimiser";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Minimal mock types for test compatibility
 type StringyMCText = string | { [key: string]: any };

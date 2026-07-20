@@ -212,10 +212,13 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					current.shadow_color = parseInt(
-						rgbaToArgbHex(shadowColorMark.attrs?.shadowColor).replace(/^#/, ""),
-						16,
-					);
+					let colorVal = shadowColorMark.attrs?.shadowColor.replace(/^#/, "");
+					if (colorVal && colorVal.length <= 8) {
+						current.shadow_color = parseInt(
+							rgbaToArgbHex(colorVal).replace(/^#/, ""),
+							16,
+						);
+					}
 				}
 
 				current = addTypeSpecificValues(current, c, true);
@@ -249,7 +252,7 @@ export function translateJSON(
 				if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
 					finalResult = finalResult.replaceAll(
 						match[0],
-						`shadow_color:${num}L`,
+						`"shadow_color":${num}L`,
 					);
 				}
 			}

@@ -60,7 +60,7 @@ export type MinecraftText = {
 	atlas?: string;
 	sprite?: string;
 	player?: {
-		name?: string;
+		name: string;
 	};
 	hat?: string;
 

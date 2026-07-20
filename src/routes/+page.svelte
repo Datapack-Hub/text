@@ -574,9 +574,9 @@
 	<div>
 		{#if page.url.searchParams.has("dev")}
 			<code class="inline-block overflow-x-scroll p-3 text-xs"
-				><pre>
-					DEV ONLY: {editor ? JSON.stringify(editor.getJSON()) : "Loading..."}
-				</pre></code>
+				>DEV ONLY: {editor
+					? JSON.stringify(editor.getJSON())
+					: "Loading..."}</code>
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">

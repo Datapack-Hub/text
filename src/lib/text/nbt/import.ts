@@ -44,9 +44,14 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 		return [raw.replace(/"/g, "")];
 	}
 
-	// replace 1b and 0b
+	// replace 1b and 0b with true and false literals
 	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
 	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false");
+
+	// remove type suffixes from numbers (e.g., 1.0f, 2.0d, 3l)
+	raw = raw.replace(/(?<="\w+"\s*:\s*)-?\d+(\.\d+)?[fdl]/gi, (match) => {
+		return match.slice(0, -1);
+	});
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
@@ -242,13 +247,22 @@ function applyStyling(
 	}
 
 	if (text.shadow_color) {
-		const hex = "#" + text.shadow_color.toString(16).padStart(8, "0");
-		finalText.marks?.push({
-			type: "shadowColor",
-			attrs: {
-				shadowColor: hex,
-			},
-		});
+		const combinedShadowStr = (
+			Array.isArray(text.shadow_color)
+				? text.shadow_color.map(mapToHexByte).join("")
+				: text.shadow_color.toString(16)
+		).replace(/[lL#]/g, "");
+		const intValue = parseInt(combinedShadowStr, 16);
+
+		if (intValue > 0 && intValue < 0xffffffff) {
+			const hex = "#" + combinedShadowStr.padStart(8, "ff");
+			finalText.marks?.push({
+				type: "shadowColor",
+				attrs: {
+					shadowColor: hex,
+				},
+			});
+		}
 	}
 
 	if (text.bold) {
@@ -405,4 +419,15 @@ function fixBrokenNewLines(doc: JSONContent) {
 		type: "doc",
 		content: fixedContent,
 	};
+}
+
+function mapToHexByte(value: number): string {
+	if (value < 0.0 || value > 1.0) {
+		return "00"; // Return "00" for out-of-range values
+	}
+
+	const byteValue = Math.round(value * 255);
+	const hexString = byteValue.toString(16);
+
+	return hexString.length === 1 ? "0" + hexString : hexString;
 }

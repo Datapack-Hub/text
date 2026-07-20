@@ -84,8 +84,12 @@ button {
 	--custom-source-align: top;
 }
 
-.obfuscated:not(:has([data-atlas-object-node], [data-player-object-node])) {
-	filter: blur(2px);
+.obfuscated {
+	@apply transition-all;
+}
+
+.obfuscated:not(:hover) {
+	filter: blur(3px);
 }
 
 .color-picker {

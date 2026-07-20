@@ -7,8 +7,7 @@ import {
 	unescapeUnicode,
 } from "$lib/text/utils";
 import type { JSONContent } from "@tiptap/core";
-import { it } from "vitest";
-import { describe, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("isDefinedTextObject", () => {
 	it("should report defined object with minimal object", () => {

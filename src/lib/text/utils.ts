@@ -71,33 +71,29 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 		return;
 	}
 	return colorMap.find((e) => e.name.toLowerCase() === color)?.value || color;
-} /**
- * Checks the type of the mark against `type`
+}
+
+/**
+ * Finds a mark of a specific type in a JSONContent node.
  *
  * @param c the node you want to examine
  * @param type type to check
- * @returns true if it matches
+ * @returns the mark if found, otherwise undefined
  */
-
-export function isMarkType(c: JSONContent, type: string) {
+export function findMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
 export function unescapeUnicode(str: string) {
 	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;
 
-	return str.replace(regex, (match, p1, p2) => {
-		// p1 will contain the 4-digit hex if it's \uXXXX
-		// p2 will contain the variable hex if it's \u{XXXXX}
+	// p1 will contain the 4-digit hex if it's \uXXXX
+	// p2 will contain the variable hex if it's \u{XXXXX}
+	return str.replace(regex, (_, p1: string, p2: string) => {
 		const hex = p1 || p2; // Get the hex value from whichever group matched
 
-		if (hex) {
-			const codePoint = parseInt(hex, 16);
-			return String.fromCodePoint(codePoint);
-		}
-		// If for some reason no hex was captured (shouldn't happen with this regex),
-		// return the original match to avoid breaking the string.
-		return match;
+		const codePoint = parseInt(hex, 16);
+		return String.fromCodePoint(codePoint);
 	});
 }
 

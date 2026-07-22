@@ -7,7 +7,7 @@ import type {
 import { type JSONContent } from "@tiptap/core";
 import {
 	defaultColorLUT,
-	isMarkType,
+	findMarkType,
 	trueMarkOrUndefined,
 	unescapeUnicode,
 } from "../utils";
@@ -117,8 +117,8 @@ export function addTypeSpecificValues(
  * @param includeInteractivity if it should have interactive events or not
  */
 function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
-	if (isMarkType(c, "clickEvent")) {
-		const ce = isMarkType(c, "clickEvent")?.attrs;
+	if (findMarkType(c, "clickEvent")) {
+		const ce = findMarkType(c, "clickEvent")?.attrs;
 		current.click_event = { action: ce!.action };
 		switch (ce!.action) {
 			case "open_url":
@@ -140,8 +140,8 @@ function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
 		}
 	}
 
-	if (isMarkType(c, "hoverEvent")) {
-		const ce = isMarkType(c, "hoverEvent")?.attrs;
+	if (findMarkType(c, "hoverEvent")) {
+		const ce = findMarkType(c, "hoverEvent")?.attrs;
 		current.hover_event = { action: ce!.action, value: ce!.value };
 	}
 }
@@ -154,13 +154,13 @@ function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
  * @param includeInteractivity if it should have interactive events or not
  */
 function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
-	if (isMarkType(c, "clickEvent")) {
-		const ce = isMarkType(c, "clickEvent")?.attrs;
+	if (findMarkType(c, "clickEvent")) {
+		const ce = findMarkType(c, "clickEvent")?.attrs;
 		current.clickEvent = { action: ce!.action, value: ce!.value };
 	}
 
-	if (isMarkType(c, "hoverEvent")) {
-		const ce = isMarkType(c, "hoverEvent")?.attrs;
+	if (findMarkType(c, "hoverEvent")) {
+		const ce = findMarkType(c, "hoverEvent")?.attrs;
 		current.hoverEvent = { action: ce!.action, contents: ce!.value };
 	}
 }
@@ -177,7 +177,7 @@ export function convert(
 	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
 	if (exportVersion.index >= 1 && !force_json) {
-		// only remove strings
+		// only remove string keys
 		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
 			match.replace(/"/g, ""),
 		);

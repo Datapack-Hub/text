@@ -296,28 +296,27 @@ function applyStyling(
 	}
 
 	if (text.click_event) {
-		const cE = text.click_event;
+		const e = text.click_event;
 
 		// Check if only one of the properties is set, throw an error if more than one is set
 		if (
-			(cE.url && (cE.command || cE.value || cE.page || cE.dialog)) ||
-			(cE.command && (cE.url || cE.value || cE.page || cE.dialog)) ||
-			(cE.value && (cE.url || cE.command || cE.page || cE.dialog)) ||
-			(cE.page && (cE.url || cE.command || cE.value || cE.dialog)) ||
-			(cE.dialog && (cE.url || cE.command || cE.value || cE.page))
+			(e.url && (e.command || e.value || e.page || e.dialog)) ||
+			(e.command && (e.url || e.value || e.page || e.dialog)) ||
+			(e.value && (e.url || e.command || e.page || e.dialog)) ||
+			(e.page && (e.url || e.command || e.value || e.dialog)) ||
+			(e.dialog && (e.url || e.command || e.value || e.page))
 		) {
 			throw new Error(
 				"Click event can only have one of url, command, value, page, or dialog set.",
 			);
 		}
 
-		const actionSource =
-			cE.url || cE.command || cE.value || cE.page || cE.dialog;
+		const actionSource = e.url || e.command || e.value || e.page || e.dialog;
 
 		finalText.marks?.push({
 			type: "clickEvent",
 			attrs: {
-				action: cE.action,
+				action: e.action,
 				value: actionSource,
 			},
 		});

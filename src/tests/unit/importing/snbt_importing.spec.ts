@@ -99,6 +99,26 @@ it("should return a one length array if passed with a single component", async (
 	expect(converted[0]).toEqual({ text: "hi", color: "#c0bb1e" });
 });
 
+it("should return valid interactive components", async () => {
+	const interactiveSNBT = await readTestDataFile(
+		"clean/snbt/interactives.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(interactiveSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks?.[0]).toBeDefined();
+	expect(textNode?.marks?.[0].type).toBe("clickEvent");
+});
+
+it("should return valid interactive components with old formats", async () => {
+	const interactiveSNBT = await readTestDataFile(
+		"clean/snbt/interactives_old.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(interactiveSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks?.[0]).toBeDefined();
+	expect(textNode?.marks?.[0].type).toBe("clickEvent");
+});
+
 describe("handling text styling marks", () => {
 	it("should bold text styling to a text node", async () => {
 		const allTextStyleSNBT = await readTestDataFile(

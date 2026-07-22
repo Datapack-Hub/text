@@ -2,7 +2,7 @@ import { outputVersion } from "$lib/stores";
 import { addTypeSpecificValues } from "$lib/text/nbt/export";
 import { versions, type MinecraftText } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 it("should add text property for type 'text'", () => {
 	const current: MinecraftText = {};
@@ -71,31 +71,59 @@ it("should add selector property for type 'selector'", () => {
 	expect(result.selector).toBe("@a");
 });
 
-it("should add atlas and sprite for type 'atlas_object'", () => {
-	outputVersion.set(versions[versions.length - 1]); // Ensure exportVersion is set to a version that supports atlas_object
-	const current: MinecraftText = {};
-	const c: JSONContent = {
-		type: "atlas_object",
-		attrs: {
-			atlas: "someAtlas",
-			sprite: "someSprite",
-		},
-	};
+describe("object types", () => {
+	it("should add atlas and sprite for type 'atlas_object'", () => {
+		outputVersion.set(versions[versions.length - 1]); // Ensure exportVersion is set to a version that supports atlas_object
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "atlas_object",
+			attrs: {
+				atlas: "someAtlas",
+				sprite: "someSprite",
+			},
+		};
 
-	const result = addTypeSpecificValues(current, c, false);
-	expect(result.atlas).toBe("someAtlas");
-	expect(result.sprite).toBe("someSprite");
-});
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.atlas).toBe("someAtlas");
+		expect(result.sprite).toBe("someSprite");
+	});
 
-it("should add object, player, and hat for type 'player_object'", () => {
-	outputVersion.set(versions[versions.length - 1]); // Ensure exportVersion is set to a version that supports player_object
-	const current: MinecraftText = {};
-	const c: JSONContent = {
-		type: "player_object",
-		attrs: { player: { name: "Cbble_" }, hat: true },
-	};
-	const result = addTypeSpecificValues(current, c, false);
-	expect(result.object).toBe("player");
-	expect(result.player).toEqual({ name: "Cbble_" });
-	expect(result.hat).toBe(true);
+	it("should add object, player, and hat for type 'player_object'", () => {
+		outputVersion.set(versions[versions.length - 1]); // Ensure exportVersion is set to a version that supports player_object
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "player_object",
+			attrs: { player: { name: "Cbble_" }, hat: true },
+		};
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result.object).toBe("player");
+		expect(result.player).toEqual({ name: "Cbble_" });
+		expect(result.hat).toBe(true);
+	});
+
+	it("should be empty if version does not support 'atlas_object'", () => {
+		outputVersion.set(versions[0]);
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "atlas_object",
+			attrs: {
+				atlas: "someAtlas",
+				sprite: "someSprite",
+			},
+		};
+
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result).toEqual({ text: "" });
+	});
+
+	it("should be empty if version does not support 'player_object'", () => {
+		outputVersion.set(versions[0]);
+		const current: MinecraftText = {};
+		const c: JSONContent = {
+			type: "player_object",
+			attrs: { player: { name: "Cbble_" }, hat: true },
+		};
+		const result = addTypeSpecificValues(current, c, false);
+		expect(result).toEqual({ text: "" });
+	});
 });

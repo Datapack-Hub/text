@@ -44,14 +44,6 @@ export function optimise(
 	output.push(...flattenMCText(stringyTextElements));
 	output = mergeTextComponents(output);
 
-	// remove leading empty string if followed by a string
-	if (output.length >= 2 && output[0] === "" && typeof output[1] === "string")
-		output.shift();
-
-	if (shouldHaveLeadingEmptyString(output)) {
-		output.shift();
-	}
-
 	// if it is item lore then override
 	if (lore) {
 		output.unshift({ italic: false, color: "white", text: "" });
@@ -133,24 +125,6 @@ function propsMatch(a: any, b: any, property: string) {
 }
 
 /**
- * Determines if the final output should have the leading empty string removed
- *
- * @param output the optimized output array
- * @returns true if the final output should have the leading empty string removed
- */
-function shouldHaveLeadingEmptyString(output: StringyMCText[]): boolean {
-	return (
-		output.length >= 2 &&
-		output[0] == "" &&
-		(typeof output[1] === "string" ||
-			(typeof output[1] === "object" &&
-				!styleProps.some(
-					(prop) => output[1][prop as keyof StringyMCText] !== undefined,
-				)))
-	);
-}
-
-/**
  * Flattens the text elements by converting objects with only text property to strings and removing undefined properties
  *
  * @param stringyTextElements the text elements
@@ -174,9 +148,11 @@ function flattenMCText(stringyTextElements: StringyMCText[]): StringyMCText[] {
 			}
 		}
 
-		// if only text property remains, convert to string
 		output.push(
-			Object.keys(component).length === 1 ? component.text! : component,
+			// if only text property remains, convert to string
+			Object.keys(component).length === 1 && component.text
+				? component.text
+				: component,
 		);
 	}
 	return output;
@@ -193,7 +169,7 @@ function mergeTextComponents(output: StringyMCText[]) {
 		const current = output[i],
 			next = output[i + 1];
 
-		// Merge whitespace to next component
+		// Merge whitespace and empty strings to next component
 		if (
 			isDefinedTextObject(current) &&
 			typeof next === "string" &&
@@ -269,7 +245,6 @@ function mergeTextComponents(output: StringyMCText[]) {
 					}
 				}
 				output.splice(i, group.length, merged);
-				// i--; // TODO: actually fix the bug caused by checking again
 			}
 		}
 	}

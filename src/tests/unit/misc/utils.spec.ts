@@ -2,7 +2,7 @@ import {
 	defaultColorLUT,
 	defaultColorReverseLUT,
 	isDefinedTextObject,
-	isMarkType,
+	findMarkType,
 	trueMarkOrUndefined,
 	unescapeUnicode,
 } from "$lib/text/utils";
@@ -56,6 +56,11 @@ describe("unescapeUnicode", () => {
 		const output = unescapeUnicode(input);
 		expect(output).toBe("HELLO");
 	});
+	it("should correctly handle invalid unicode sequences", () => {
+		const input = "\\uXXXX";
+		const output = unescapeUnicode(input);
+		expect(output).toBe("\\uXXXX");
+	});
 });
 
 describe("trueMarkOrUndefined", () => {
@@ -105,13 +110,13 @@ describe("defaultColorLUT", () => {
 	});
 });
 
-it("isMarkType should correctly identify mark types", () => {
+it("findMarkType finds the correct mark", () => {
 	const contentWithMarks: JSONContent = {
 		type: "text",
 		marks: [{ type: "bold" }, { type: "italic" }],
 		text: "Sample Text",
 	};
-	expect(isMarkType(contentWithMarks, "bold")).toBeDefined();
-	expect(isMarkType(contentWithMarks, "italic")).toBeDefined();
-	expect(isMarkType(contentWithMarks, "underline")).toBeUndefined();
+	expect(findMarkType(contentWithMarks, "bold")).toBeDefined();
+	expect(findMarkType(contentWithMarks, "italic")).toBeDefined();
+	expect(findMarkType(contentWithMarks, "underline")).toBeUndefined();
 });

@@ -13,6 +13,18 @@ describe("optimise", () => {
 		expect(optimise([""])).toEqual([""]);
 	});
 
+	it("should combine with leading empty strings", () => {
+		expect(
+			optimise(["", { text: "hello " }, { color: "red", text: "world!" }]),
+		).toEqual(["hello ", { color: "red", text: "world!" }]);
+	});
+
+	it("should combine whitespace string to next component ", () => {
+		expect(
+			optimise(["", { text: "hello" }, " ", { color: "red", text: "world!" }]),
+		).toEqual(["hello ", { color: "red", text: "world!" }]);
+	});
+
 	it("removes undefined properties and flattens objects with only text", () => {
 		const input: StringyMCText[] = [
 			{ text: "Hello", color: undefined, bold: undefined },

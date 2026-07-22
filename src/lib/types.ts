@@ -134,7 +134,8 @@ export type ExternalSources = {
 		selector: string;
 	};
 	object: {
-		object?: string; // can be omitted for only atlas objects ONLY
+		// can be omitted for only atlas objects ONLY
+		object?: string;
 		atlas: string;
 		sprite: string;
 		player: {

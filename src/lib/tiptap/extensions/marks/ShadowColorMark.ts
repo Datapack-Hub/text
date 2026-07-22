@@ -8,7 +8,7 @@ export const ShadowColorMark = Mark.create({
 			shadowColor: {
 				default: null,
 				parseHTML: (element) =>
-					element.getAttribute("data-shadow-color") || null,
+					element.dataset.shadowColor || null,
 				renderHTML: (attributes) => {
 					if (!attributes.shadowColor) {
 						return {};
@@ -28,7 +28,7 @@ export const ShadowColorMark = Mark.create({
 						return false;
 					}
 					const el = element as HTMLElement;
-					const shadowColor = el.getAttribute("data-shadow-color");
+					const shadowColor = el.dataset.shadowColor;
 					if (!shadowColor) {
 						return false;
 					}

@@ -19,7 +19,7 @@ describe("optimise", () => {
 		).toEqual(["hello ", { color: "red", text: "world!" }]);
 	});
 
-	it("should combine whitespace string to next component ", () => {
+	it("should combine whitespace string to next component", () => {
 		expect(
 			optimise(["", { text: "hello" }, " ", { color: "red", text: "world!" }]),
 		).toEqual(["hello ", { color: "red", text: "world!" }]);

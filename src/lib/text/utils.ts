@@ -85,12 +85,13 @@ export function findMarkType(c: JSONContent, type: string) {
 }
 
 export function unescapeUnicode(str: string) {
-	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;
+	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/gu;
 
 	// p1 will contain the 4-digit hex if it's \uXXXX
 	// p2 will contain the variable hex if it's \u{XXXXX}
 	return str.replace(regex, (_, p1: string, p2: string) => {
-		const hex = p1 || p2; // Get the hex value from whichever group matched
+		// Get the hex value from whichever group matched
+		const hex = p1 || p2;
 
 		const codePoint = parseInt(hex, 16);
 		return String.fromCodePoint(codePoint);
@@ -126,7 +127,7 @@ export function applyGradient(editor: Editor, gradientColors: string[]) {
 			}
 		}
 	});
-	if (!text.length) return;
+	if (text.length === 0) return;
 
 	const total = text.length;
 	if (total === 0 || gradientColors.length < 2) return;

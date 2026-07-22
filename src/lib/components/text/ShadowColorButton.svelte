@@ -18,9 +18,6 @@
 
 	let {
 		labelElement = $bindable(),
-		hex,
-		label,
-		name = undefined,
 		dir,
 		small,
 	}: Props = $props();

@@ -16,7 +16,7 @@ export const FixedTextStyle = TextStyle.extend({
 
 // Helper function to convert rgb() to hex
 function rgbToHex(rgb: string): string {
-	const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/.exec(rgb);
+	const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/u.exec(rgb);
 	return result
 		? "#" +
 				[1, 2, 3]

@@ -110,7 +110,7 @@
 	let unicodeSelectorDialog: Modal = $state()!;
 
 	let finalOutput = $derived(
-		editor ? convert(tiptapJSON, "standard", shouldOptimise) : "Loading...",
+		editor ? convert(tiptapJSON, shouldOptimise) : "Loading...",
 	);
 
 	function importToEditor() {
@@ -209,9 +209,9 @@
 	});
 
 	function toTitleCase(str: string) {
-		return str.replace(
-			/\w\S*/g,
-			(text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
+		return str.replaceAll(
+			/\w\S*/gu,
+			(text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
 		);
 	}
 
@@ -220,7 +220,7 @@
 		colorDialog?.close();
 	}
 
-	const debounce = (callback: Function, wait: number) => {
+	const debounce = (callback: (...args: any[]) => void, wait: number) => {
 		let timeoutId: number;
 		return (...args: any[]) => {
 			window.clearTimeout(timeoutId);
@@ -338,12 +338,12 @@
 		}
 	}
 
-	function removeAllNodes(editor: Editor | undefined, type: string) {
+	function removeAllNodes(type: string) {
 		if (!editor) {
 			return;
 		}
-		let editor_json = editor.getJSON();
-		editor_json.content.forEach((paragraph) => {
+		let editorJson = editor.getJSON();
+		editorJson.content.forEach((paragraph) => {
 			if (paragraph.content) {
 				paragraph.content = paragraph.content.filter(
 					(node) => node.type !== type,
@@ -351,8 +351,8 @@
 			}
 		});
 
-		editor?.commands.setContent(editor_json);
-		tiptapJSON = editor_json;
+		editor?.commands.setContent(editorJson);
+		tiptapJSON = editorJson;
 	}
 
 	let versionPopupConfirmationVisible = $state(false);
@@ -363,7 +363,7 @@
 			return;
 		}
 
-		if ($outputVersion.index > version.index && confirm == false) {
+		if ($outputVersion.index > version.index && confirm === false) {
 			versionPopupConfirmationVisible = true;
 			temporaryVersionConfirmation = version;
 			return;
@@ -376,8 +376,8 @@
 
 		if (version.index < 2) {
 			// remove object keys
-			removeAllNodes(editor, "atlas_object");
-			removeAllNodes(editor, "player_object");
+			removeAllNodes("atlas_object");
+			removeAllNodes("player_object");
 		}
 
 		tiptapJSON = editor!.getJSON();

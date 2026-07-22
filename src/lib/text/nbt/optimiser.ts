@@ -143,7 +143,8 @@ function flattenMCText(stringyTextElements: StringyMCText[]): StringyMCText[] {
 			// MinecraftText with text property
 			for (const [key, value] of Object.entries(component)) {
 				if (value === undefined) {
-					delete component[key as MCTextKey]; // remove undefined properties
+					// remove undefined properties
+					delete component[key as MCTextKey];
 				}
 			}
 		}
@@ -173,7 +174,7 @@ function mergeTextComponents(output: StringyMCText[]) {
 		if (
 			isDefinedTextObject(current) &&
 			typeof next === "string" &&
-			next.match(/^\s*$/)
+			/^\s*$/u.test(next)
 		) {
 			current.text += next;
 			output.splice(i + 1, 1);
@@ -184,12 +185,12 @@ function mergeTextComponents(output: StringyMCText[]) {
 		// Merge whitespace objects to next component
 		if (isDefinedTextObject(current) && isDefinedTextObject(next)) {
 			// which direction to merge
-			if (next.text.match(/^\s+$/)) {
+			if (/^\s+$/u.test(next.text)) {
 				current.text += next.text;
 				output.splice(i + 1, 1);
 				i--;
 				continue;
-			} else if (current.text.match(/^\s+$/)) {
+			} else if (/^\s+$/u.test(current.text)) {
 				next.text = current.text + next.text;
 				output.splice(i, 1);
 				i--;
@@ -213,7 +214,7 @@ function mergeTextComponents(output: StringyMCText[]) {
 				let group = [current];
 				collectAllFromIndex(i, group, output, sharedProperties);
 
-				if (group.length < 1) {
+				if (group.length === 0) {
 					continue;
 				}
 
@@ -231,18 +232,14 @@ function mergeTextComponents(output: StringyMCText[]) {
 				const first = extras.shift();
 				let merged = { ...sharedProperties };
 				// Rebuild merged component
-				if (typeof first == "string") {
+				if (typeof first === "string") {
 					merged.text = first;
-					if (extras.length > 0) {
-						if (!merged.extra) merged.extra = extras;
-						else merged.extra = merged.extra.concat(extras);
-					}
 				} else {
 					Object.assign(merged, { ...first });
-					if (extras.length > 0) {
-						if (!merged.extra) merged.extra = extras;
-						else merged.extra = merged.extra.concat(extras);
-					}
+				}
+				if (extras.length > 0) {
+					if (merged.extra) {merged.extra = merged.extra.concat(extras);}
+					else {merged.extra = extras;}
 				}
 				output.splice(i, group.length, merged);
 			}

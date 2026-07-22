@@ -20,7 +20,7 @@ export const FontsExtension = Extension.create({
 					font: {
 						default: null,
 						parseHTML: (element) =>
-							element.style.fontFamily?.replace(/['"]+/g, ""),
+							element.style.fontFamily?.replaceAll(/['"]+/gu, ""),
 						renderHTML: (attributes) => {
 							if (!attributes.font) {
 								return {};

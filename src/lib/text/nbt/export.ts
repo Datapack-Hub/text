@@ -45,7 +45,7 @@ export function addTypeSpecificValues(
 			break;
 		case "translate":
 			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
+			if (c.attrs?.params && c.attrs?.params.length !== 0) {
 				current.with = c.attrs?.params;
 			}
 			if (c.attrs?.fallback) {
@@ -170,16 +170,16 @@ function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
  */
 export function convert(
 	jsonContent: JSONContent,
-	exportType: "standard" | "item_lore" = "standard",
 	optimise: boolean,
-	force_json: boolean = false,
+	exportType: "standard" | "item_lore" = "standard",
+	forceJson: boolean = false,
 ): string {
 	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
-	if (exportVersion.index >= 1 && !force_json) {
+	if (exportVersion.index >= 1 && !forceJson) {
 		// only remove string keys
-		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
-			match.replace(/"/g, ""),
+		out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) =>
+			match.replaceAll(`"`, ""),
 		);
 	}
 	return out;
@@ -212,10 +212,10 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					let colorVal = shadowColorMark.attrs?.shadowColor.replace(/^#/, "");
+					let colorVal = shadowColorMark.attrs?.shadowColor.replace(/^#/u, "");
 					if (colorVal && colorVal.length <= 8) {
 						current.shadow_color = parseInt(
-							rgbaToArgbHex(colorVal).replace(/^#/, ""),
+							rgbaToArgbHex(colorVal).replace(/^#/u, ""),
 							16,
 						);
 					}
@@ -245,7 +245,7 @@ export function translateJSON(
 
 		let finalResult = JSON.stringify(data);
 
-		const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/g);
+		const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/gu);
 		for (const match of shadowColorMatches) {
 			if (match[1]) {
 				const num = parseInt(match[1]);

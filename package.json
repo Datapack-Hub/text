@@ -9,7 +9,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier . --write . --cache",
-		"lint": "oxlint . -W perf",
+		"lint": "oxlint . -W perf -W suspicious --vitest-plugin",
 		"test:unit": "vitest --coverage",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
 		"test:e2e": "playwright test"

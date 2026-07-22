@@ -31,8 +31,9 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
 	raw = raw
-		.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":') // quote unquoted keys
-		.replace(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/g, (_, p1) => {
+		// quote unquoted keys
+		.replaceAll(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/gu, '$1"$2":')
+		.replaceAll(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/gu, (_, p1) => {
 			// quote unquoted strings, ignoring booleans
 			const protectedValues = ["true", "false", "1b", "0b"];
 			if (protectedValues.includes(p1.toLowerCase())) {
@@ -40,16 +41,16 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 			}
 			return `: "${p1}"`;
 		});
-	if (raw.match(/^"\w*"/)) {
-		return [raw.replace(/"/g, "")];
+	if (/^"\w*"/u.test(raw)) {
+		return [raw.replaceAll(`"`, "")];
 	}
 
 	// replace 1b and 0b with true and false literals
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false");
+	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)\b1b\b/gu, "true");
+	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)\b0b\b/gu, "false");
 
 	// remove type suffixes from numbers (e.g., 1.0f, 2.0d, 3l)
-	raw = raw.replace(/(?<="\w+"\s*:\s*)-?\d+(\.\d+)?[fdl]/gi, (match) => {
+	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)-?\d+(\.\d+)?[fdl]/giu, (match) => {
 		return match.slice(0, -1);
 	});
 
@@ -251,7 +252,7 @@ function applyStyling(
 			Array.isArray(text.shadow_color)
 				? text.shadow_color.map(mapToHexByte).join("")
 				: text.shadow_color.toString(16)
-		).replace(/[lL#]/g, "");
+		).replaceAll(/[lL#]/gu, "");
 		const intValue = parseInt(combinedShadowStr, 16);
 
 		if (intValue > 0 && intValue < 0xffffffff) {
@@ -422,7 +423,8 @@ function fixBrokenNewLines(doc: JSONContent) {
 
 function mapToHexByte(value: number): string {
 	if (value < 0.0 || value > 1.0) {
-		return "00"; // Return "00" for out-of-range values
+		// Return "00" for out-of-range values
+		return "00";
 	}
 
 	const byteValue = Math.round(value * 255);

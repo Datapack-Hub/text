@@ -55,7 +55,6 @@
 				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
-				// TODO: fix the JSON parsing errors that can happen here
 				value = JSON.stringify(editor.getJSON());
 				output = JSON.parse(translate(editor.getJSON()));
 			},
@@ -109,9 +108,9 @@
 	}
 
 	export function getValue() {
-		return translate(editor!.getJSON()).replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-			(match) => match.replace(/"/g, ""),
+		return translate(editor!.getJSON()).replaceAll(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/gu,
+			(match) => match.replaceAll(`"`, ""),
 		);
 	}
 

@@ -10,7 +10,7 @@ it("should return a basic document", async () => {
 	expect(document).toEqual(expectedDocument);
 });
 
-it("should return a basic document (empty str)", async () => {
+it("should return a basic document (empty str)", () => {
 	const document = snbtToDocument(convertToTextOrEmpty(""));
 	const expectedDocument = { content: [], type: "doc" };
 	expect(document).toEqual(expectedDocument);

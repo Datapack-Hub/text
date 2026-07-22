@@ -16,11 +16,7 @@
 		small?: boolean;
 	}
 
-	let {
-		labelElement = $bindable(),
-		dir,
-		small,
-	}: Props = $props();
+	let { labelElement = $bindable(), dir, small }: Props = $props();
 </script>
 
 <button

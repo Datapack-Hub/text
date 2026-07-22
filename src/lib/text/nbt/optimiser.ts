@@ -238,8 +238,11 @@ function mergeTextComponents(output: StringyMCText[]) {
 					Object.assign(merged, { ...first });
 				}
 				if (extras.length > 0) {
-					if (merged.extra) {merged.extra = merged.extra.concat(extras);}
-					else {merged.extra = extras;}
+					if (merged.extra) {
+						merged.extra = merged.extra.concat(extras);
+					} else {
+						merged.extra = extras;
+					}
 				}
 				output.splice(i, group.length, merged);
 			}

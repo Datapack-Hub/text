@@ -575,8 +575,8 @@
 	<div>
 		{#if page.url.searchParams.has("dev")}
 			<code class="inline-block overflow-x-scroll p-3 text-xs"
-				>DEV ONLY: {editor
-					? JSON.stringify(editor.getJSON())
+				>DEV ONLY: {tiptapJSON
+					? JSON.stringify(tiptapJSON)
 					: "Loading..."}</code>
 			<br />
 		{/if}

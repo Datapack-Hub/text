@@ -5,12 +5,6 @@
 	interface Props {
 		/** DOM element of the label wrapper */
 		labelElement: HTMLLabelElement | undefined;
-		/** hex color */
-		hex: string | null;
-		/** input label */
-		label: string;
-		/** input name, useful in a native form */
-		name?: string | undefined;
 		/** directionality left to right, or right to left*/
 		dir: "ltr" | "rtl";
 		small?: boolean;

@@ -8,6 +8,7 @@ import { type JSONContent } from "@tiptap/core";
 import {
 	defaultColorLUT,
 	findMarkType,
+	rgbaToArgbHex,
 	trueMarkOrUndefined,
 	unescapeUnicode,
 } from "../utils";
@@ -210,10 +211,13 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					let colorVal = shadowColorMark.attrs?.shadowColor.replace(/^#/u, "");
+					let colorVal: string = shadowColorMark.attrs?.shadowColor.replace(
+						/^#/u,
+						"",
+					);
 					if (colorVal && colorVal.length <= 8) {
 						current.shadow_color = parseInt(
-							rgbaToArgbHex(colorVal).replace(/^#/u, ""),
+							rgbaToArgbHex(colorVal.padEnd(8, "FF")).replace(/^#/u, ""),
 							16,
 						);
 					}
@@ -290,16 +294,4 @@ export function translateJSON(
 	}
 
 	return "[]";
-}
-
-function rgbaToArgbHex(rgbaHex: string): string {
-	// Remove the leading '#' if it exists
-	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
-
-	// Extract RGB and Alpha components
-	const rgb = hex.slice(0, 6);
-	const alpha = hex.slice(6, 8);
-
-	// Return with alpha placed at the beginning
-	return `#${alpha}${rgb}`;
 }

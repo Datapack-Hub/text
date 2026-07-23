@@ -1,6 +1,5 @@
 import type { MinecraftText } from "$lib/types";
 import type { Editor, JSONContent } from "@tiptap/core";
-import { generateGradient } from "typescript-color-gradient";
 
 export const colorMap = [
 	{ name: "dark_red", value: "#AA0000", code: "4" },
@@ -122,4 +121,47 @@ export function isDefinedTextObject(
 
 export function getNodeAtSelection(editor: Editor) {
 	return editor.state.selection.$head.nodeBefore;
+}
+
+export function mapToHexByte(value: number): string {
+	if (value < 0.0 || value > 1.0) {
+		// Return "00" for out-of-range values
+		return "00";
+	}
+
+	const byteValue = Math.round(value * 255);
+	const hexString = byteValue.toString(16);
+
+	return hexString.length === 1 ? "0" + hexString : hexString;
+}
+
+export function stripTypeSuffixes(input: string): string {
+	const regex = /\b(\d+(?:\.\d+)?)[fdlsib]\b/gi;
+
+	return input.replaceAll(regex, "$1");
+}
+
+export function argbToRgbaHex(rgbaHex: string): string {
+	// Remove the leading '#' if it exists
+	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
+
+	// Extract RGB and Alpha components
+	const alpha = hex.slice(0, 2);
+	const rgb = hex.slice(2, 8);
+
+	// Return with alpha placed at the beginning
+
+	return `#${rgb}${alpha}`;
+}
+
+export function rgbaToArgbHex(rgbaHex: string): string {
+	// Remove the leading '#' if it exists
+	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
+
+	// Extract RGB and Alpha components
+	const rgb = hex.slice(0, 6);
+	const alpha = hex.slice(6, 8);
+
+	// Return with alpha placed at the beginning
+	return `#${alpha}${rgb}`;
 }

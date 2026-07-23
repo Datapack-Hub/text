@@ -1,5 +1,11 @@
 import type { JSONContent } from "@tiptap/core";
-import { defaultColorReverseLUT } from "../utils";
+import {
+	argbToRgbaHex,
+	defaultColorReverseLUT,
+	mapToHexByte,
+	rgbaToArgbHex,
+	stripTypeSuffixes,
+} from "../utils";
 import { type MinecraftText, type OldMinecraftText } from "../../types";
 import { type StringyMCText } from "../../types";
 
@@ -248,14 +254,14 @@ function applyStyling(
 	if (text.shadow_color) {
 		const combinedShadowStr = (
 			Array.isArray(text.shadow_color)
-				? text.shadow_color.map(mapToHexByte).join("")
+				? rgbaToArgbHex(text.shadow_color.map(mapToHexByte).join(""))
 				: text.shadow_color.toString(16)
 		).replaceAll(/[lL#]/gu, "");
 		const intValue = parseInt(combinedShadowStr, 16);
 
 		if (intValue > 0 && intValue < 0xffffffff) {
-			const hex = "#" + combinedShadowStr.padStart(8, "ff");
-			finalText.marks?.push({
+			const hex = argbToRgbaHex(combinedShadowStr.padEnd(8, "FF"));
+			finalText.marks.push({
 				type: "shadowColor",
 				attrs: {
 					shadowColor: hex,
@@ -265,31 +271,31 @@ function applyStyling(
 	}
 
 	if (text.bold) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "bold",
 		});
 	}
 
 	if (text.italic) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "italic",
 		});
 	}
 
 	if (text.underlined) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "underline",
 		});
 	}
 
 	if (text.obfuscated) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "obfuscated",
 		});
 	}
 
 	if (text.strikethrough) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "strike",
 		});
 	}
@@ -417,24 +423,4 @@ function fixBrokenNewLines(doc: JSONContent) {
 		type: "doc",
 		content: fixedContent,
 	};
-}
-
-function mapToHexByte(value: number): string {
-	if (value < 0.0 || value > 1.0) {
-		// Return "00" for out-of-range values
-		return "00";
-	}
-
-	const byteValue = Math.round(value * 255);
-	const hexString = byteValue.toString(16);
-
-	return hexString.length === 1 ? "0" + hexString : hexString;
-}
-
-function stripTypeSuffixes(input: string): string {
-	// Regex matches digits, optional decimal, and captures the numeric part (group 1)
-	// while matching the suffix [fDdLsS] outside the group.
-	const regex = /\b(\d+(?:\.\d+)?)[fDdLsS]\b/g;
-
-	return input.replaceAll(regex, "$1");
 }

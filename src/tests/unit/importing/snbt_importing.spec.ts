@@ -60,7 +60,7 @@ it("should apply a decimal shadow color to a text node", async () => {
 	expect(mark?.type).toMatch("shadowColor");
 
 	expect(mark?.attrs?.shadowColor).toBeDefined();
-	expect(mark?.attrs?.shadowColor).toMatch("#ffffff84");
+	expect(mark?.attrs?.shadowColor).toMatch("#ffff84ff");
 });
 
 it("should apply a hexadecimal shadow color to a text node", async () => {
@@ -77,7 +77,7 @@ it("should apply a hexadecimal shadow color to a text node", async () => {
 	expect(mark?.type).toMatch("shadowColor");
 
 	expect(mark?.attrs?.shadowColor).toBeDefined();
-	expect(mark?.attrs?.shadowColor).toMatch("#ffff0000");
+	expect(mark?.attrs?.shadowColor).toMatch("#ff0000ff");
 });
 
 it("should apply an array-based shadow color to a text node", async () => {
@@ -94,6 +94,7 @@ it("should apply an array-based shadow color to a text node", async () => {
 	expect(mark?.type).toMatch("shadowColor");
 
 	expect(mark?.attrs?.shadowColor).toBeDefined();
+	// Would be #FF8000FF, but ARGB to RGBA conversion is applied, so it becomes #8000FFFF
 	expect(mark?.attrs?.shadowColor).toMatch("#ff8000ff");
 });
 

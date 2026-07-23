@@ -228,8 +228,7 @@ function mergeTextComponents(output: StringyMCText[]) {
 			);
 
 			if (sharedPropertyKeys.length > 0) {
-				let group = [current];
-				group = collectStyledRun(i, current, output, sharedProperties);
+				let group = collectStyledRun(i, current, output, sharedProperties);
 
 				// TODO: what the hell does this do? is it just for performance?
 				if (group.length === 1) {
@@ -247,7 +246,6 @@ function mergeTextComponents(output: StringyMCText[]) {
 
 				// Optimise "extra" properties
 				extras = optimise(extras);
-				extras.shift(); // remove leading empty string from optimise
 				const first = extras.shift();
 				let merged = { ...sharedProperties };
 

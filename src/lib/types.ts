@@ -146,7 +146,6 @@ export type ExternalSources = {
 	};
 };
 
-export type MCTextKey = keyof MinecraftText;
 export type TranslateOptions = Partial<{
 	optimise: boolean;
 	exportType: "standard" | "item_lore";

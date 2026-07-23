@@ -114,7 +114,6 @@ export function addTypeSpecificValues(
  *
  * @param current your current minecraft text
  * @param c the content
- * @param includeInteractivity if it should have interactive events or not
  */
 function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
 	if (findMarkType(c, "clickEvent")) {
@@ -151,7 +150,6 @@ function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
  *
  * @param current your current (old) minecraft text
  * @param c the content
- * @param includeInteractivity if it should have interactive events or not
  */
 function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
 	if (findMarkType(c, "clickEvent")) {

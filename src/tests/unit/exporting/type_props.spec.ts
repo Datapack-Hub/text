@@ -1,6 +1,10 @@
 import { outputVersion } from "$lib/stores";
 import { addTypeSpecificValues } from "$lib/text/nbt/export";
-import { versions, type MinecraftText } from "$lib/types";
+import {
+	versions,
+	type MinecraftText,
+	type VersionAgnosticText,
+} from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 
@@ -69,6 +73,174 @@ it("should add selector property for type 'selector'", () => {
 	const c: JSONContent = { type: "selector", attrs: { selector: "@a" } };
 	const result = addTypeSpecificValues(current, c, false);
 	expect(result.selector).toBe("@a");
+});
+
+describe("events", () => {
+	it("should add proper URL properties for 'click_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "open_url", value: "https://text.datapackhub.net/" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.click_event).toEqual({
+			action: "open_url",
+			url: "https://text.datapackhub.net/",
+		});
+	});
+
+	it("should add proper properties for 'click_event' (old format)", () => {
+		outputVersion.set(versions[0]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "open_url", value: "https://text.datapackhub.net/" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.clickEvent).toEqual({
+			action: "open_url",
+			value: "https://text.datapackhub.net/",
+		});
+	});
+
+	it("should add proper command properties for 'click_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "run_command", value: "/say Hello" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.click_event).toEqual({
+			action: "run_command",
+			command: "/say Hello",
+		});
+	});
+
+	it("should add proper value properties for 'click_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "copy_to_clipboard", value: "Hello World!" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.click_event).toEqual({
+			action: "copy_to_clipboard",
+			value: "Hello World!",
+		});
+	});
+
+	it("should add proper page properties for 'click_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "change_page", value: "2" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.click_event).toEqual({
+			action: "change_page",
+			page: "2",
+		});
+	});
+
+	it("should add proper dialog properties for 'click_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Click me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Click me!",
+			marks: [
+				{
+					type: "clickEvent",
+					attrs: { action: "open_dialog", value: "dialog_id" },
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.click_event).toEqual({
+			action: "open_dialog",
+			dialog: "dialog_id",
+		});
+	});
+
+	it("should add proper properties for 'hover_event'", () => {
+		outputVersion.set(versions[versions.length - 1]);
+		const current: VersionAgnosticText = { text: "Hover me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Hover me!",
+			marks: [
+				{
+					type: "hoverEvent",
+					attrs: {
+						action: "show_text",
+						value: { type: "text", text: "Hello!" },
+					},
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.hover_event).toEqual({
+			action: "show_text",
+			value: { type: "text", text: "Hello!" },
+		});
+	});
+
+	it("should add proper properties for 'hover_event' (old format)", () => {
+		outputVersion.set(versions[0]);
+		const current: VersionAgnosticText = { text: "Hover me!" };
+		const c: JSONContent = {
+			type: "text",
+			text: "Hover me!",
+			marks: [
+				{
+					type: "hoverEvent",
+					attrs: {
+						action: "show_text",
+						value: { type: "text", text: "Hello!" },
+					},
+				},
+			],
+		};
+		addTypeSpecificValues(current, c);
+		expect(current.hoverEvent).toEqual({
+			action: "show_text",
+			contents: { type: "text", text: "Hello!" },
+		});
+	});
 });
 
 describe("object types", () => {

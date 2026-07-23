@@ -98,62 +98,6 @@ export function unescapeUnicode(str: string) {
 	});
 }
 
-/**
- * Applies a gradient to a selection in an editor
- *
- * @param editor the editor you want to apply it to
- * @param gradientColors the colors you want to use
- * @returns
- */
-export function applyGradient(editor: Editor, gradientColors: string[]) {
-	const { from, to } = editor.state.selection;
-	if (from === to) return;
-
-	const doc = editor.state.doc;
-	let text = "";
-	let textPositions: { pos: number; len: number }[] = [];
-
-	// Collect all text and their positions in the selection
-	doc.nodesBetween(from, to, (node, pos) => {
-		if (node.isText) {
-			const nodeStart = Math.max(from, pos);
-			const nodeEnd = Math.min(to, pos + node.text!.length);
-			const sliceStart = nodeStart - pos;
-			const sliceEnd = nodeEnd - pos;
-			const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
-			if (part.length > 0) {
-				text += part;
-				textPositions.push({ pos: nodeStart, len: part.length });
-			}
-		}
-	});
-	if (text.length === 0) return;
-
-	const total = text.length;
-	if (total === 0 || gradientColors.length < 2) return;
-
-	const gradientArray = generateGradient(gradientColors, total);
-
-	let chain = editor.chain();
-
-	// Remove color from selection first
-	chain.focus().setTextSelection({ from, to }).unsetColor();
-
-	let charIndex = 0;
-	for (const { pos, len } of textPositions) {
-		for (let i = 0; i < len; i++) {
-			const color = gradientArray[charIndex];
-			chain
-				.setTextSelection({ from: pos + i, to: pos + i + 1 })
-				.setColor(color);
-			charIndex++;
-		}
-	}
-	chain.focus().setTextSelection({ from, to });
-
-	chain.run();
-}
-
 export function isAnInteractiveProp(prop: string) {
 	return (
 		prop === "click_event" ||
@@ -171,6 +115,7 @@ export function isAnInteractiveProp(prop: string) {
  */
 export function isDefinedTextObject(
 	obj: any,
+	// return type is that so that it can require the text property, instead of being optional
 ): obj is Omit<MinecraftText, "text"> & { text: string } {
 	return typeof obj === "object" && obj.text !== undefined;
 }

@@ -60,7 +60,7 @@ it("should apply a decimal shadow color to a text node", async () => {
 	expect(mark?.type).toMatch("shadowColor");
 
 	expect(mark?.attrs?.shadowColor).toBeDefined();
-	expect(mark?.attrs?.shadowColor).toMatch("#ffff0000");
+	expect(mark?.attrs?.shadowColor).toMatch("#ffffff84");
 });
 
 it("should apply a hexadecimal shadow color to a text node", async () => {
@@ -78,6 +78,40 @@ it("should apply a hexadecimal shadow color to a text node", async () => {
 
 	expect(mark?.attrs?.shadowColor).toBeDefined();
 	expect(mark?.attrs?.shadowColor).toMatch("#ffff0000");
+});
+
+it("should apply an array-based shadow color to a text node", async () => {
+	const basicColorSNBT = await readTestDataFile(
+		"clean/snbt/shadow_color_array.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(basicColorSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks).toBeDefined();
+	expect(textNode?.marks).toHaveLength(1);
+
+	const mark = textNode?.marks?.at(0);
+
+	expect(mark?.type).toMatch("shadowColor");
+
+	expect(mark?.attrs?.shadowColor).toBeDefined();
+	expect(mark?.attrs?.shadowColor).toMatch("#ff8000ff");
+});
+
+it("should successfully blank out an array-based shadow color if it is invalid", async () => {
+	const basicColorSNBT = await readTestDataFile(
+		"bad/shadow_color_array_invalid.snbt",
+	);
+	const document = snbtToDocument(convertToTextOrEmpty(basicColorSNBT));
+	const textNode = document.content?.[0]?.content?.[0];
+	expect(textNode?.marks).toBeDefined();
+	expect(textNode?.marks).toHaveLength(1);
+
+	const mark = textNode?.marks?.at(0);
+
+	expect(mark?.type).toMatch("shadowColor");
+
+	expect(mark?.attrs?.shadowColor).toBeDefined();
+	expect(mark?.attrs?.shadowColor).toMatch("#008000ff");
 });
 
 it("should throw an error if the format is invalid", async () => {

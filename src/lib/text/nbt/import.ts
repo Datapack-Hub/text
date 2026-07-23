@@ -50,9 +50,7 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)\b0b\b/gu, "false");
 
 	// remove type suffixes from numbers (e.g., 1.0f, 2.0d, 3l)
-	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)-?\d+(\.\d+)?[fdl]/giu, (match) => {
-		return match.slice(0, -1);
-	});
+	raw = stripTypeSuffixes(raw);
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
@@ -431,4 +429,12 @@ function mapToHexByte(value: number): string {
 	const hexString = byteValue.toString(16);
 
 	return hexString.length === 1 ? "0" + hexString : hexString;
+}
+
+function stripTypeSuffixes(input: string): string {
+	// Regex matches digits, optional decimal, and captures the numeric part (group 1)
+	// while matching the suffix [fDdLsS] outside the group.
+	const regex = /\b(\d+(?:\.\d+)?)[fDdLsS]\b/g;
+
+	return input.replaceAll(regex, "$1");
 }

@@ -1,7 +1,8 @@
 <script lang="ts">
+	// Local variables
 	import { convert } from "$lib/text/nbt/export";
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
-	import { colorMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
+	import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
 	import { openDataStore } from "$lib/db";
 	import { outputVersion } from "$lib/stores";
 	import { tooltip } from "$lib/tooltip";
@@ -67,56 +68,52 @@
 	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/state";
 
-	let tiptapJSON: JSONContent = $state()!;
+	// VARIABLES
 
+	// Tiptap variables
+	let tiptapJSON: JSONContent = $state()!;
 	let element: HTMLElement = $state()!;
 	let editor: Editor | undefined = $state()!;
-	let color = $state("#ffffff");
-	let colorDialog: Modal = $state()!;
 
-	let outputDialog: Modal = $state()!;
-	let versionPopup: boolean = $state(false);
-
-	let doesContentExist: boolean = $derived(editor ? !editor.isEmpty : false);
 	let shouldOptimise = $state(true);
 
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
 
+	// Export
 	let recentlyCopied = $state(false);
+	let finalOutput = $derived(
+		editor ? convert(tiptapJSON, shouldOptimise) : "Loading...",
+	);
 
 	// Snapshots and stuff
 	let snapshots: object[] = $state([]);
 	let recentlySaved = $state(false);
 	let loadDialog: Modal = $state()!;
 
-	// Dialogs
+	// Dialogs and UI
 	let gradientDialog: Modal = $state()!;
 	let gradientSteps: string[] = $state(["#ffffff"]);
-
 	let keybindDialog: Modal = $state()!;
-
 	let clickEventType = $state("");
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
-
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
 	let hoverEventValue = $state("");
-
 	let fontDialog: Modal = $state()!;
 	let fontUploadModal: Modal = $state()!;
 	let fontName = $state("");
-
 	let customType: string | undefined = $state();
 	let customDialog: Modal = $state()!;
-
 	let unicodeSelectorDialog: Modal = $state()!;
-
-	let finalOutput = $derived(
-		editor ? convert(tiptapJSON, shouldOptimise) : "Loading...",
-	);
+	let colour = $state("#ffffff");
+	let colourDialog: Modal = $state()!;
+	let outputDialog: Modal = $state()!;
+	let versionPopup: boolean = $state(false);
+	let doesContentExist: boolean = $derived(editor ? !editor.isEmpty : false);
+	let useUSEnglish: boolean = (navigator.language.toLowerCase() == "en-us") ? true : false
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
@@ -216,9 +213,9 @@
 		);
 	}
 
-	function customColorHandler() {
-		editor?.chain().focus().setColor(color).run();
-		colorDialog?.close();
+	function customColourHandler() {
+		editor?.chain().focus().setColor(colour).run();
+		colourDialog?.close();
 	}
 
 	const debounce = (callback: (...args: any[]) => void, wait: number) => {
@@ -435,29 +432,29 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				{color}
+				colour={colour}
 				Icon={IconColor}
-				onClick={colorDialog.open}
-				ariaLabel="Custom Color" />
+				onClick={colourDialog.open}
+				ariaLabel="Custom {useUSEnglish ? "Color" : "Colour"}" />
 
 			<ToolbarButton
 				Icon={IconGradient}
 				onClick={gradientDialog.open}
-				ariaLabel="Color Gradient" />
+				ariaLabel="{useUSEnglish ? "Color" : "Colour"} Gradient" />
 			<div id="colorBtns">
-				{#each colorMap as color}
+				{#each colourMap as colour}
 					<ToolbarButton
 						Icon={IconSquare}
-						onClick={() => editor!.chain().focus().setColor(color.value).run()}
-						styleVar={editor.isActive("textStyle", { color: color.value })}
-						color={color.value}
-						ariaLabel={toTitleCase(color.name.replace("_", " "))} />
+						onClick={() => editor!.chain().focus().setColor(colour.value).run()}
+						styleVar={editor.isActive("textStyle", { color: colour.value })}
+						colour={colour.value}
+						ariaLabel={toTitleCase(colour.name.replace("_", " "))} />
 				{/each}
 			</div>
 			{#if editor.getAttributes("textStyle").color}
 				<button
 					onclick={() => editor?.chain().focus().unsetColor().run()}
-					aria-label="Unset color"
+					aria-label="Unset {useUSEnglish ? "Color" : "Colour"}"
 					{@attach tooltip}
 					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
 					class:active={editor.isActive("underline")}>
@@ -671,9 +668,9 @@
 				<button
 					{@attach tooltip}
 					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-					aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
+					aria-label="Click to toggle whether the output should be {useUSEnglish ? "optimized" : "optimised"} (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
 					onclick={() => (shouldOptimise = !shouldOptimise)}
-					>{shouldOptimise ? "optimised" : "expanded"}</button>
+					>{shouldOptimise ? (useUSEnglish ? "optimized" : "optimised") : "expanded"}</button>
 
 				<p class="font-lexend nomob text-xs text-white/60">•</p>
 
@@ -758,10 +755,10 @@
 		<modal.default bind:customDialog bind:customType {editor} />
 	{/await}
 
-	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
+	<Modal title="Custom {useUSEnglish ? "Color" : "Colour"}" bind:this={colourDialog} small nopad key="C">
 		<div class="flex w-full flex-col py-4">
 			<ColorPicker
-				bind:hex={color}
+				bind:hex={colour}
 				--cp-bg-color="transparent"
 				--cp-border-color="transparent"
 				--cp-text-color="white"
@@ -771,7 +768,7 @@
 				isAlpha={false} />
 
 			<button
-				onclick={customColorHandler}
+				onclick={customColourHandler}
 				class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Done
 			</button>

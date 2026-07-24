@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { colorMap } from "$lib/text/utils";
+	import { colourMap } from "$lib/text/utils";
 	import { tooltip } from "$lib/tooltip";
 	import type { Editor } from "@tiptap/core";
 	import ColorPicker from "svelte-awesome-color-picker";
@@ -98,7 +98,7 @@
 				c.hex && editor.chain().focus().setShadowColor(c.hex).run();
 			}
 		}}
-		swatches={Object.values(colorMap).map((c) => c.value)}
+		swatches={Object.values(colourMap).map((c) => c.value)}
 		components={{ input: ShadowColorButton }} />
 {:else}
 	<button

@@ -51,7 +51,7 @@
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						convert(editor.getJSON(), "standard", shouldOptimise, exportAsJSON),
+						convert(editor.getJSON(), shouldOptimise, "standard", exportAsJSON),
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -62,8 +62,8 @@
 				<pre class="inline break-all whitespace-pre-wrap">{editor
 						? convert(
 								editor.getJSON(),
-								"standard",
 								shouldOptimise,
+								"standard",
 								exportAsJSON,
 							)
 						: "Loading..."}</pre>
@@ -76,7 +76,7 @@
 				class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
 				onclick={() => {
 					navigator.clipboard.writeText(
-						`[lore=${convert(editor.getJSON(), "item_lore", shouldOptimise, exportAsJSON)}]`,
+						`[lore=${convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)}]`,
 					);
 					recentlyCopied = true;
 					setTimeout(() => (recentlyCopied = false), 2000);
@@ -88,8 +88,8 @@
 				<pre class="inline break-all whitespace-pre-wrap">{editor
 						? convert(
 								editor.getJSON(),
-								"item_lore",
 								shouldOptimise,
+								"item_lore",
 								exportAsJSON,
 							)
 						: "Loading..."}</pre>

@@ -1,7 +1,7 @@
 import type { MinecraftText } from "$lib/types";
 import type { Editor, JSONContent } from "@tiptap/core";
 
-export const colorMap = [
+export const colourMap = [
 	{ name: "dark_red", value: "#AA0000", code: "4" },
 	{ name: "red", value: "#FF5555", code: "c" },
 	{ name: "gold", value: "#FFAA00", code: "6" },
@@ -56,7 +56,7 @@ export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.value.toUpperCase() === color)?.name || color;
+	return colourMap.find((e) => e.value.toUpperCase() === color)?.name || color;
 }
 
 /**
@@ -69,7 +69,7 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.name.toLowerCase() === color)?.value || color;
+	return colourMap.find((e) => e.name.toLowerCase() === color)?.value || color;
 }
 
 /**

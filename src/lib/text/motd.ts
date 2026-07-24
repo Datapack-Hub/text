@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { colorMap, trueMarkOrUndefined, unescapeUnicode } from "./utils";
+import { colourMap, trueMarkOrUndefined, unescapeUnicode } from "./utils";
 
 function hexToRgb(hex: string): [number, number, number] {
 	hex = hex.replace(/^#/, "");
@@ -76,7 +76,7 @@ export function translateMOTD(c: JSONContent) {
 			let formatting = "";
 
 			const colorMark = c.marks?.at(0)?.attrs?.color;
-			for (const color of colorMap) {
+			for (const color of colourMap) {
 				if (!colorMark) {
 					continue;
 				}

@@ -672,7 +672,7 @@
 				<button
 					{@attach tooltip}
 					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-					aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
+					aria-label="Click to toggle whether the output should be {useUSEnglish ? "optimized" : "optimised"} (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
 					onclick={() => (shouldOptimise = !shouldOptimise)}
 					>{shouldOptimise ? (useUSEnglish ? "optimized" : "optimised") : "expanded"}</button>
 

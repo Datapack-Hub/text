@@ -39,14 +39,14 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 				"data-nbt-node": "true",
 				contenteditable: "false",
 				style: `
-			background-color: #18181b;
-			padding: 1px 5px;
-			border-radius: 4px;
-			font-size: 1rem;
-			display: inline-block;
-			vertical-align: var(--custom-source-align, middle);
-			text-decoration: inherit;
-			`,
+					background-color: #18181b;
+					padding: 1px 5px;
+					border-radius: 4px;
+					font-size: 1rem;
+					display: inline-block;
+					vertical-align: var(--custom-source-align, middle);
+					text-decoration: inherit;
+				`,
 			}),
 			["span", {}, `NBT: ${nbt}, ${block}`],
 		];

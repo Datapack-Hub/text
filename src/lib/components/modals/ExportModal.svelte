@@ -6,29 +6,42 @@
 	import IconDownload from "~icons/tabler/download";
 	import IconCopy from "~icons/tabler/copy";
 	import CheckBox from "../CheckBox.svelte";
-	import html2canvas from "html2canvas-pro";
+	import { domToPng, domToJpeg, domToWebp, domToSvg, type Options } from "modern-screenshot";
 
 	let {
 		outputDialog = $bindable(),
 		editor,
-		recentlyCopied,
+		recentlyCopied = $bindable(),
 		shouldOptimise = true,
 	} = $props();
 
 	let exportAsJSON = $state(false);
+	let extension = $state("png");
+
+	const functionLUT = new Map<
+		string,
+		(element: HTMLElement, options?: Options) => Promise<string>
+	>();
+
+	functionLUT.set("png", domToPng);
+	functionLUT.set("jpeg", domToJpeg);
+	functionLUT.set("webp", domToWebp);
+	functionLUT.set("svg", domToSvg);
+
+	let renderOptions: Options = {
+		scale: 4,
+	}
 
 	async function exportAsImage() {
-		const canvas = document.createElement("canvas");
-		canvas.width = document.querySelector(".ProseMirror")!.clientWidth;
-		canvas.height = document.querySelector(".ProseMirror")!.clientHeight;
-		await html2canvas(document.querySelector(".ProseMirror")!, {
-			backgroundColor: null,
-			scale: 2,
-			canvas: canvas,
-		});
-		const dataUrl = canvas.toDataURL("image/png");
+		const func = functionLUT.get(extension);
+		if (func) {
+			await func(document.querySelector(".ProseMirror")!, renderOptions).then(downloadImage);
+		}
+	}
+
+	async function downloadImage(dataUrl: string) {
 		const link = document.createElement("a");
-		link.download = "tellraw-output.png";
+		link.download = `tellraw-output.${extension}`;
 		link.href = dataUrl;
 		link.click();
 	}
@@ -120,10 +133,25 @@
 		<p class="text-sm text-white/50">
 			Accuracy may not be great! You have been warned!
 		</p>
-		<button
-			class="my-2 w-fit rounded-sm bg-zinc-600 p-2 text-lg font-medium text-white hover:brightness-90 active:brightness-75"
-			onclick={exportAsImage}>
-			<IconDownload />
-		</button>
+		<div class="flex gap-2 mt-4 items-center">
+			<button
+				class="rounded-sm bg-orange-500 size-12 flex items-center justify-center text-lg text-black hover:brightness-90 active:brightness-75"
+				onclick={exportAsImage}>
+				<IconDownload />
+			</button>
+			<div class="flex flex-col">
+				<label for="extension" class="ml-2 text-white/50 text-xs"
+					>Image format:</label>
+				<select
+					bind:value={extension}
+					name="extension"
+					class="ml-2 rounded-sm bg-zinc-900 p-1 border-zinc-900 border-r-8 text-white outline-0">
+					<option value="png">PNG</option>
+					<option value="jpeg">JPEG</option>
+					<option value="webp">WEBP</option>
+					<option value="svg">SVG</option>
+				</select>
+			</div>
+		</div>
 	</div>
 </Modal>

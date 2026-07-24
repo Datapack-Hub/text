@@ -1,30 +1,23 @@
 <script lang="ts">
 	// Local variables
+	import { openDataStore } from "$lib/db";
+	import { outputVersion } from "$lib/stores";
 	import { convert } from "$lib/text/nbt/export";
 	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
 	import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
-	import { openDataStore } from "$lib/db";
-	import { outputVersion } from "$lib/stores";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-
-	// Local components
+// Local components
 	import Modal from "$lib/components/Modal.svelte";
 	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
-
-	// External components
+// External components
 	import ColorPicker from "svelte-awesome-color-picker";
 	import { Highlight } from "svelte-highlight";
 	import typescript from "svelte-highlight/languages/typescript";
-
-	// Tiptap
-	import { Editor, type JSONContent } from "@tiptap/core";
-	import Color from "@tiptap/extension-color";
-	import Placeholder from "@tiptap/extension-placeholder";
-	import StarterKit from "@tiptap/starter-kit";
+// Tiptap
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import {
 		AtlasObjectNode,
@@ -43,8 +36,11 @@
 		StorageNBTNode,
 		TranslateNode,
 	} from "$lib/tiptap/extensions/index";
-
-	// Icons
+	import { Editor, type JSONContent } from "@tiptap/core";
+	import Color from "@tiptap/extension-color";
+	import Placeholder from "@tiptap/extension-placeholder";
+	import StarterKit from "@tiptap/starter-kit";
+// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -63,10 +59,9 @@
 	import IconHollow from "~icons/tabler/square-x";
 	import IconDelete from "~icons/tabler/trash";
 	import IconLoad from "~icons/tabler/upload";
-
-	// Svelte
-	import { onDestroy, onMount } from "svelte";
+// Svelte
 	import { page } from "$app/state";
+	import { onDestroy, onMount } from "svelte";
 
 	// VARIABLES
 

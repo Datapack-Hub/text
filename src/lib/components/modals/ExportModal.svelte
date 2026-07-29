@@ -6,7 +6,13 @@
 	import IconDownload from "~icons/tabler/download";
 	import IconCopy from "~icons/tabler/copy";
 	import CheckBox from "../CheckBox.svelte";
-	import { domToPng, domToJpeg, domToWebp, domToSvg, type Options } from "modern-screenshot";
+	import {
+		domToPng,
+		domToJpeg,
+		domToWebp,
+		domToSvg,
+		type Options,
+	} from "modern-screenshot";
 
 	let {
 		outputDialog = $bindable(),
@@ -30,12 +36,14 @@
 
 	let renderOptions: Options = {
 		scale: 4,
-	}
+	};
 
 	async function exportAsImage() {
 		const func = functionLUT.get(extension);
 		if (func) {
-			await func(document.querySelector(".ProseMirror")!, renderOptions).then(downloadImage);
+			await func(document.querySelector(".ProseMirror")!, renderOptions).then(
+				downloadImage,
+			);
 		}
 	}
 
@@ -133,19 +141,19 @@
 		<p class="text-sm text-white/50">
 			Accuracy may not be great! You have been warned!
 		</p>
-		<div class="flex gap-2 mt-4 items-center">
+		<div class="mt-4 flex items-center gap-2">
 			<button
-				class="rounded-sm bg-orange-500 size-12 flex items-center justify-center text-lg text-black hover:brightness-90 active:brightness-75"
+				class="flex size-12 items-center justify-center rounded-sm bg-orange-500 text-lg text-black hover:brightness-90 active:brightness-75"
 				onclick={exportAsImage}>
 				<IconDownload />
 			</button>
 			<div class="flex flex-col">
-				<label for="extension" class="ml-2 text-white/50 text-xs"
+				<label for="extension" class="ml-2 text-xs text-white/50"
 					>Image format:</label>
 				<select
 					bind:value={extension}
 					name="extension"
-					class="ml-2 rounded-sm bg-zinc-900 p-1 border-zinc-900 border-r-8 text-white outline-0">
+					class="ml-2 rounded-sm border-r-8 border-zinc-900 bg-zinc-900 p-1 text-white outline-0">
 					<option value="png">PNG</option>
 					<option value="jpeg">JPEG</option>
 					<option value="webp">WEBP</option>

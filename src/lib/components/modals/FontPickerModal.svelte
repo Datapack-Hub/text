@@ -33,6 +33,7 @@
 		<p>Select one of the default Minecraft fonts below:</p>
 		<div class="flex flex-col space-y-1">
 			<button
+				data-testid="font-button-default"
 				onclick={() => {
 					editor?.chain().focus().unsetFont().run();
 					fontDialog?.close();
@@ -42,6 +43,7 @@
 				<span>Default</span>
 			</button>
 			<button
+				data-testid="font-button-illageralt"
 				onclick={() => {
 					editor?.chain().focus().setFont("minecraft:illageralt").run();
 					fontDialog?.close();
@@ -52,6 +54,7 @@
 				<span class="font-mono text-white/60">(minecraft:illageralt)</span>
 			</button>
 			<button
+				data-testid="font-button-alt"
 				onclick={() => {
 					editor?.chain().focus().setFont("minecraft:alt").run();
 					fontDialog?.close();

@@ -15,6 +15,7 @@
 
 <button
 	aria-label="Shadow Color"
+	data-testid="shadow-color-button"
 	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'

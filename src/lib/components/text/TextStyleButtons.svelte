@@ -20,6 +20,7 @@
 
 <button
 	aria-label="Bold"
+	data-testid="bold-button"
 	onclick={() => editor.chain().focus().toggleBold().run()}
 	{@attach tooltip}
 	class="p-1 {small
@@ -33,6 +34,7 @@
 </button>
 <button
 	aria-label="Italic"
+	data-testid="italic-button"
 	onclick={() => editor.chain().focus().toggleItalic().run()}
 	{@attach tooltip}
 	class="p-1 {small
@@ -46,6 +48,7 @@
 </button>
 <button
 	aria-label="Strikethrough"
+	data-testid="strikethrough-button"
 	onclick={() => editor.chain().focus().toggleStrike().run()}
 	{@attach tooltip}
 	class="p-1 {small
@@ -59,6 +62,7 @@
 </button>
 <button
 	aria-label="Underline"
+	data-testid="underline-button"
 	onclick={() => editor.chain().focus().toggleUnderline().run()}
 	{@attach tooltip}
 	class="p-1 {small
@@ -72,6 +76,7 @@
 </button>
 <button
 	aria-label="Obfuscated"
+	data-testid="obfuscation-button"
 	onclick={() => editor.chain().focus().toggleObfuscated().run()}
 	{@attach tooltip}
 	class="p-1 {small

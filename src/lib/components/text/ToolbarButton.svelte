@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { tooltip } from "$lib/tooltip";
 	import type { Component } from "svelte";
-	import tippy from "tippy.js";
 
 	type Props = {
 		onClick: () => void;
@@ -19,6 +18,6 @@
 	onclick={onClick}
 	{@attach tooltip}
 	style="color: {colour || 'inherit'}"
-	class="toolbar-btn {styleVar ? 'bg-zinc-800' : ''}">
+	class="toolbar-btn{styleVar ? ' bg-zinc-800' : ''}">
 	<Icon />
 </button>

@@ -7,17 +7,17 @@
 	import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-// Local components
+	// Local components
 	import Modal from "$lib/components/Modal.svelte";
 	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
-// External components
+	// External components
 	import ColorPicker from "svelte-awesome-color-picker";
 	import { Highlight } from "svelte-highlight";
 	import typescript from "svelte-highlight/languages/typescript";
-// Tiptap
+	// Tiptap
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import {
 		AtlasObjectNode,
@@ -40,7 +40,7 @@
 	import Color from "@tiptap/extension-color";
 	import Placeholder from "@tiptap/extension-placeholder";
 	import StarterKit from "@tiptap/starter-kit";
-// Icons
+	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
 	import IconTick from "~icons/tabler/check";
@@ -59,7 +59,7 @@
 	import IconHollow from "~icons/tabler/square-x";
 	import IconDelete from "~icons/tabler/trash";
 	import IconLoad from "~icons/tabler/upload";
-// Svelte
+	// Svelte
 	import { page } from "$app/state";
 	import { onDestroy, onMount } from "svelte";
 
@@ -192,6 +192,10 @@
 						"Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",
 				}),
 			],
+			onTransaction: ({ editor: newEditor }) => {
+				editor = undefined;
+				editor = newEditor;
+			},
 			onUpdate: ({ editor }) => {
 				tiptapJSON = editor.getJSON();
 				debounce(saveContent, 1000)();
@@ -431,7 +435,7 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				colour={colour}
+				{colour}
 				Icon={IconColor}
 				onClick={colourDialog.open}
 				ariaLabel="Custom Colour" />
@@ -450,13 +454,13 @@
 						ariaLabel={toTitleCase(colour.name.replace("_", " "))} />
 				{/each}
 			</div>
-			{#if editor.getAttributes("textStyle").color}
+			{#if editor.isActive("textStyle")}
 				<button
-					onclick={() => editor?.chain().focus().unsetColor().run()}
+					onclick={() => editor!.chain().focus().unsetColor().run()}
 					aria-label="Unset Colour"
+					data-testid="unset-color-button"
 					{@attach tooltip}
-					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
-					class:active={editor.isActive("underline")}>
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3">
 					<IconHollow />
 				</button>
 			{/if}

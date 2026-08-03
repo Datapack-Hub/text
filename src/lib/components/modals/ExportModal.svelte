@@ -141,11 +141,12 @@
 		<p class="text-sm text-white/50">
 			Accuracy may not be great! You have been warned!
 		</p>
-		<div class="mt-4 flex items-center gap-2">
+		<div class="mt-2 flex items-center gap-2">
 			<button
-				class="flex size-12 items-center justify-center rounded-sm bg-orange-500 text-lg text-black hover:brightness-90 active:brightness-75"
+				class="flex space-x-2 p-2 items-center justify-center rounded-sm bg-zinc-900 text-md hover:brightness-90 active:brightness-75"
 				onclick={exportAsImage}>
 				<IconDownload />
+				<span>Download image</span>
 			</button>
 			<div class="flex flex-col">
 				<label for="extension" class="ml-2 text-xs text-white/50"

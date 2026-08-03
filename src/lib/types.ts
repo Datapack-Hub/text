@@ -60,7 +60,7 @@ export type MinecraftText = {
 	atlas?: string;
 	sprite?: string;
 	player?: {
-		name?: string;
+		name: string;
 	};
 	hat?: string;
 
@@ -134,7 +134,8 @@ export type ExternalSources = {
 		selector: string;
 	};
 	object: {
-		object?: string; // can be omitted for only atlas objects ONLY
+		// can be omitted for only atlas objects ONLY
+		object?: string;
 		atlas: string;
 		sprite: string;
 		player: {
@@ -145,7 +146,6 @@ export type ExternalSources = {
 	};
 };
 
-export type MCTextKey = keyof MinecraftText;
 export type TranslateOptions = Partial<{
 	optimise: boolean;
 	exportType: "standard" | "item_lore";

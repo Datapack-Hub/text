@@ -21,8 +21,8 @@ export const ClickEventMark = Mark.create({
 						return false;
 					}
 					const el = element as HTMLElement;
-					const action = el.getAttribute("data-click-event-action");
-					const value = el.getAttribute("data-click-event-value");
+					const action = el.dataset.clickEventAction;
+					const value = el.dataset.clickEventValue;
 					if (!action) {
 						return false;
 					}
@@ -42,7 +42,7 @@ export const ClickEventMark = Mark.create({
 				{
 					"data-click-event-action": HTMLAttributes.action,
 					"data-click-event-value": HTMLAttributes.value,
-					class: "clickEvent", // Optional styling
+					class: "clickEvent",
 				},
 				HTMLAttributes,
 			),

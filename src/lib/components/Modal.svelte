@@ -1,10 +1,16 @@
 <script lang="ts">
-	import { tick } from "svelte";
+	import { tick, type Snippet } from "svelte";
 	import IconClose from "~icons/tabler/x";
 
 	type Props = {
-		key?: string;
-		[key: string]: any;
+		opened?: boolean;
+		title?: string;
+		small?: boolean;
+		nopad?: boolean;
+		big?: boolean;
+		flexible?: boolean;
+		children: Snippet;
+		key: string;
 	};
 
 	let {
@@ -70,7 +76,7 @@
 					? 'w-[95%]!'
 					: ''} {flexible ? 'w-fit! max-w-[95%]' : ''} m-auto py-4">
 				<div class="flex items-center rounded-t-lg bg-zinc-900 p-4">
-					<span class="grow text-lg font-bold">{title}</span>
+					<span class="grow text-lg font-bold" data-testid="modal-title-{title.toLowerCase()}">{title}</span>
 					<button aria-label="close" onclick={close}><IconClose /></button>
 				</div>
 				<div

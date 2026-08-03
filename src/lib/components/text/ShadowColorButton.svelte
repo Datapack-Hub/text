@@ -5,29 +5,17 @@
 	interface Props {
 		/** DOM element of the label wrapper */
 		labelElement: HTMLLabelElement | undefined;
-		/** hex color */
-		hex: string | null;
-		/** input label */
-		label: string;
-		/** input name, useful in a native form */
-		name?: string | undefined;
 		/** directionality left to right, or right to left*/
 		dir: "ltr" | "rtl";
 		small?: boolean;
 	}
 
-	let {
-		labelElement = $bindable(),
-		hex,
-		label,
-		name = undefined,
-		dir,
-		small,
-	}: Props = $props();
+	let { labelElement = $bindable(), dir, small }: Props = $props();
 </script>
 
 <button
 	aria-label="Shadow Color"
+	data-testid="shadow-color-button"
 	{@attach tooltip}
 	class="p-1 {small
 		? 'text-sm'

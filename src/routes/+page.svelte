@@ -1,30 +1,23 @@
 <script lang="ts">
 	// Local variables
-	import { convert } from "$lib/text/nbt/export";
-	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
-	import { colorMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
 	import { openDataStore } from "$lib/db";
 	import { outputVersion } from "$lib/stores";
+	import { convert } from "$lib/text/nbt/export";
+	import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
+	import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
 	import { tooltip } from "$lib/tooltip";
 	import { versions, type Version } from "$lib/types";
-
 	// Local components
 	import Modal from "$lib/components/Modal.svelte";
 	import MiniEditor from "$lib/components/text/MiniEditor.svelte";
 	import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
 	import TextStyleButtons from "$lib/components/text/TextStyleButtons.svelte";
 	import ToolbarButton from "$lib/components/text/ToolbarButton.svelte";
-
 	// External components
 	import ColorPicker from "svelte-awesome-color-picker";
 	import { Highlight } from "svelte-highlight";
 	import typescript from "svelte-highlight/languages/typescript";
-
 	// Tiptap
-	import { Editor, type JSONContent } from "@tiptap/core";
-	import Color from "@tiptap/extension-color";
-	import Placeholder from "@tiptap/extension-placeholder";
-	import StarterKit from "@tiptap/starter-kit";
 	import { fontLUT } from "$lib/tiptap/extensions/fonts";
 	import {
 		AtlasObjectNode,
@@ -43,7 +36,10 @@
 		StorageNBTNode,
 		TranslateNode,
 	} from "$lib/tiptap/extensions/index";
-
+	import { Editor, type JSONContent } from "@tiptap/core";
+	import Color from "@tiptap/extension-color";
+	import Placeholder from "@tiptap/extension-placeholder";
+	import StarterKit from "@tiptap/starter-kit";
 	// Icons
 	import IconUndo from "~icons/tabler/arrow-back-up";
 	import IconRedo from "~icons/tabler/arrow-forward-up";
@@ -63,57 +59,60 @@
 	import IconHollow from "~icons/tabler/square-x";
 	import IconDelete from "~icons/tabler/trash";
 	import IconLoad from "~icons/tabler/upload";
-
 	// Svelte
-	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/state";
+	import { onDestroy, onMount } from "svelte";
 
-	// VARIABLES
-
-	// Tiptap variables
 	let tiptapJSON: JSONContent = $state()!;
+
 	let element: HTMLElement = $state()!;
 	let editor: Editor | undefined = $state()!;
+	let colour = $state("#ffffff");
+	let colourDialog: Modal = $state()!;
 
+	let outputDialog: Modal = $state()!;
+	let versionPopup: boolean = $state(false);
+
+	let doesContentExist: boolean = $derived(editor ? !editor.isEmpty : false);
 	let shouldOptimise = $state(true);
 
 	// Import
 	let importDialog: Modal = $state()!;
 	let importText: string = $state("");
 
-	// Export
 	let recentlyCopied = $state(false);
-	let finalOutput = $derived(
-		editor ? convert(tiptapJSON, "standard", shouldOptimise) : "Loading...",
-	);
 
 	// Snapshots and stuff
 	let snapshots: object[] = $state([]);
 	let recentlySaved = $state(false);
 	let loadDialog: Modal = $state()!;
 
-	// Dialogs and UI
+	// Dialogs
 	let gradientDialog: Modal = $state()!;
 	let gradientSteps: string[] = $state(["#ffffff"]);
+
 	let keybindDialog: Modal = $state()!;
+
 	let clickEventType = $state("");
 	let clickEventValue = $state("");
 	let clickEventDialog: Modal = $state()!;
+
 	let hoverEventEditor: MiniEditor = $state()!;
 	let hoverEventDialog: Modal = $state()!;
 	let hoverEventValue = $state("");
+
 	let fontDialog: Modal = $state()!;
 	let fontUploadModal: Modal = $state()!;
 	let fontName = $state("");
+
 	let customType: string | undefined = $state();
 	let customDialog: Modal = $state()!;
+
 	let unicodeSelectorDialog: Modal = $state()!;
-	let color = $state("#ffffff");
-	let colorDialog: Modal = $state()!;
-	let outputDialog: Modal = $state()!;
-	let versionPopup: boolean = $state(false);
-	let doesContentExist: boolean = $derived(editor ? !editor.isEmpty : false);
-	let useUSEnglish: boolean = (navigator.language.toLowerCase() == "en-us") ? true : false
+
+	let finalOutput = $derived(
+		editor ? convert(tiptapJSON, shouldOptimise) : "Loading...",
+	);
 
 	function importToEditor() {
 		const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
@@ -211,18 +210,18 @@
 	});
 
 	function toTitleCase(str: string) {
-		return str.replace(
-			/\w\S*/g,
-			(text) => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase(),
+		return str.replaceAll(
+			/\w\S*/gu,
+			(text) => text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
 		);
 	}
 
-	function customColorHandler() {
-		editor?.chain().focus().setColor(color).run();
-		colorDialog?.close();
+	function customColourHandler() {
+		editor?.chain().focus().setColor(colour).run();
+		colourDialog?.close();
 	}
 
-	const debounce = (callback: Function, wait: number) => {
+	const debounce = (callback: (...args: any[]) => void, wait: number) => {
 		let timeoutId: number;
 		return (...args: any[]) => {
 			window.clearTimeout(timeoutId);
@@ -340,12 +339,12 @@
 		}
 	}
 
-	function removeAllNodes(editor: Editor | undefined, type: string) {
+	function removeAllNodes(type: string) {
 		if (!editor) {
 			return;
 		}
-		let editor_json = editor.getJSON();
-		editor_json.content.forEach((paragraph) => {
+		let editorJson = editor.getJSON();
+		editorJson.content.forEach((paragraph) => {
 			if (paragraph.content) {
 				paragraph.content = paragraph.content.filter(
 					(node) => node.type !== type,
@@ -353,8 +352,8 @@
 			}
 		});
 
-		editor?.commands.setContent(editor_json);
-		tiptapJSON = editor_json;
+		editor?.commands.setContent(editorJson);
+		tiptapJSON = editorJson;
 	}
 
 	let versionPopupConfirmationVisible = $state(false);
@@ -365,7 +364,7 @@
 			return;
 		}
 
-		if ($outputVersion.index > version.index && confirm == false) {
+		if ($outputVersion.index > version.index && confirm === false) {
 			versionPopupConfirmationVisible = true;
 			temporaryVersionConfirmation = version;
 			return;
@@ -378,8 +377,8 @@
 
 		if (version.index < 2) {
 			// remove object keys
-			removeAllNodes(editor, "atlas_object");
-			removeAllNodes(editor, "player_object");
+			removeAllNodes("atlas_object");
+			removeAllNodes("player_object");
 		}
 
 		tiptapJSON = editor!.getJSON();
@@ -436,32 +435,32 @@
 			<div class="mx-2 h-5 w-px bg-zinc-600"></div>
 
 			<ToolbarButton
-				{color}
+				{colour}
 				Icon={IconColor}
-				onClick={colorDialog.open}
-				ariaLabel="Custom Color" />
+				onClick={colourDialog.open}
+				ariaLabel="Custom Colour" />
 
 			<ToolbarButton
 				Icon={IconGradient}
 				onClick={gradientDialog.open}
-				ariaLabel="Color Gradient" />
+				ariaLabel="Colour Gradient" />
 			<div id="colorBtns">
-				{#each colorMap as color}
+				{#each colourMap as colour}
 					<ToolbarButton
 						Icon={IconSquare}
-						onClick={() => editor!.chain().focus().setColor(color.value).run()}
-						styleVar={editor.isActive("textStyle", { color: color.value })}
-						color={color.value}
-						ariaLabel={toTitleCase(color.name.replace("_", " "))} />
+						onClick={() => editor!.chain().focus().setColor(colour.value).run()}
+						styleVar={editor.isActive("textStyle", { color: colour.value })}
+						colour={colour.value}
+						ariaLabel={toTitleCase(colour.name.replace("_", " "))} />
 				{/each}
 			</div>
-			{#if editor.getAttributes("textStyle").color}
+			{#if editor.isActive("textStyle")}
 				<button
-					onclick={() => editor?.chain().focus().unsetColor().run()}
-					aria-label="Unset color"
+					onclick={() => editor!.chain().focus().unsetColor().run()}
+					aria-label="Unset Colour"
+					data-testid="unset-color-button"
 					{@attach tooltip}
-					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3"
-					class:active={editor.isActive("underline")}>
+					class="rounded-md p-1 text-lg text-zinc-500 hover:bg-white/3">
 					<IconHollow />
 				</button>
 			{/if}
@@ -576,9 +575,9 @@
 	<div>
 		{#if page.url.searchParams.has("dev")}
 			<code class="inline-block overflow-x-scroll p-3 text-xs"
-				><pre>
-					DEV ONLY: {editor ? JSON.stringify(editor.getJSON()) : "Loading..."}
-				</pre></code>
+				>DEV ONLY: {tiptapJSON
+					? JSON.stringify(tiptapJSON)
+					: "Loading..."}</code>
 			<br />
 		{/if}
 		<div class="bg-zinc-950 p-3">
@@ -672,9 +671,9 @@
 				<button
 					{@attach tooltip}
 					class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-					aria-label="Click to toggle whether the output should be {useUSEnglish ? "optimized" : "optimised"} (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
+					aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
 					onclick={() => (shouldOptimise = !shouldOptimise)}
-					>{shouldOptimise ? (useUSEnglish ? "optimized" : "optimised") : "expanded"}</button>
+					>{shouldOptimise ? "optimised" : "expanded"}</button>
 
 				<p class="font-lexend nomob text-xs text-white/60">•</p>
 
@@ -759,10 +758,10 @@
 		<modal.default bind:customDialog bind:customType {editor} />
 	{/await}
 
-	<Modal title="Custom Color" bind:this={colorDialog} small nopad key="C">
+	<Modal title="Custom Colour" bind:this={colourDialog} small nopad key="C">
 		<div class="flex w-full flex-col py-4">
 			<ColorPicker
-				bind:hex={color}
+				bind:hex={colour}
 				--cp-bg-color="transparent"
 				--cp-border-color="transparent"
 				--cp-text-color="white"
@@ -772,7 +771,7 @@
 				isAlpha={false} />
 
 			<button
-				onclick={customColorHandler}
+				onclick={customColourHandler}
 				class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
 				Done
 			</button>

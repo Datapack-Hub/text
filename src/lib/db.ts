@@ -1,7 +1,7 @@
 import { openDB } from "idb";
 
 export async function openDataStore() {
-	const db = await openDB("dph_data-store", 1, {
+	const fontDatabase = await openDB("dph_data-store", 1, {
 		upgrade(db, _old, _new, _) {
 			db.createObjectStore("fonts", {
 				keyPath: "identifier",
@@ -9,5 +9,5 @@ export async function openDataStore() {
 		},
 	});
 
-	return db;
+	return fontDatabase;
 }

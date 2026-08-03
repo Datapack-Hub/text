@@ -20,8 +20,8 @@ export const HoverEventMark = Mark.create({
 						return false;
 					}
 					const el = element as HTMLElement;
-					const action = el.getAttribute("data-hover-event-action");
-					const value = JSON.parse(el.getAttribute("data-hover-event-value")!);
+					const action = el.dataset.hoverEventAction;
+					const value = JSON.parse(el.dataset.hoverEventValue!);
 					if (!action) {
 						return false;
 					}

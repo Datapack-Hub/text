@@ -2,13 +2,16 @@ import {
 	defaultColorLUT,
 	defaultColorReverseLUT,
 	isDefinedTextObject,
-	isMarkType,
+	findMarkType,
 	trueMarkOrUndefined,
 	unescapeUnicode,
+	mapToHexByte,
+	stripTypeSuffixes,
+	rgbaToArgbHex,
+	argbToRgbaHex,
 } from "$lib/text/utils";
 import type { JSONContent } from "@tiptap/core";
-import { it } from "vitest";
-import { describe, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("isDefinedTextObject", () => {
 	it("should report defined object with minimal object", () => {
@@ -56,6 +59,11 @@ describe("unescapeUnicode", () => {
 		const input = "\\u0048\\u0045\\u004C\\u004C\\u004F";
 		const output = unescapeUnicode(input);
 		expect(output).toBe("HELLO");
+	});
+	it("should correctly handle invalid unicode sequences", () => {
+		const input = "\\uXXXX";
+		const output = unescapeUnicode(input);
+		expect(output).toBe("\\uXXXX");
 	});
 });
 
@@ -106,13 +114,47 @@ describe("defaultColorLUT", () => {
 	});
 });
 
-it("isMarkType should correctly identify mark types", () => {
+it("findMarkType finds the correct mark", () => {
 	const contentWithMarks: JSONContent = {
 		type: "text",
 		marks: [{ type: "bold" }, { type: "italic" }],
 		text: "Sample Text",
 	};
-	expect(isMarkType(contentWithMarks, "bold")).toBeDefined();
-	expect(isMarkType(contentWithMarks, "italic")).toBeDefined();
-	expect(isMarkType(contentWithMarks, "underline")).toBeUndefined();
+	expect(findMarkType(contentWithMarks, "bold")).toBeDefined();
+	expect(findMarkType(contentWithMarks, "italic")).toBeDefined();
+	expect(findMarkType(contentWithMarks, "underline")).toBeUndefined();
+});
+
+it("should convert number to hex byte string", () => {
+	expect(mapToHexByte(0)).toBe("00");
+	expect(mapToHexByte(1 / 255)).toBe("01");
+	expect(mapToHexByte(1 / 16)).toBe("10");
+	expect(mapToHexByte(1)).toBe("ff");
+	expect(mapToHexByte(1.2)).toBe("00");
+});
+
+it("should strip type suffixes from input string", () => {
+	expect(stripTypeSuffixes("1L")).toBe("1");
+	expect(stripTypeSuffixes("1.0F")).toBe("1.0");
+	expect(stripTypeSuffixes("1.0D")).toBe("1.0");
+	expect(stripTypeSuffixes("1b")).toBe("1");
+	expect(stripTypeSuffixes("1s")).toBe("1");
+	expect(stripTypeSuffixes("1i")).toBe("1");
+	expect(stripTypeSuffixes("1.0")).toBe("1.0");
+});
+
+it("should convert rgba hex to argb hex", () => {
+	expect(rgbaToArgbHex("#FF0000FF")).toBe("#FFFF0000");
+	expect(rgbaToArgbHex("#00FF00FF")).toBe("#FF00FF00");
+	expect(rgbaToArgbHex("#0000FFFF")).toBe("#FF0000FF");
+	expect(rgbaToArgbHex("FFFFFFFF")).toBe("#FFFFFFFF");
+	expect(rgbaToArgbHex("00000000")).toBe("#00000000");
+});
+
+it("should convert argb hex to rgba hex", () => {
+	expect(argbToRgbaHex("#FFFF0000")).toBe("#FF0000FF");
+	expect(argbToRgbaHex("#FF00FF00")).toBe("#00FF00FF");
+	expect(argbToRgbaHex("FF0000FF")).toBe("#0000FFFF");
+	expect(argbToRgbaHex("FFFFFFFF")).toBe("#FFFFFFFF");
+	expect(argbToRgbaHex("00000000")).toBe("#00000000");
 });

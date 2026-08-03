@@ -13,7 +13,7 @@
 	import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt/import";
 
 	import {
-		colorMap,
+		colourMap,
 		defaultColorLUT,
 		trueMarkOrUndefined,
 	} from "$lib/text/utils";
@@ -55,7 +55,6 @@
 				editor = newEditor;
 			},
 			onUpdate: ({ editor }) => {
-				// TODO: fix the JSON parsing errors that can happen here
 				value = JSON.stringify(editor.getJSON());
 				output = JSON.parse(translate(editor.getJSON()));
 			},
@@ -109,9 +108,9 @@
 	}
 
 	export function getValue() {
-		return translate(editor!.getJSON()).replace(
-			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/g,
-			(match) => match.replace(/"/g, ""),
+		return translate(editor!.getJSON()).replaceAll(
+			/"(?:[^"\\]*(?:\\.[^"\\]*)*)"\s*:/gu,
+			(match) => match.replaceAll(`"`, ""),
 		);
 	}
 
@@ -128,7 +127,7 @@
 
 			<div class="w-4"></div>
 
-			{#each colorMap as color}
+			{#each colourMap as color}
 				<button
 					onclick={() => editor?.chain().focus().setColor(color.value).run()}
 					title={color.name}

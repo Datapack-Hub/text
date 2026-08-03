@@ -1,5 +1,11 @@
 import type { JSONContent } from "@tiptap/core";
-import { defaultColorReverseLUT } from "../utils";
+import {
+	argbToRgbaHex,
+	defaultColorReverseLUT,
+	mapToHexByte,
+	rgbaToArgbHex,
+	stripTypeSuffixes,
+} from "../utils";
 import { type MinecraftText, type OldMinecraftText } from "../../types";
 import { type StringyMCText } from "../../types";
 
@@ -31,8 +37,9 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 	if (raw === "") return [];
 
 	raw = raw
-		.replace(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":') // quote unquoted keys
-		.replace(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/g, (_, p1) => {
+		// quote unquoted keys
+		.replaceAll(/([,{]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/gu, '$1"$2":')
+		.replaceAll(/:\s*([a-zA-Z_][a-zA-Z0-9_.:-]*)(?=\s*[,}\]])/gu, (_, p1) => {
 			// quote unquoted strings, ignoring booleans
 			const protectedValues = ["true", "false", "1b", "0b"];
 			if (protectedValues.includes(p1.toLowerCase())) {
@@ -40,13 +47,16 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
 			}
 			return `: "${p1}"`;
 		});
-	if (raw.match(/^"\w*"/)) {
-		return [raw.replace(/"/g, "")];
+	if (/^"\w*"/u.test(raw)) {
+		return [raw.replaceAll(`"`, "")];
 	}
 
-	// replace 1b and 0b
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b1b\b/g, "true");
-	raw = raw.replace(/(?<="\w+"\s*:\s*)\b0b\b/g, "false");
+	// replace 1b and 0b with true and false literals
+	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)\b1b\b/gu, "true");
+	raw = raw.replaceAll(/(?<="\w+"\s*:\s*)\b0b\b/gu, "false");
+
+	// remove type suffixes from numbers (e.g., 1.0f, 2.0d, 3l)
+	raw = stripTypeSuffixes(raw);
 
 	let parsed: MinecraftText[] | MinecraftText | string;
 
@@ -242,68 +252,76 @@ function applyStyling(
 	}
 
 	if (text.shadow_color) {
-		const hex = "#" + text.shadow_color.toString(16).padStart(8, "0");
-		finalText.marks?.push({
-			type: "shadowColor",
-			attrs: {
-				shadowColor: hex,
-			},
-		});
+		const combinedShadowStr = (
+			Array.isArray(text.shadow_color)
+				? rgbaToArgbHex(text.shadow_color.map(mapToHexByte).join(""))
+				: text.shadow_color.toString(16)
+		).replaceAll(/[lL#]/gu, "");
+		const intValue = parseInt(combinedShadowStr, 16);
+
+		if (intValue > 0 && intValue < 0xffffffff) {
+			const hex = argbToRgbaHex(combinedShadowStr.padEnd(8, "FF"));
+			finalText.marks.push({
+				type: "shadowColor",
+				attrs: {
+					shadowColor: hex,
+				},
+			});
+		}
 	}
 
 	if (text.bold) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "bold",
 		});
 	}
 
 	if (text.italic) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "italic",
 		});
 	}
 
 	if (text.underlined) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "underline",
 		});
 	}
 
 	if (text.obfuscated) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "obfuscated",
 		});
 	}
 
 	if (text.strikethrough) {
-		finalText.marks?.push({
+		finalText.marks.push({
 			type: "strike",
 		});
 	}
 
 	if (text.click_event) {
-		const cE = text.click_event;
+		const e = text.click_event;
 
 		// Check if only one of the properties is set, throw an error if more than one is set
 		if (
-			(cE.url && (cE.command || cE.value || cE.page || cE.dialog)) ||
-			(cE.command && (cE.url || cE.value || cE.page || cE.dialog)) ||
-			(cE.value && (cE.url || cE.command || cE.page || cE.dialog)) ||
-			(cE.page && (cE.url || cE.command || cE.value || cE.dialog)) ||
-			(cE.dialog && (cE.url || cE.command || cE.value || cE.page))
+			(e.url && (e.command || e.value || e.page || e.dialog)) ||
+			(e.command && (e.url || e.value || e.page || e.dialog)) ||
+			(e.value && (e.url || e.command || e.page || e.dialog)) ||
+			(e.page && (e.url || e.command || e.value || e.dialog)) ||
+			(e.dialog && (e.url || e.command || e.value || e.page))
 		) {
 			throw new Error(
 				"Click event can only have one of url, command, value, page, or dialog set.",
 			);
 		}
 
-		const actionSource =
-			cE.url || cE.command || cE.value || cE.page || cE.dialog;
+		const actionSource = e.url || e.command || e.value || e.page || e.dialog;
 
 		finalText.marks?.push({
 			type: "clickEvent",
 			attrs: {
-				action: cE.action,
+				action: e.action,
 				value: actionSource,
 			},
 		});

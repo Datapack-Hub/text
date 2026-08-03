@@ -1,8 +1,7 @@
 import type { MinecraftText } from "$lib/types";
 import type { Editor, JSONContent } from "@tiptap/core";
-import { generateGradient } from "typescript-color-gradient";
 
-export const colorMap = [
+export const colourMap = [
 	{ name: "dark_red", value: "#AA0000", code: "4" },
 	{ name: "red", value: "#FF5555", code: "c" },
 	{ name: "gold", value: "#FFAA00", code: "6" },
@@ -57,7 +56,7 @@ export function defaultColorLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.value.toUpperCase() === color)?.name || color;
+	return colourMap.find((e) => e.value.toUpperCase() === color)?.name || color;
 }
 
 /**
@@ -70,91 +69,32 @@ export function defaultColorReverseLUT(color: string): string | undefined {
 	if (!color || color === "null") {
 		return;
 	}
-	return colorMap.find((e) => e.name.toLowerCase() === color)?.value || color;
-} /**
- * Checks the type of the mark against `type`
+	return colourMap.find((e) => e.name.toLowerCase() === color)?.value || color;
+}
+
+/**
+ * Finds a mark of a specific type in a JSONContent node.
  *
  * @param c the node you want to examine
  * @param type type to check
- * @returns true if it matches
+ * @returns the mark if found, otherwise undefined
  */
-
-export function isMarkType(c: JSONContent, type: string) {
+export function findMarkType(c: JSONContent, type: string) {
 	return c.marks?.find((e) => e.type === type);
 }
 
 export function unescapeUnicode(str: string) {
-	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/g;
+	const regex = /\\u(?:([0-9a-fA-F]{4})|\{([0-9a-fA-F]+)\})/gu;
 
-	return str.replace(regex, (match, p1, p2) => {
-		// p1 will contain the 4-digit hex if it's \uXXXX
-		// p2 will contain the variable hex if it's \u{XXXXX}
-		const hex = p1 || p2; // Get the hex value from whichever group matched
+	// p1 will contain the 4-digit hex if it's \uXXXX
+	// p2 will contain the variable hex if it's \u{XXXXX}
+	return str.replace(regex, (_, p1: string, p2: string) => {
+		// Get the hex value from whichever group matched
+		const hex = p1 || p2;
 
-		if (hex) {
-			const codePoint = parseInt(hex, 16);
-			return String.fromCodePoint(codePoint);
-		}
-		// If for some reason no hex was captured (shouldn't happen with this regex),
-		// return the original match to avoid breaking the string.
-		return match;
+		const codePoint = parseInt(hex, 16);
+		return String.fromCodePoint(codePoint);
 	});
-}
-
-/**
- * Applies a gradient to a selection in an editor
- *
- * @param editor the editor you want to apply it to
- * @param gradientColors the colors you want to use
- * @returns
- */
-export function applyGradient(editor: Editor, gradientColors: string[]) {
-	const { from, to } = editor.state.selection;
-	if (from === to) return;
-
-	const doc = editor.state.doc;
-	let text = "";
-	let textPositions: { pos: number; len: number }[] = [];
-
-	// Collect all text and their positions in the selection
-	doc.nodesBetween(from, to, (node, pos) => {
-		if (node.isText) {
-			const nodeStart = Math.max(from, pos);
-			const nodeEnd = Math.min(to, pos + node.text!.length);
-			const sliceStart = nodeStart - pos;
-			const sliceEnd = nodeEnd - pos;
-			const part = node.text?.slice(sliceStart, sliceEnd) ?? "";
-			if (part.length > 0) {
-				text += part;
-				textPositions.push({ pos: nodeStart, len: part.length });
-			}
-		}
-	});
-	if (!text.length) return;
-
-	const total = text.length;
-	if (total === 0 || gradientColors.length < 2) return;
-
-	const gradientArray = generateGradient(gradientColors, total);
-
-	let chain = editor.chain();
-
-	// Remove color from selection first
-	chain.focus().setTextSelection({ from, to }).unsetColor();
-
-	let charIndex = 0;
-	for (const { pos, len } of textPositions) {
-		for (let i = 0; i < len; i++) {
-			const color = gradientArray[charIndex];
-			chain
-				.setTextSelection({ from: pos + i, to: pos + i + 1 })
-				.setColor(color);
-			charIndex++;
-		}
-	}
-	chain.focus().setTextSelection({ from, to });
-
-	chain.run();
 }
 
 export function isAnInteractiveProp(prop: string) {
@@ -174,10 +114,54 @@ export function isAnInteractiveProp(prop: string) {
  */
 export function isDefinedTextObject(
 	obj: any,
+	// return type is that so that it can require the text property, instead of being optional
 ): obj is Omit<MinecraftText, "text"> & { text: string } {
 	return typeof obj === "object" && obj.text !== undefined;
 }
 
 export function getNodeAtSelection(editor: Editor) {
 	return editor.state.selection.$head.nodeBefore;
+}
+
+export function mapToHexByte(value: number): string {
+	if (value < 0.0 || value > 1.0) {
+		// Return "00" for out-of-range values
+		return "00";
+	}
+
+	const byteValue = Math.round(value * 255);
+	const hexString = byteValue.toString(16);
+
+	return hexString.length === 1 ? "0" + hexString : hexString;
+}
+
+export function stripTypeSuffixes(input: string): string {
+	const regex = /\b(\d+(?:\.\d+)?)[fdlsib]\b/gi;
+
+	return input.replaceAll(regex, "$1");
+}
+
+export function argbToRgbaHex(rgbaHex: string): string {
+	// Remove the leading '#' if it exists
+	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
+
+	// Extract RGB and Alpha components
+	const alpha = hex.slice(0, 2);
+	const rgb = hex.slice(2, 8);
+
+	// Return with alpha placed at the beginning
+
+	return `#${rgb}${alpha}`;
+}
+
+export function rgbaToArgbHex(rgbaHex: string): string {
+	// Remove the leading '#' if it exists
+	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
+
+	// Extract RGB and Alpha components
+	const rgb = hex.slice(0, 6);
+	const alpha = hex.slice(6, 8);
+
+	// Return with alpha placed at the beginning
+	return `#${alpha}${rgb}`;
 }

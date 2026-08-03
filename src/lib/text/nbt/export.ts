@@ -7,7 +7,8 @@ import type {
 import { type JSONContent } from "@tiptap/core";
 import {
 	defaultColorLUT,
-	isMarkType,
+	findMarkType,
+	rgbaToArgbHex,
 	trueMarkOrUndefined,
 	unescapeUnicode,
 } from "../utils";
@@ -45,7 +46,7 @@ export function addTypeSpecificValues(
 			break;
 		case "translate":
 			current.translate = c.attrs?.key;
-			if (c.attrs?.params && c.attrs?.params.length != 0) {
+			if (c.attrs?.params && c.attrs?.params.length !== 0) {
 				current.with = c.attrs?.params;
 			}
 			if (c.attrs?.fallback) {
@@ -114,11 +115,10 @@ export function addTypeSpecificValues(
  *
  * @param current your current minecraft text
  * @param c the content
- * @param includeInteractivity if it should have interactive events or not
  */
 function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
-	if (isMarkType(c, "clickEvent")) {
-		const ce = isMarkType(c, "clickEvent")?.attrs;
+	if (findMarkType(c, "clickEvent")) {
+		const ce = findMarkType(c, "clickEvent")?.attrs;
 		current.click_event = { action: ce!.action };
 		switch (ce!.action) {
 			case "open_url":
@@ -140,8 +140,8 @@ function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
 		}
 	}
 
-	if (isMarkType(c, "hoverEvent")) {
-		const ce = isMarkType(c, "hoverEvent")?.attrs;
+	if (findMarkType(c, "hoverEvent")) {
+		const ce = findMarkType(c, "hoverEvent")?.attrs;
 		current.hover_event = { action: ce!.action, value: ce!.value };
 	}
 }
@@ -151,16 +151,15 @@ function newApplyInteractiveValues(current: MinecraftText, c: JSONContent) {
  *
  * @param current your current (old) minecraft text
  * @param c the content
- * @param includeInteractivity if it should have interactive events or not
  */
 function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
-	if (isMarkType(c, "clickEvent")) {
-		const ce = isMarkType(c, "clickEvent")?.attrs;
+	if (findMarkType(c, "clickEvent")) {
+		const ce = findMarkType(c, "clickEvent")?.attrs;
 		current.clickEvent = { action: ce!.action, value: ce!.value };
 	}
 
-	if (isMarkType(c, "hoverEvent")) {
-		const ce = isMarkType(c, "hoverEvent")?.attrs;
+	if (findMarkType(c, "hoverEvent")) {
+		const ce = findMarkType(c, "hoverEvent")?.attrs;
 		current.hoverEvent = { action: ce!.action, contents: ce!.value };
 	}
 }
@@ -170,16 +169,16 @@ function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
  */
 export function convert(
 	jsonContent: JSONContent,
-	exportType: "standard" | "item_lore" = "standard",
 	optimise: boolean,
-	force_json: boolean = false,
+	exportType: "standard" | "item_lore" = "standard",
+	forceJson: boolean = false,
 ): string {
 	exportVersion = get(outputVersion);
 	let out = translateJSON(jsonContent, { exportType, optimise });
-	if (exportVersion.index >= 1 && !force_json) {
-		// only remove strings
-		out = out.replace(/(?<=[{,]\s*)"[^"]*"\s*:/g, (match) =>
-			match.replace(/"/g, ""),
+	if (exportVersion.index >= 1 && !forceJson) {
+		// only remove string keys
+		out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) =>
+			match.replaceAll(`"`, ""),
 		);
 	}
 	return out;
@@ -212,10 +211,16 @@ export function translateJSON(
 
 				const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
 				if (shadowColorMark) {
-					current.shadow_color = parseInt(
-						rgbaToArgbHex(shadowColorMark.attrs?.shadowColor).replace(/^#/, ""),
-						16,
+					let colorVal: string = shadowColorMark.attrs?.shadowColor.replace(
+						/^#/u,
+						"",
 					);
+					if (colorVal && colorVal.length <= 8) {
+						current.shadow_color = parseInt(
+							rgbaToArgbHex(colorVal.padEnd(8, "FF")).replace(/^#/u, ""),
+							16,
+						);
+					}
 				}
 
 				current = addTypeSpecificValues(current, c, true);
@@ -242,14 +247,14 @@ export function translateJSON(
 
 		let finalResult = JSON.stringify(data);
 
-		const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/g);
+		const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/gu);
 		for (const match of shadowColorMatches) {
 			if (match[1]) {
 				const num = parseInt(match[1]);
 				if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
 					finalResult = finalResult.replaceAll(
 						match[0],
-						`shadow_color:${num}L`,
+						`"shadow_color":${num}L`,
 					);
 				}
 			}
@@ -289,16 +294,4 @@ export function translateJSON(
 	}
 
 	return "[]";
-}
-
-function rgbaToArgbHex(rgbaHex: string): string {
-	// Remove the leading '#' if it exists
-	const hex = rgbaHex.startsWith("#") ? rgbaHex.slice(1) : rgbaHex;
-
-	// Extract RGB and Alpha components
-	const rgb = hex.slice(0, 6);
-	const alpha = hex.slice(6, 8);
-
-	// Return with alpha placed at the beginning
-	return `#${alpha}${rgb}`;
 }

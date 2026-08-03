@@ -1,5 +1,5 @@
 import { optimise } from "$lib/text/nbt/optimiser";
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 // Minimal mock types for test compatibility
 type StringyMCText = string | { [key: string]: any };
@@ -11,6 +11,18 @@ describe("optimise", () => {
 
 	it("returns empty string array if input is just an empty string", () => {
 		expect(optimise([""])).toEqual([""]);
+	});
+
+	it("should combine with leading empty strings", () => {
+		expect(
+			optimise(["", { text: "hello " }, { color: "red", text: "world!" }]),
+		).toEqual(["hello ", { color: "red", text: "world!" }]);
+	});
+
+	it("should combine whitespace string to next component", () => {
+		expect(
+			optimise(["", { text: "hello" }, " ", { color: "red", text: "world!" }]),
+		).toEqual(["hello ", { color: "red", text: "world!" }]);
 	});
 
 	it("removes undefined properties and flattens objects with only text", () => {

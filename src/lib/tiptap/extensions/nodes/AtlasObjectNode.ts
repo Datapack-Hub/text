@@ -1,56 +1,52 @@
 import { Node, mergeAttributes, type CommandProps } from "@tiptap/core";
-import {
-	markSchema,
-	type AtlasObjectAttributes,
-	type NodeOptions,
-} from "../index";
+import { markSchema, type AtlasObjectAttributes, type NodeOptions } from "../index";
 
 export const AtlasObjectNode = Node.create<NodeOptions>({
-	name: "atlas_object",
+    name: "atlas_object",
 
-	inline: true,
-	group: "inline",
-	atom: true,
+    inline: true,
+    group: "inline",
+    atom: true,
 
-	marks() {
-		const blocklist = new Set(["bold", "italic", "obfuscated"]);
-		const allMarks = Object.keys(markSchema.marks || {});
-		return allMarks.filter((mark) => !blocklist.has(mark)).join(" ");
-	},
+    marks() {
+        const blocklist = new Set(["bold", "italic", "obfuscated"]);
+        const allMarks = Object.keys(markSchema.marks || {});
+        return allMarks.filter((mark) => !blocklist.has(mark)).join(" ");
+    },
 
-	addOptions() {
-		return {
-			HTMLAttributes: {},
-		};
-	},
+    addOptions() {
+        return {
+            HTMLAttributes: {},
+        };
+    },
 
-	addAttributes(): AtlasObjectAttributes {
-		return {
-			atlas: "",
-			sprite: "",
-		};
-	},
+    addAttributes(): AtlasObjectAttributes {
+        return {
+            atlas: "",
+            sprite: "",
+        };
+    },
 
-	parseHTML() {
-		return [
-			{
-				tag: "span[data-atlas-object-node]",
-			},
-		];
-	},
+    parseHTML() {
+        return [
+            {
+                tag: "span[data-atlas-object-node]",
+            },
+        ];
+    },
 
-	renderHTML({ HTMLAttributes, node }) {
-		let { atlas, sprite } = node.attrs;
-		if (!atlas) {
-			atlas = "minecraft:blocks";
-		}
+    renderHTML({ HTMLAttributes, node }) {
+        let { atlas, sprite } = node.attrs;
+        if (!atlas) {
+            atlas = "minecraft:blocks";
+        }
 
-		return [
-			"span",
-			mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-				"data-atlas-object-node": "",
-				contenteditable: "false",
-				style: `
+        return [
+            "span",
+            mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+                "data-atlas-object-node": "",
+                contenteditable: "false",
+                style: `
             background-color: #18181b;
             padding: 0px 5px;
             border-radius: 4px;
@@ -62,21 +58,21 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 			font-family: Minecraft !important;
 			text-decoration: inherit;
         `,
-			}),
-			["span", {}, `OBJECT: [${sprite}@${atlas}]`],
-		];
-	},
+            }),
+            ["span", {}, `OBJECT: [${sprite}@${atlas}]`],
+        ];
+    },
 
-	addCommands() {
-		return {
-			insertAtlasObject:
-				(attrs) =>
-				({ commands }: CommandProps) => {
-					return commands.insertContent({
-						type: this.name,
-						attrs,
-					});
-				},
-		};
-	},
+    addCommands() {
+        return {
+            insertAtlasObject:
+                (attrs) =>
+                ({ commands }: CommandProps) => {
+                    return commands.insertContent({
+                        type: this.name,
+                        attrs,
+                    });
+                },
+        };
+    },
 });

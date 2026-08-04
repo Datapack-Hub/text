@@ -1,11 +1,13 @@
 {
-	"useTabs": true,
-	"singleQuote": false,
-	"trailingComma": "all",
-	"printWidth": 80,
-	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
-	"overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }],
-	"semi": true,
-	"bracketSameLine": true,
-	"singleAttributePerLine": false
+    "singleQuote": false,
+    "trailingComma": "all",
+    "printWidth": 100,
+    "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }],
+    "semi": true,
+    "bracketSameLine": true,
+    "singleAttributePerLine": false,
+    "svelteIndentScriptAndStyle": true,
+    "svelteAllowShorthand": true,
+    "tabWidth": 4
 }

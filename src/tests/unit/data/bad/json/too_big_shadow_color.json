@@ -1,18 +1,18 @@
 {
-	"content": [
-		{
-			"content": [
-				{
-					"type": "text",
-					"text": "Shadow",
-					"marks": [
-						{
-							"type": "shadowColor",
-							"attrs": { "shadowColor": "#100000000" }
-						}
-					]
-				}
-			]
-		}
-	]
+    "content": [
+        {
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Shadow",
+                    "marks": [
+                        {
+                            "type": "shadowColor",
+                            "attrs": { "shadowColor": "#100000000" }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

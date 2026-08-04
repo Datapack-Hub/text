@@ -2,37 +2,37 @@
 name: Automated Tests
 
 on:
-  pull_request:
-  push:
+    pull_request:
+    push:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    build:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
 
-    strategy:
-      matrix:
-        node-version: [24.x]
+        strategy:
+            matrix:
+                node-version: [24.x]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v6
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
 
-      - name: Install dependencies
-        run: npm install
+            - name: Install dependencies
+              run: npm install
 
-      - name: Install Playwright dependencies
-        run: npx playwright install-deps
+            - name: Install Playwright dependencies
+              run: npx playwright install-deps
 
-      - name: Install Playwright browsers
-        run: npx playwright install
+            - name: Install Playwright browsers
+              run: npx playwright install
 
-      - name: Run tests
-        run: npm test
+            - name: Run tests
+              run: npm test

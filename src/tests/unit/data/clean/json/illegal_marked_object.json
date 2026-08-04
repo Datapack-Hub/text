@@ -1,27 +1,19 @@
 {
-	"content": [
-		{
-			"type": "paragraph",
-			"content": [
-				{
-					"type": "atlas_object",
-					"attrs": { "atlas": "", "sprite": "item/cobblestone" },
-					"marks": [
-						{ "type": "bold" },
-						{ "type": "italic" },
-						{ "type": "obfuscated" }
-					]
-				},
-				{
-					"type": "player_object",
-					"attrs": { "player": { "name": "Cbble_" }, "hat": true },
-					"marks": [
-						{ "type": "bold" },
-						{ "type": "italic" },
-						{ "type": "obfuscated" }
-					]
-				}
-			]
-		}
-	]
+    "content": [
+        {
+            "type": "paragraph",
+            "content": [
+                {
+                    "type": "atlas_object",
+                    "attrs": { "atlas": "", "sprite": "item/cobblestone" },
+                    "marks": [{ "type": "bold" }, { "type": "italic" }, { "type": "obfuscated" }]
+                },
+                {
+                    "type": "player_object",
+                    "attrs": { "player": { "name": "Cbble_" }, "hat": true },
+                    "marks": [{ "type": "bold" }, { "type": "italic" }, { "type": "obfuscated" }]
+                }
+            ]
+        }
+    ]
 }

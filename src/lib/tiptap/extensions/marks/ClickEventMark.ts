@@ -3,65 +3,65 @@ import { Mark, mergeAttributes } from "@tiptap/core";
 import { type ClickEventAttributes } from "../index";
 
 export const ClickEventMark = Mark.create({
-	name: "clickEvent",
+    name: "clickEvent",
 
-	addAttributes(): ClickEventAttributes {
-		return {
-			action: null,
-			value: null,
-		};
-	},
+    addAttributes(): ClickEventAttributes {
+        return {
+            action: null,
+            value: null,
+        };
+    },
 
-	parseHTML() {
-		return [
-			{
-				tag: "span[data-click-event-action]",
-				getAttrs: (element) => {
-					if (typeof element === "string") {
-						return false;
-					}
-					const el = element as HTMLElement;
-					const action = el.dataset.clickEventAction;
-					const value = el.dataset.clickEventValue;
-					if (!action) {
-						return false;
-					}
-					return {
-						action,
-						value,
-					};
-				},
-			},
-		];
-	},
+    parseHTML() {
+        return [
+            {
+                tag: "span[data-click-event-action]",
+                getAttrs: (element) => {
+                    if (typeof element === "string") {
+                        return false;
+                    }
+                    const el = element as HTMLElement;
+                    const action = el.dataset.clickEventAction;
+                    const value = el.dataset.clickEventValue;
+                    if (!action) {
+                        return false;
+                    }
+                    return {
+                        action,
+                        value,
+                    };
+                },
+            },
+        ];
+    },
 
-	renderHTML({ HTMLAttributes }) {
-		return [
-			"span",
-			mergeAttributes(
-				{
-					"data-click-event-action": HTMLAttributes.action,
-					"data-click-event-value": HTMLAttributes.value,
-					class: "clickEvent",
-				},
-				HTMLAttributes,
-			),
-			0,
-		];
-	},
+    renderHTML({ HTMLAttributes }) {
+        return [
+            "span",
+            mergeAttributes(
+                {
+                    "data-click-event-action": HTMLAttributes.action,
+                    "data-click-event-value": HTMLAttributes.value,
+                    class: "clickEvent",
+                },
+                HTMLAttributes,
+            ),
+            0,
+        ];
+    },
 
-	addCommands() {
-		return {
-			setClickEvent:
-				(attributes: ClickEventAttributes) =>
-				({ chain }) => {
-					return chain().setMark(this.name, attributes).run();
-				},
-			unsetClickEvent:
-				() =>
-				({ chain }) => {
-					return chain().unsetMark(this.name).run();
-				},
-		};
-	},
+    addCommands() {
+        return {
+            setClickEvent:
+                (attributes: ClickEventAttributes) =>
+                ({ chain }) => {
+                    return chain().setMark(this.name, attributes).run();
+                },
+            unsetClickEvent:
+                () =>
+                ({ chain }) => {
+                    return chain().unsetMark(this.name).run();
+                },
+        };
+    },
 });

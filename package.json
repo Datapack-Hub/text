@@ -50,5 +50,8 @@
         "svelte-highlight": "^7.16.2",
         "tippy.js": "^6.3.7",
         "typescript-color-gradient": "^4.2.0"
+    },
+    "overrides": {
+        "prosemirror-model": "1.25.11"
     }
 }

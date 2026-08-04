@@ -21,7 +21,7 @@
             placeholder="Paste NBT text components here"
             bind:value={importText}></textarea>
 
-        <button onclick={importToEditor} class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+        <button onclick={importToEditor} class="btn">
             Import
         </button>
     </div>

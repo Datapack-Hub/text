@@ -191,7 +191,7 @@
                     })
                     .run();
             }}
-            class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="btn mt-2">
             Add Translate Key
         </button>
     {:else if customType === "score"}
@@ -220,7 +220,7 @@
                     })
                     .run();
             }}
-            class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="btn mt-2">
             Add Score Value
         </button>
     {:else if customType === "nbt"}
@@ -263,7 +263,7 @@
                         })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn mt-2">
                 Add NBT Value
             </button>
         {:else if customValues.nbt.sourceType === "entity"}
@@ -299,7 +299,7 @@
                         })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn mt-2">
                 Add NBT Value
             </button>
         {:else if customValues.nbt.sourceType === "block"}
@@ -335,7 +335,7 @@
                         })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn mt-2">
                 Add NBT Value
             </button>
         {/if}
@@ -351,7 +351,7 @@
                 customDialog.close();
                 editor.chain().focus().insertKeybind({ key: customValues.keybind.key }).run();
             }}
-            class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="btn mt-2">
             Add Keybind
         </button>
     {:else if customType === "selector"}
@@ -370,7 +370,7 @@
                     .insertSelector({ selector: customValues.selector.selector })
                     .run();
             }}
-            class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="btn mt-2">
             Add Selector
         </button>
     {:else if customType === "object"}
@@ -406,7 +406,7 @@
                         })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn mt-2">
                 Add Object
             </button>
         {:else if customValues.object.object == "player"}
@@ -435,7 +435,7 @@
                         })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn mt-2">
                 Add Object
             </button>
         {/if}

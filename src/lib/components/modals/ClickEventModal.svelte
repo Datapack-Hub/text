@@ -78,7 +78,7 @@
                         .setClickEvent({ action: clickEventType, value: clickEventValue })
                         .run();
                 }}
-                class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                class="btn">
                 Add Click Event
             </button>
         {/if}

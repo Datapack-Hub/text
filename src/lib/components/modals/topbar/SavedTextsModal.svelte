@@ -13,9 +13,21 @@
     }
 
     let { editor, snapshots, loadDialog = $bindable() }: Props = $props();
+
+    function saveSnapshot() {
+        const snapshotsTemp = localStorage.getItem("snapshots");
+        if (snapshotsTemp) {
+            snapshots = JSON.parse(snapshotsTemp);
+            snapshots.push(editor!.getJSON());
+            localStorage.setItem("snapshots", JSON.stringify(snapshots));
+        } else {
+            localStorage.setItem("snapshots", JSON.stringify([editor!.getJSON()]));
+            snapshots = [editor!.getJSON()];
+        }
+    }
 </script>
 
-<Modal title="Load a snapshot" bind:this={loadDialog} key="L">
+<Modal title="Saved texts" bind:this={loadDialog} key="L">
     <div class="flex w-full flex-col space-y-2">
         {#if snapshots.length == 0}
             <p>You have not saved anything yet!</p>
@@ -47,5 +59,6 @@
                 </div>
             </div>
         {/each}
+        <button class="btn" onclick={saveSnapshot}>Save current text</button>
     </div>
 </Modal>

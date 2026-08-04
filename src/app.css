@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Meta stuff */
 ::-webkit-color-swatch,
 ::-moz-color-swatch {
     border-color: transparent;
@@ -20,6 +21,12 @@
     --font-minecraft: Minecraft, sans-serif;
 }
 
+button {
+    cursor: pointer;
+}
+
+/* Fonts */
+
 /* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
 *[style*="font-family: MinecraftEnchanting"] strong {
     font-family: MinecraftEnchantingBold;
@@ -38,9 +45,7 @@ strong {
     font-weight: 100;
 }
 
-button {
-    cursor: pointer;
-}
+/* Editor */
 
 .tiptap {
     @apply h-full p-4;
@@ -82,12 +87,16 @@ button {
     filter: blur(3px);
 }
 
-.color-picker {
-    margin: none;
-}
+/* Useful */
 
 .nomob {
     @apply hidden md:inline;
+}
+
+/* Standardised  */
+
+.btn {
+    @apply w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50;
 }
 
 .toolbar-btn {
@@ -99,11 +108,21 @@ button {
     font-family: "Lexend", sans-serif;
 }
 
+/* Other */
+
+.color-picker {
+    margin: none;
+}
+
+/* Output */
+
 pre code.hljs {
     background: transparent !important;
     padding: 0 !important;
     @apply break-all whitespace-pre-wrap;
 }
+
+/* Text highlight */
 
 .hljs-attr {
     color: #55ffff !important;

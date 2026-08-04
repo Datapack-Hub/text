@@ -114,7 +114,7 @@
                 editor?.chain().focus().setFont(fontName).run();
                 fontDialog?.close();
             }}
-            class="w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="btn">
             Set Font
         </button>
     </div>

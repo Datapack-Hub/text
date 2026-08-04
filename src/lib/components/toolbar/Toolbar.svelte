@@ -289,7 +289,7 @@
                 .run();
             hoverEventDialog?.close();
         }}
-        class="mt-2 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+        class="btn">
         Add Hover Event
     </button>
 </Modal>
@@ -312,7 +312,7 @@
 
         <button
             onclick={customColourHandler}
-            class="mx-4 w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            class="mx-4 btn">
             Done
         </button>
     </div>

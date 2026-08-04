@@ -78,7 +78,7 @@
     }
 </script>
 
-<Modal title="Upload a font" bind:this={fontUploadModal}>
+<Modal title="Upload a font" bind:this={fontUploadModal} key="O">
     {#if step === 1}
         <label
             for="fontFileUpload"

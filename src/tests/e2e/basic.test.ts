@@ -107,13 +107,15 @@ test("the color buttons should work", async ({ page }) => {
         const colorName = (await button.getAttribute("aria-label"))
             ?.toLowerCase()
             .replace(" ", "_");
-        await expect(button).toHaveClass(/bg-zinc-800/);
-        await expect(textbox.locator("p>span[style*='color']")).toHaveCSS(
-            "color",
-            /rgb\(\d+, \d+, \d+\)/,
-        );
-        await expect(textbox.locator("p>span[style*='color']")).toHaveAttribute("style", color!);
-        await expect(output).toContainText(colorName!);
+        await Promise.all([
+            expect(button).toHaveClass(/bg-zinc-800/),
+            expect(textbox.locator("p>span[style*='color']")).toHaveCSS(
+                "color",
+                /rgb\(\d+, \d+, \d+\)/,
+            ),
+            expect(textbox.locator("p>span[style*='color']")).toHaveAttribute("style", color!),
+            expect(output).toContainText(colorName!),
+        ]);
     }
 
     // check unsetting color

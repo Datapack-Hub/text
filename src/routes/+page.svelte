@@ -245,7 +245,7 @@
                 </code>
             </div>
             <div class="mt-2 flex items-center space-x-2 select-none">
-                <p class="font-lexend text-xs text-white/60">click to change output settings:</p>
+                <p class="font-lexend text-xs text-white/60 nomob">click to change output settings:</p>
 
                 <div class="relative inline-block">
                     {#if versionPopup}

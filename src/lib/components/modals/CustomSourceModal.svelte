@@ -11,7 +11,6 @@
 
     import CheckBox from "../CheckBox.svelte";
     import MiniEditor from "../text/MiniEditor.svelte";
-    import Combobox from "../Combobox.svelte";
     import { outputVersion } from "$lib/stores";
 
     let { customDialog = $bindable(), editor, customType = $bindable() } = $props();
@@ -383,11 +382,12 @@
 
         {#if customValues.object.object == "atlas"}
             <p class="mt-2">Atlas</p>
-            <Combobox
-                items={defaultAtlases}
-                type="single"
-                inputProps={{ placeholder: "Defaults to minecraft:blocks" }}
-                bind:value={customValues.object.atlas} />
+            <select bind:value={customValues.object.atlas} class="rounded-md bg-zinc-900 p-2 data-hidden:border-2">
+                <option hidden value="" data-hidden>Defaults to minecraft:blocks</option>
+                {#each defaultAtlases as atlas}
+                    <option value={atlas.value}>{atlas.label}</option>
+                {/each}
+            </select>
             <p class="mt-2">Sprite</p>
             <input
                 type="text"

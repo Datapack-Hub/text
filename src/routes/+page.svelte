@@ -35,6 +35,7 @@
     import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
     import TopUI from "$lib/components/TopUI.svelte";
     import { onDestroy, onMount } from "svelte";
+    import { appSettings } from "$lib/settings";
 
     let tiptapJSON: JSONContent = $state()!;
 
@@ -122,6 +123,15 @@
                 debounce(saveContent, 1000)();
             },
         });
+
+        appSettings.subscribe(() => {
+            var el = document.querySelector(".tiptap") as HTMLElement
+            if ($appSettings.realisticLineHeight == true) {
+                el.style.lineHeight = "1rem"
+            } else {
+                el.style.lineHeight = "1.75rem "
+            }
+        })
     });
 
     onDestroy(() => {
@@ -198,6 +208,7 @@
 
         tiptapJSON = editor!.getJSON();
     }
+
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
@@ -238,10 +249,13 @@
                     {/if}</button>
                 <code id="outputbox">
                     <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-                    <!-- <pre class="inline break-all whitespace-pre-wrap">{editor
-							? finalOutput
-							: "Loading..."}</pre> -->
+                    {#if $appSettings.syntaxHighlight}
                     <Highlight language={typescript} code={finalOutput} />
+                    {:else}
+                    <pre class="inline break-all whitespace-pre-wrap">{editor
+                        ? finalOutput
+                        : "Loading..."}</pre>
+                    {/if}
                 </code>
             </div>
             <div class="mt-2 flex items-center space-x-2 select-none">
@@ -321,11 +335,13 @@
                     other output formats
                 </button>
 
+                {#if $appSettings.showCharacterCount}
                 <p class="font-lexend nomob text-xs text-white/60">•</p>
 
                 <p class="font-lexend nomob text-xs text-white/60">
                     {finalOutput.length} characters
                 </p>
+                {/if}
             </div>
         </div>
     </div>

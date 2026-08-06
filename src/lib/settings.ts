@@ -5,7 +5,8 @@ import { browser } from '$app/environment';
 export type Settings = {
     showCharacterCount: boolean; // whether the character count is shown
     syntaxHighlight: boolean; // whether to show highlighted output text
-    realisticLineHeight: boolean // whether to use smaller line height
+    realisticLineHeight: boolean; // whether to use smaller line height
+    fontSize: number; // 0 = small, 1 = default, 2 = large
 };
 
 function createPersistentStore(key: string, startValue: any) {
@@ -31,5 +32,6 @@ function createPersistentStore(key: string, startValue: any) {
 export const appSettings: Writable<Settings> = createPersistentStore('settings', {
     showCharacterCount: true,
     syntaxHighlight: true,
-    realisticLineHeight: false
+    realisticLineHeight: false,
+    fontSize: 1
 });

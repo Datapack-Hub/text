@@ -126,11 +126,18 @@
 
         appSettings.subscribe(() => {
             var el = document.querySelector(".tiptap") as HTMLElement
+
             if ($appSettings.realisticLineHeight == true) {
-                el.style.lineHeight = "1rem"
+                var lineHeight = 0.8 + (0.2 * $appSettings.fontSize)
+                el.style.lineHeight = lineHeight.toString() + "rem"
+                // TODO fix the overlap from objects and event marks 
             } else {
-                el.style.lineHeight = "1.75rem "
+                var lineHeight = 1.25 + (0.25 * $appSettings.fontSize)
+                el.style.lineHeight = lineHeight.toString() + "rem"
             }
+
+            var fontSize = 1 + (0.25 * $appSettings.fontSize)
+            el.style.fontSize = fontSize.toString() + "rem"
         })
     });
 

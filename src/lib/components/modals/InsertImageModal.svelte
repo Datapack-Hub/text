@@ -31,11 +31,10 @@
 
                 image.src = imageDataUrl;
                 image.onload = () => {
-                    const canvas = new OffscreenCanvas(image.width, image.height);
-                    processImage(canvas, image);
+                    processImage(image);
                 };
             });
-
+            
             reader.readAsDataURL(files[0]);
         }
     }
@@ -51,20 +50,22 @@
             }
         }
     }
-
-    function processImage(canvas: OffscreenCanvas, image: HTMLImageElement): JSONContent[] {
+    
+    function processImage(image: HTMLImageElement): JSONContent[] {
         if (!files || !editor) return [];
         let completeContent: JSONContent[] = [];
-
+        
+        const canvas = new OffscreenCanvas(image.width, image.height);
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         ctx?.reset();
         ctx?.drawImage(image, 0, 0);
 
+        if (!ctx) return [];
+
         for (let y = 0; y < image.height; y++) {
             for (let x = 0; x < image.width; x++) {
-                const pixel = ctx?.getImageData(x, y, 1, 1);
-                const data = pixel?.data;
-                console.log(data?.[3])
+                const pixel = ctx.getImageData(x, y, 1, 1);
+                const data = pixel.data;
                 if (data && data[3] !== 0) {
                     const hexColor = `#${data[0].toString(16).padStart(2, "0")}${data[1]
                         .toString(16)

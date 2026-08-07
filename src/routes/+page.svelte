@@ -217,6 +217,8 @@
     }
 </script>
 
+<svelte:window onkeydown={clearMarksHandler} />
+
 <main class="flex h-screen max-h-screen flex-col">
     <TopUI {editor} />
 

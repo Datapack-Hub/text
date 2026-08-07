@@ -21,8 +21,6 @@
             placeholder="Paste NBT text components here"
             bind:value={importText}></textarea>
 
-        <button onclick={importToEditor} class="btn">
-            Import
-        </button>
+        <button onclick={importToEditor} class="btn">Import</button>
     </div>
 </Modal>

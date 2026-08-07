@@ -382,7 +382,9 @@
 
         {#if customValues.object.object == "atlas"}
             <p class="mt-2">Atlas</p>
-            <select bind:value={customValues.object.atlas} class="rounded-md bg-zinc-900 p-2 data-hidden:border-2">
+            <select
+                bind:value={customValues.object.atlas}
+                class="rounded-md bg-zinc-900 p-2 data-hidden:border-2">
                 <option hidden value="" data-hidden>Defaults to minecraft:blocks</option>
                 {#each defaultAtlases as atlas}
                     <option value={atlas.value}>{atlas.label}</option>

@@ -1,6 +1,5 @@
-// src/lib/stores/settings.js
-import { writable, type Writable } from 'svelte/store';
-import { browser } from '$app/environment';
+import { writable, type Writable } from "svelte/store";
+import { browser } from "$app/environment";
 
 export type Settings = {
     showCharacterCount: boolean; // whether the character count is shown
@@ -10,11 +9,11 @@ export type Settings = {
 };
 
 function createPersistentStore(key: string, startValue: any) {
-    var value = browser ? localStorage.getItem(key) ?? startValue : startValue;
-    if (typeof value == "string"){
-        value = JSON.parse(value)
+    var value = browser ? (localStorage.getItem(key) ?? startValue) : startValue;
+    if (typeof value == "string") {
+        value = JSON.parse(value);
     } else {
-        value = value
+        value = value;
     }
 
     const store = writable(value);
@@ -29,9 +28,9 @@ function createPersistentStore(key: string, startValue: any) {
     return store;
 }
 
-export const appSettings: Writable<Settings> = createPersistentStore('settings', {
+export const appSettings: Writable<Settings> = createPersistentStore("settings", {
     showCharacterCount: true,
     syntaxHighlight: true,
     realisticLineHeight: false,
-    fontSize: 1
+    fontSize: 1,
 });

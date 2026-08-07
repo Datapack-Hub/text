@@ -117,6 +117,7 @@
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
                 editor = newEditor;
+                console.log("huh")
             },
             onUpdate: ({ editor }) => {
                 tiptapJSON = editor.getJSON();
@@ -125,20 +126,20 @@
         });
 
         appSettings.subscribe(() => {
-            var el = document.querySelector(".tiptap") as HTMLElement
+            var el = document.querySelector(".tiptap") as HTMLElement;
 
             if ($appSettings.realisticLineHeight == true) {
-                var lineHeight = 0.8 + (0.2 * $appSettings.fontSize)
-                el.style.lineHeight = lineHeight.toString() + "rem"
-                // TODO fix the overlap from objects and event marks 
+                var lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
+                el.style.lineHeight = lineHeight.toString() + "rem";
+                // TODO fix the overlap from objects and event marks
             } else {
-                var lineHeight = 1.25 + (0.25 * $appSettings.fontSize)
-                el.style.lineHeight = lineHeight.toString() + "rem"
+                var lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
+                el.style.lineHeight = lineHeight.toString() + "rem";
             }
 
-            var fontSize = 1 + (0.25 * $appSettings.fontSize)
-            el.style.fontSize = fontSize.toString() + "rem"
-        })
+            var fontSize = 1 + 0.25 * $appSettings.fontSize;
+            el.style.fontSize = fontSize.toString() + "rem";
+        });
     });
 
     onDestroy(() => {
@@ -215,13 +216,12 @@
 
         tiptapJSON = editor!.getJSON();
     }
-
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col">
-    <TopUI {editor} {outputDialog} />
+    <TopUI {editor} />
 
     <ControlBar {editor} />
 
@@ -257,16 +257,18 @@
                 <code id="outputbox">
                     <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
                     {#if $appSettings.syntaxHighlight}
-                    <Highlight language={typescript} code={finalOutput} />
+                        <Highlight language={typescript} code={finalOutput} />
                     {:else}
-                    <pre class="inline break-all whitespace-pre-wrap">{editor
-                        ? finalOutput
-                        : "Loading..."}</pre>
+                        <pre class="inline break-all whitespace-pre-wrap">{editor
+                                ? finalOutput
+                                : "Loading..."}</pre>
                     {/if}
                 </code>
             </div>
             <div class="mt-2 flex items-center space-x-2 select-none">
-                <p class="font-lexend text-xs text-white/60 nomob">click to change output settings:</p>
+                <p class="font-lexend nomob text-xs text-white/60">
+                    click to change output settings:
+                </p>
 
                 <div class="relative inline-block">
                     {#if versionPopup}
@@ -343,11 +345,11 @@
                 </button>
 
                 {#if $appSettings.showCharacterCount}
-                <p class="font-lexend nomob text-xs text-white/60">•</p>
+                    <p class="font-lexend nomob text-xs text-white/60">•</p>
 
-                <p class="font-lexend nomob text-xs text-white/60">
-                    {finalOutput.length} characters
-                </p>
+                    <p class="font-lexend nomob text-xs text-white/60">
+                        {finalOutput.length} characters
+                    </p>
                 {/if}
             </div>
         </div>

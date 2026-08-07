@@ -19,7 +19,7 @@
     import IconDownload from "~icons/tabler/download";
 
     // UI
-    let showOutput: string | null = $state(null)
+    let showOutput: string | null = $state(null);
 
     let {
         outputDialog = $bindable(),
@@ -52,21 +52,21 @@
     var transparent: boolean = $state(true);
 
     async function exportImage() {
-        const textContainer: HTMLElement = document.querySelector(".ProseMirror")!
+        const textContainer: HTMLElement = document.querySelector(".ProseMirror")!;
 
         // Briefly resize so that the image bounding box is correct
-        textContainer.style.height = "fit-content"
-        textContainer.style.width = "fit-content"
-        const rect = textContainer.getBoundingClientRect()
-        textContainer.style.height = "100%"
-        textContainer.style.width = "100%"
+        textContainer.style.height = "fit-content";
+        textContainer.style.width = "fit-content";
+        const rect = textContainer.getBoundingClientRect();
+        textContainer.style.height = "100%";
+        textContainer.style.width = "100%";
 
         // Get output
         return await domToPng(textContainer, {
             ...renderOptions,
             width: rect.width,
             height: rect.height,
-            backgroundColor: !transparent ? "black" : "transparent"
+            backgroundColor: !transparent ? "black" : "transparent",
         });
     }
 
@@ -81,184 +81,188 @@
         const response = await fetch(dataUrl);
         const blob = await response.blob();
 
-        await navigator.clipboard.write([
-            new ClipboardItem({ [blob.type]: blob })
-        ]);
+        await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
     }
 
     async function showImageOutput() {
-        showOutput = "image"
+        showOutput = "image";
         const func = functionLUT.get(extension);
-        exportImage().then(imgUrl => {
-            imgPreview!.src = imgUrl
+        exportImage().then((imgUrl) => {
+            imgPreview!.src = imgUrl;
         });
     }
 </script>
 
-<Modal title="Other output formats" bind:this={outputDialog} key="E" onOpen={() => showOutput = null}>
+<Modal
+    title="Other output formats"
+    bind:this={outputDialog}
+    key="E"
+    onOpen={() => (showOutput = null)}>
     <div class="flex w-full flex-col space-y-2">
         {#if showOutput == null}
-        <p>You can also export the text in one of these formats too:</p>
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
-            <button
-                onclick={() => showOutput = "lore"}
-                class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconItem />
-                <span>Lore item component</span>
-            </button>
+            <p>You can also export the text in one of these formats too:</p>
+            <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
+                <button
+                    onclick={() => (showOutput = "lore")}
+                    class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconItem />
+                    <span>Lore item component</span>
+                </button>
 
-            <button
-                onclick={() => showOutput = "motd"}
-                class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconMOTD />
-                <span>Server MOTD</span>
-            </button>
+                <button
+                    onclick={() => (showOutput = "motd")}
+                    class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconMOTD />
+                    <span>Server MOTD</span>
+                </button>
 
-            <button
-                onclick={showImageOutput}
-                class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconImage />
-                <span>Image</span>
-                <span class="font-mono text-white/60">(.png)</span>
-            </button>
+                <button
+                    onclick={showImageOutput}
+                    class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconImage />
+                    <span>Image</span>
+                    <span class="font-mono text-white/60">(.png)</span>
+                </button>
 
-            <div
-                class="h-full w-full p-2">
-                <span class="text-zinc-600">More coming soon</span>
+                <div class="h-full w-full p-2">
+                    <span class="text-zinc-600">More coming soon</span>
+                </div>
             </div>
-        </div>
         {:else if showOutput == "lore"}
-        <div class="flex items-center space-x-2">
-            <div
-                class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
-                <IconItem />
-                <span>Lore item component</span>
+            <div class="flex items-center space-x-2">
+                <div class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
+                    <IconItem />
+                    <span>Lore item component</span>
+                </div>
+                <button
+                    onclick={() => (showOutput = null)}
+                    class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconBack />
+                    <span>Back</span>
+                </button>
             </div>
-            <button
-                onclick={() => showOutput = null}
-                class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconBack />
-                <span>Back</span>
-            </button>
-        </div>
-        <code class="space-x-3 rounded-lg bg-zinc-950 p-3 w-full max-h-56 overflow-auto">
-            <span class="text-white/35 select-none">[lore=</span>
-            {#if $appSettings.syntaxHighlight}
-            <div class="ml-0 lg:ml-4">
-            <Highlight language={typescript} code={convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)} />
-            </div>
-            {:else}
-            <pre class="inline break-all whitespace-pre-wrap">{editor
-                    ? convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)
-                    : "Loading..."}</pre>
-            {/if}
-            <span class="text-white/35 select-none">]</span>
-        </code>
-        
-        <button
-            class="btn flex items-center space-x-2"
-            onclick={() => {
-                navigator.clipboard.writeText(
-                    `[lore=${convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)}]`,
-                );
-                recentlyCopied = true;
-                setTimeout(() => (recentlyCopied = false), 2000);
-            }}>
-            {#if !recentlyCopied}
-            <IconCopy />
-            <span>Copy</span>
-            {:else}
-            <IconCheck />
-            <span>Copied!</span>
-            {/if}
-        </button>
-        {:else if showOutput == "motd"}
-        <div class="flex items-center space-x-2">
-            <div
-                class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
-                <IconMOTD />
-                <span>Server MOTD</span>
-            </div>
-            <button
-                onclick={() => showOutput = null}
-                class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconBack />
-                <span>Back</span>
-            </button>
-        </div>
-        <code class="space-x-3 rounded-lg bg-zinc-950 p-3 w-full max-h-56 overflow-auto">
-            <pre class="inline break-all whitespace-pre-wrap">{editor
-                ? translateMOTD(editor.getJSON())
-                : "Loading..."}</pre>
-        </code>
-        
-        <button
-            class="btn flex items-center space-x-2"
-            onclick={() => {
-                navigator.clipboard.writeText(translateMOTD(editor.getJSON()));
-                recentlyCopied = true;
-                setTimeout(() => (recentlyCopied = false), 2000);
-            }}>
-            {#if !recentlyCopied}
-            <IconCopy />
-            <span>Copy</span>
-            {:else}
-            <IconCheck />
-            <span>Copied!</span>
-            {/if}
-        </button>
-        {:else if showOutput == "image"}
-        <div class="flex items-center space-x-2">
-            <div
-                class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
-                <IconImage />
-                <span>Image</span>
-            </div>
-            <button
-                onclick={() => showOutput = null}
-                class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconBack />
-                <span>Back</span>
-            </button>
-        </div>
-        <div class="rounded-lg bg-zinc-950 w-full max-h-56 overflow-auto">
-            <img src="#" bind:this={imgPreview} alt="" />
-        </div>
-        <div class="flex items-center space-x-2">
-            <CheckBox label="bg" bind:value={transparent} />
-            <label for="bg">Transparent background</label>
-        </div>
-        <div class="flex items-center space-x-2">
+            <code class="max-h-56 w-full space-x-3 overflow-auto rounded-lg bg-zinc-950 p-3">
+                <span class="text-white/35 select-none">[lore=</span>
+                {#if $appSettings.syntaxHighlight}
+                    <div class="ml-0 lg:ml-4">
+                        <Highlight
+                            language={typescript}
+                            code={convert(
+                                editor.getJSON(),
+                                shouldOptimise,
+                                "item_lore",
+                                exportAsJSON,
+                            )} />
+                    </div>
+                {:else}
+                    <pre class="inline break-all whitespace-pre-wrap">{editor
+                            ? convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)
+                            : "Loading..."}</pre>
+                {/if}
+                <span class="text-white/35 select-none">]</span>
+            </code>
+
             <button
                 class="btn flex items-center space-x-2"
                 onclick={() => {
-                    exportImage().then(copyImage);
+                    navigator.clipboard.writeText(
+                        `[lore=${convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)}]`,
+                    );
                     recentlyCopied = true;
                     setTimeout(() => (recentlyCopied = false), 2000);
                 }}>
                 {#if !recentlyCopied}
-                <IconCopy />
-                <span>Copy</span>
+                    <IconCopy />
+                    <span>Copy</span>
                 {:else}
-                <IconCheck />
-                <span>Copied!</span>
+                    <IconCheck />
+                    <span>Copied!</span>
                 {/if}
             </button>
+        {:else if showOutput == "motd"}
+            <div class="flex items-center space-x-2">
+                <div class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
+                    <IconMOTD />
+                    <span>Server MOTD</span>
+                </div>
+                <button
+                    onclick={() => (showOutput = null)}
+                    class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconBack />
+                    <span>Back</span>
+                </button>
+            </div>
+            <code class="max-h-56 w-full space-x-3 overflow-auto rounded-lg bg-zinc-950 p-3">
+                <pre class="inline break-all whitespace-pre-wrap">{editor
+                        ? translateMOTD(editor.getJSON())
+                        : "Loading..."}</pre>
+            </code>
 
             <button
                 class="btn flex items-center space-x-2"
                 onclick={() => {
-                    exportImage().then(downloadImage);
+                    navigator.clipboard.writeText(translateMOTD(editor.getJSON()));
+                    recentlyCopied = true;
+                    setTimeout(() => (recentlyCopied = false), 2000);
                 }}>
-                <IconDownload />
-                <span>Download</span>
-                <span class="font-mono text-white/60">(.png)</span>
+                {#if !recentlyCopied}
+                    <IconCopy />
+                    <span>Copy</span>
+                {:else}
+                    <IconCheck />
+                    <span>Copied!</span>
+                {/if}
             </button>
-        </div>
+        {:else if showOutput == "image"}
+            <div class="flex items-center space-x-2">
+                <div class="flex h-full w-full cursor-pointer items-center space-x-2 p-2 font-bold">
+                    <IconImage />
+                    <span>Image</span>
+                </div>
+                <button
+                    onclick={() => (showOutput = null)}
+                    class="flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                    <IconBack />
+                    <span>Back</span>
+                </button>
+            </div>
+            <div class="max-h-56 w-full overflow-auto rounded-lg bg-zinc-950">
+                <img src="#" bind:this={imgPreview} alt="" />
+            </div>
+            <div class="flex items-center space-x-2">
+                <CheckBox label="bg" bind:value={transparent} />
+                <label for="bg">Transparent background</label>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button
+                    class="btn flex items-center space-x-2"
+                    onclick={() => {
+                        exportImage().then(copyImage);
+                        recentlyCopied = true;
+                        setTimeout(() => (recentlyCopied = false), 2000);
+                    }}>
+                    {#if !recentlyCopied}
+                        <IconCopy />
+                        <span>Copy</span>
+                    {:else}
+                        <IconCheck />
+                        <span>Copied!</span>
+                    {/if}
+                </button>
+
+                <button
+                    class="btn flex items-center space-x-2"
+                    onclick={() => {
+                        exportImage().then(downloadImage);
+                    }}>
+                    <IconDownload />
+                    <span>Download</span>
+                    <span class="font-mono text-white/60">(.png)</span>
+                </button>
+            </div>
         {/if}
     </div>
 </Modal>
-
 
 <!-- <Modal title="More output formats" bind:this={outputDialog} big key="E">
     <div class="flex w-full flex-col">

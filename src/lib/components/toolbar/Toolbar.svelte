@@ -310,11 +310,7 @@
             isDialog={false}
             isAlpha={false} />
 
-        <button
-            onclick={customColourHandler}
-            class="mx-4 btn">
-            Done
-        </button>
+        <button onclick={customColourHandler} class="btn mx-4"> Done </button>
     </div>
 </Modal>
 

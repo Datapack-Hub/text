@@ -29,7 +29,7 @@
     export async function open() {
         opened = true;
         if (onOpen) {
-            onOpen()
+            onOpen();
         }
         await tick();
     }

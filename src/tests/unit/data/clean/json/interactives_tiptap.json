@@ -1,26 +1,26 @@
 {
-	"content": [
-		{
-			"type": "paragraph",
-			"content": [
-				{
-					"type": "text",
-					"marks": [
-						{
-							"type": "clickEvent",
-							"attrs": { "action": "open_url", "value": "hi" }
-						},
-						{
-							"type": "hoverEvent",
-							"attrs": {
-								"action": "show_text",
-								"value": ["", { "text": "hola mundo" }]
-							}
-						}
-					],
-					"text": "blah blah"
-				}
-			]
-		}
-	]
+    "content": [
+        {
+            "type": "paragraph",
+            "content": [
+                {
+                    "type": "text",
+                    "marks": [
+                        {
+                            "type": "clickEvent",
+                            "attrs": { "action": "open_url", "value": "hi" }
+                        },
+                        {
+                            "type": "hoverEvent",
+                            "attrs": {
+                                "action": "show_text",
+                                "value": ["", { "text": "hola mundo" }]
+                            }
+                        }
+                    ],
+                    "text": "blah blah"
+                }
+            ]
+        }
+    ]
 }

@@ -4,70 +4,69 @@ import { SvelteMap } from "svelte/reactivity";
 export let fontLUT: SvelteMap<string, string> = new SvelteMap();
 
 export const FontsExtension = Extension.create({
-	name: "font",
+    name: "font",
 
-	addOptions() {
-		return {
-			types: ["textStyle"],
-		};
-	},
+    addOptions() {
+        return {
+            types: ["textStyle"],
+        };
+    },
 
-	addGlobalAttributes() {
-		return [
-			{
-				types: this.options.types,
-				attributes: {
-					font: {
-						default: null,
-						parseHTML: (element) =>
-							element.style.fontFamily?.replace(/['"]+/g, ""),
-						renderHTML: (attributes) => {
-							if (!attributes.font) {
-								return {};
-							}
+    addGlobalAttributes() {
+        return [
+            {
+                types: this.options.types,
+                attributes: {
+                    font: {
+                        default: null,
+                        parseHTML: (element) => element.style.fontFamily?.replaceAll(/['"]+/gu, ""),
+                        renderHTML: (attributes) => {
+                            if (!attributes.font) {
+                                return {};
+                            }
 
-							let font = "monospace";
+                            let font = "monospace";
 
-							switch (attributes.font.toLowerCase()) {
-								case "minecraft:alt":
-									font = "MinecraftEnchanting";
-									break;
-								case "minecraft:illageralt":
-									font = "MinecraftIllager";
-									break;
-							}
+                            switch (attributes.font.toLowerCase()) {
+                                case "minecraft:alt":
+                                    font = "MinecraftEnchanting";
+                                    break;
+                                case "minecraft:illageralt":
+                                    font = "MinecraftIllager";
+                                    break;
+                            }
 
-							for (const [identifier, alias] of fontLUT) {
-								if (attributes.font.toLowerCase() === identifier) {
-									font = alias;
-								}
-							}
+                            for (const [identifier, alias] of fontLUT) {
+                                if (attributes.font.toLowerCase() === identifier) {
+                                    font = alias;
+                                }
+                            }
 
-							return {
-								style: `font-family: "${font}", monospace;`,
-							};
-						},
-					},
-				},
-			},
-		];
-	},
+                            return {
+                                style: `font-family: "${font}", monospace;`,
+                            };
+                        },
+                    },
+                },
+            },
+        ];
+    },
 
-	addCommands() {
-		return {
-			setFont:
-				(font) =>
-				({ chain }) => {
-					return chain().setMark("textStyle", { font: font }).run();
-				},
-			unsetFont:
-				() =>
-				({ chain }) => {
-					return chain()
-						.setMark("textStyle", { font: undefined })
-						.removeEmptyTextStyle()
-						.run();
-				},
-		};
-	},
+    addCommands() {
+        return {
+            setFont:
+                (font) =>
+                ({ chain }) => {
+                    return chain().setMark("textStyle", { font: font }).run();
+                },
+            unsetFont:
+                () =>
+                ({ chain }) => {
+                    return chain()
+                        .setMark("textStyle", { font: undefined })
+                        .removeEmptyTextStyle()
+                        .run();
+                },
+        };
+    },
 });

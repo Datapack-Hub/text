@@ -1,0 +1,18 @@
+{
+    "content": [
+        {
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Shadow",
+                    "marks": [
+                        {
+                            "type": "shadowColor",
+                            "attrs": { "shadowColor": "#ff00ff" }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

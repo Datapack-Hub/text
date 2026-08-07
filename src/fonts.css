@@ -1,58 +1,58 @@
 @font-face {
-	font-display: swap;
-	font-family: Minecraft;
-	font-weight: 400;
-	src: url("/fonts/Minecraft.woff2") format("woff2");
+    font-display: swap;
+    font-family: Minecraft;
+    font-weight: 400;
+    src: url("/fonts/Minecraft.woff2") format("woff2");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: MinecraftBold;
-	font-weight: 600;
-	src: url("/fonts/MinecraftBold.woff2") format("woff2");
+    font-display: swap;
+    font-family: MinecraftBold;
+    font-weight: 600;
+    src: url("/fonts/MinecraftBold.woff2") format("woff2");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: MinecraftEnchanting;
-	font-weight: 400;
-	src: url("/fonts/MinecraftEnchanting.woff2") format("woff2");
+    font-display: swap;
+    font-family: MinecraftEnchanting;
+    font-weight: 400;
+    src: url("/fonts/MinecraftEnchanting.woff2") format("woff2");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: MinecraftEnchantingBold;
-	font-weight: 600;
-	src: url("/fonts/MinecraftEnchantingBold.woff2") format("woff2");
+    font-display: swap;
+    font-family: MinecraftEnchantingBold;
+    font-weight: 600;
+    src: url("/fonts/MinecraftEnchantingBold.woff2") format("woff2");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: MinecraftIllager;
-	font-weight: 400;
-	src: url("/fonts/MinecraftIllager.woff2") format("woff2");
+    font-display: swap;
+    font-family: MinecraftIllager;
+    font-weight: 400;
+    src: url("/fonts/MinecraftIllager.woff2") format("woff2");
 }
 
 @font-face {
-	font-display: swap;
-	font-family: MinecraftIllagerBold;
-	font-weight: 600;
-	src: url("/fonts/MinecraftIllagerBold.woff2") format("woff2");
+    font-display: swap;
+    font-family: MinecraftIllagerBold;
+    font-weight: 600;
+    src: url("/fonts/MinecraftIllagerBold.woff2") format("woff2");
 }
 
 /* lexend-regular - latin */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-	font-family: "Lexend";
-	font-style: normal;
-	font-weight: 400;
-	src: url("/fonts/lexend-v24-latin-regular.woff2") format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 400;
+    src: url("/fonts/lexend-v24-latin-regular.woff2") format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }
 /* lexend-600 - latin */
 @font-face {
-	font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
-	font-family: "Lexend";
-	font-style: normal;
-	font-weight: 600;
-	src: url("/fonts/lexend-v24-latin-600.woff2") format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: "Lexend";
+    font-style: normal;
+    font-weight: 600;
+    src: url("/fonts/lexend-v24-latin-600.woff2") format("woff2"); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
 }

@@ -1,122 +1,145 @@
 @import "tailwindcss";
 
+/* Meta stuff */
 ::-webkit-color-swatch,
 ::-moz-color-swatch {
-	border-color: transparent;
+    border-color: transparent;
 }
 
 :root {
-	accent-color: #ff631a;
-	color-scheme: dark;
+    accent-color: #ff631a;
+    color-scheme: dark;
 }
 
 *::selection {
-	background: #ff631a55;
-	color: white;
+    background: #ff631a55;
+    color: white;
 }
 
 @theme {
-	--font-lexend: Lexend, sans-serif;
-	--font-minecraft: Minecraft, sans-serif;
+    --font-lexend: Lexend, sans-serif;
+    --font-minecraft: Minecraft, sans-serif;
 }
+
+button {
+    cursor: pointer;
+}
+
+/* Fonts */
 
 /* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
 *[style*="font-family: MinecraftEnchanting"] strong {
-	font-family: MinecraftEnchantingBold;
-	font-weight: 100;
+    font-family: MinecraftEnchantingBold;
+    font-weight: 100;
 }
 
 /* Use MinecraftIllagerBold if parent uses MinecraftIllager font */
 *[style*="font-family: MinecraftIllager"] strong {
-	font-family: MinecraftIllagerBold;
-	font-weight: 100;
+    font-family: MinecraftIllagerBold;
+    font-weight: 100;
 }
 
 /* Use MinecraftBold if not MinecraftEnchanting or MinecraftIllager */
 strong {
-	font-family: MinecraftBold;
-	font-weight: 100;
+    font-family: MinecraftBold;
+    font-weight: 100;
 }
 
-button {
-	cursor: pointer;
-}
+/* Editor */
 
 .tiptap {
-	@apply h-full p-4;
-	@apply focus:outline-none;
-	font-family: Minecraft;
-	@apply text-xl;
+    @apply h-full w-full p-4;
+    @apply focus:outline-none;
+    font-family: Minecraft;
+    @apply text-xl;
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-	color: #7f7f7f;
-	content: attr(data-placeholder);
-	float: left;
-	height: 0;
-	pointer-events: none;
+    color: #7f7f7f;
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
 }
 
 .clickEvent {
-	background-color: #3c3c40;
-	border-bottom: solid #ff5555 2px;
-	padding-top: 4px;
-	padding-bottom: 2px;
-	z-index: 10;
-	--custom-source-align: top;
+    background-color: #3c3c40;
+    border-bottom: solid #ff5555 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    z-index: 10;
+    --custom-source-align: top;
 }
 
 .hoverEvent {
-	background-color: #3c3c40;
-	border-bottom: solid #ffff55 2px;
-	padding-top: 4px;
-	z-index: 10;
-	--custom-source-align: top;
+    background-color: #3c3c40;
+    border-bottom: solid #ffff55 2px;
+    padding-top: 4px;
+    z-index: 10;
+    --custom-source-align: top;
 }
 
 .obfuscated {
-	filter: blur(2px);
+    @apply transition-all;
 }
 
-.color-picker {
-	margin: none;
+.obfuscated:not(:hover) {
+    filter: blur(3px);
 }
+
+/* Useful */
 
 .nomob {
-	@apply hidden md:inline;
+    @apply hidden md:inline;
+}
+
+/* Standardised  */
+
+.btn {
+    @apply w-fit rounded-md bg-zinc-900 p-2 hover:bg-black/50;
 }
 
 .toolbar-btn {
-	@apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
+    @apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
 }
 
 .tippy-box[data-theme~="dph"] {
-	background-color: var(--color-zinc-700);
-	font-family: "Lexend", sans-serif;
+    background-color: var(--color-zinc-700);
+    font-family: "Lexend", sans-serif;
 }
+
+/* Other */
+
+.color-picker {
+    margin: none;
+}
+
+/* Output */
 
 pre code.hljs {
-	background: transparent !important;
-	padding: 0 !important;
-	@apply break-all whitespace-pre-wrap;
+    background: transparent !important;
+    padding: 0 !important;
+    @apply break-all whitespace-pre-wrap;
 }
 
+/* Text highlight */
+
 .hljs-attr {
-	color: #55ffff !important;
+    color: #55ffff !important;
 }
 .hljs-string {
-	color: #55ff55 !important;
+    color: #55ff55 !important;
 }
 .hljs-number {
-	color: #ffaa00 !important;
+    color: #ffaa00 !important;
 }
 .hljs-literal {
-	color: #ffaa00 !important;
+    color: #ffaa00 !important;
 }
 .hljs-params {
-	color: #ffb86c !important;
+    color: #ffb86c !important;
 }
 .hljs-comment {
-	color: #6272a4 !important;
-	font-style: italic;
+    color: #6272a4 !important;
+    font-style: italic;
 }

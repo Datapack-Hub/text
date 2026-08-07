@@ -48,7 +48,7 @@ strong {
 /* Editor */
 
 .tiptap {
-    @apply h-full p-4;
+    @apply h-full w-full p-4;
     @apply focus:outline-none;
     font-family: Minecraft;
     @apply text-xl;

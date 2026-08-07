@@ -9,6 +9,7 @@
         nopad?: boolean;
         big?: boolean;
         flexible?: boolean;
+        onOpen?: () => void;
         children: Snippet;
         key: string;
     };
@@ -20,12 +21,16 @@
         nopad = $bindable(false),
         big = $bindable(false),
         flexible = $bindable(false),
+        onOpen,
         children,
         key,
     }: Props = $props();
 
     export async function open() {
         opened = true;
+        if (onOpen) {
+            onOpen()
+        }
         await tick();
     }
 

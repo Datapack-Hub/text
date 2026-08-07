@@ -56,7 +56,7 @@
         if (!files || !editor) return [];
         let completeContent: JSONContent[] = [];
 
-        const ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: false });
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
         ctx?.reset();
         ctx?.drawImage(image, 0, 0);
 
@@ -64,6 +64,7 @@
             for (let x = 0; x < image.width; x++) {
                 const pixel = ctx?.getImageData(x, y, 1, 1);
                 const data = pixel?.data;
+                console.log(data?.[3])
                 if (data && data[3] !== 0) {
                     const hexColor = `#${data[0].toString(16).padStart(2, "0")}${data[1]
                         .toString(16)
@@ -101,11 +102,11 @@
 
 <svelte:window ondragover={handleWindowDrag} ondrop={(e) => e.preventDefault()} />
 
-<Modal title="Insert Image" bind:this={insertImageDialog} key="M" opened>
+<Modal title="Insert Image" bind:this={insertImageDialog} key="M">
     <div class="flex w-full flex-col space-y-2">
         <p class="mb-2">A few things to note:</p>
         <ul class="mb-4 list-inside list-disc text-sm text-zinc-400">
-            <li>Total transparency is represented by empty space</li>
+            <li>Total transparency will become empty spaces</li>
             <li>Non-zero alpha pixels will be converted to full alpha.</li>
             <li>Large or complex images will produce a very long output</li>
             <li>This tool makes no attempt to resize images</li>

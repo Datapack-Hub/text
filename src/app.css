@@ -63,18 +63,18 @@ strong {
 }
 
 .clickEvent {
-    background-color: #3c3c40aa;
-    border-bottom: solid #ff5555 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    background-color: #45454e80;
+    border: solid #45454e 1px;
+    border-bottom: solid #9448e0 2px;
+    padding-bottom: 4px;
     z-index: 10;
     --custom-source-align: top;
 }
 
 .hoverEvent {
-    background-color: #3c3c40aa;
-    border-bottom: solid #ffff55 2px;
-    padding-top: 4px;
+    background-color: #45454e80;
+    border: solid #45454e 1px;
+    border-bottom: solid #e57e2b 2px;
     z-index: 10;
     --custom-source-align: top;
 }

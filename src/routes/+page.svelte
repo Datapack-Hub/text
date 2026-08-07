@@ -117,7 +117,6 @@
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
                 editor = newEditor;
-                console.log("huh")
             },
             onUpdate: ({ editor }) => {
                 tiptapJSON = editor.getJSON();
@@ -217,8 +216,6 @@
         tiptapJSON = editor!.getJSON();
     }
 </script>
-
-<svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col">
     <TopUI {editor} />

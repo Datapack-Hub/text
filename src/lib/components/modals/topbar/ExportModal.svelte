@@ -99,7 +99,7 @@
     <div class="flex w-full flex-col space-y-2">
         {#if showOutput == null}
         <p>You can also export the text in one of these formats too:</p>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-2">
             <button
                 onclick={() => showOutput = "lore"}
                 class="flex h-full w-full cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">

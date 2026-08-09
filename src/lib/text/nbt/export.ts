@@ -173,9 +173,6 @@ export function convert(
 
     // Convert from JSON string to NBT string if required
     if (exportVersion.index >= 1 && !forceJson) {
-        // only remove string keys
-        out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
-
         // nbt number type fix for shadow colour
         // moved from translateJSON function
         const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
@@ -187,6 +184,9 @@ export function convert(
                 }
             }
         }
+        
+        // only remove string keys
+        out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
     }
 
     return out;

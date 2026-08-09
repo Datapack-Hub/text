@@ -30,22 +30,9 @@
         shouldOptimise = true,
     } = $props();
 
-    // Output variables
-    let exportAsJSON = $state(false);
-    let extension = $state("png");
 
     // Image output
     let imgPreview: HTMLImageElement | undefined = $state();
-
-    const functionLUT = new Map<
-        string,
-        (element: HTMLElement, options?: Options) => Promise<string>
-    >();
-
-    functionLUT.set("png", domToPng);
-    functionLUT.set("jpeg", domToJpeg);
-    functionLUT.set("webp", domToWebp);
-    functionLUT.set("svg", domToSvg);
 
     let renderOptions: Options = {
         scale: 4,
@@ -53,7 +40,8 @@
 
     // output variables
     var transparent: boolean = $state(true);
-    var indent: boolean = $state(true)
+    var indent: boolean = $state(true);
+    var jsonLore: boolean = $state(false);
 
     async function exportImage() {
         const textContainer: HTMLElement = document.querySelector(".ProseMirror")!;
@@ -76,7 +64,7 @@
 
     async function downloadImage(dataUrl: string) {
         const link = document.createElement("a");
-        link.download = `tellraw-output.${extension}`;
+        link.download = `tellraw-output.png`;
         link.href = dataUrl;
         link.click();
     }
@@ -90,7 +78,6 @@
 
     async function showImageOutput() {
         showOutput = "image";
-        const func = functionLUT.get(extension);
         exportImage().then((imgUrl) => {
             imgPreview!.src = imgUrl;
         });
@@ -239,27 +226,32 @@
                 {#if $appSettings.syntaxHighlight}
                     <div class="ml-0 lg:ml-4">
                         <Highlight
-                            language={typescript}
+                            language={jsonLore ? json : typescript}
                             code={convert(
                                 editor.getJSON(),
                                 shouldOptimise,
                                 "item_lore",
-                                exportAsJSON,
+                                jsonLore,
                             )} />
                     </div>
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                            ? convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)
+                            ? convert(editor.getJSON(), shouldOptimise, "item_lore", jsonLore)
                             : "Loading..."}</pre>
                 {/if}
                 <span class="text-white/35 select-none">]</span>
             </code>
 
+            <div class="flex items-center space-x-2">
+                <CheckBox label="bg" bind:value={jsonLore} />
+                <label for="bg">JSON output</label>
+            </div>
+
             <button
                 class="btn flex items-center space-x-2"
                 onclick={() => {
                     navigator.clipboard.writeText(
-                        `[lore=${convert(editor.getJSON(), shouldOptimise, "item_lore", exportAsJSON)}]`,
+                        `[lore=${convert(editor.getJSON(), shouldOptimise, "item_lore", jsonLore)}]`,
                     );
                     recentlyCopied = true;
                     setTimeout(() => (recentlyCopied = false), 2000);

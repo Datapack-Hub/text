@@ -176,16 +176,15 @@ export function convert(
         // nbt number type fix for shadow colour
         // moved from translateJSON function
         const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
-        for (const match of shadowColorMatches) {
-            if (match[1]) {
-                const num = parseInt(match[1]);
-                if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
-                    out = out.replaceAll(match[0], `"shadow_color":${num}L`);
-                }
-            }
+        const relevantShadowColorMatches = shadowColorMatches.filter(item => (parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)).toArray().map(item => item[1])
+        const deduplicatedRelevantShadowColorMatches = [...new Set(relevantShadowColorMatches)];
+
+        for (const match of deduplicatedRelevantShadowColorMatches) {
+            const num = parseInt(match)
+            out = out.replaceAll(match, `"shadow_color":${num}L`);
         }
         
-        // only remove string keys
+        // remove string marks from json keys only
         out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
     }
 

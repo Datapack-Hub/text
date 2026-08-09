@@ -1,13 +1,17 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte";
     import type { Editor } from "@tiptap/core";
+    import { onMount } from "svelte";
     import ColorPicker from "svelte-awesome-color-picker";
+    import Sortable from "sortablejs"
     import { generateGradient } from "typescript-color-gradient";
 
     import IconCustom from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
+    import IconHandle from "~icons/tabler/grip-vertical"
 
     let { gradientDialog = $bindable(), gradientSteps = $bindable(), editor } = $props();
+    let sortContainer: HTMLDivElement | undefined = $state();
 
     function applyGradient(editor: Editor, gradientColors: string[]) {
         const { from, to } = editor.state.selection;
@@ -55,14 +59,32 @@
 
         chain.run();
     }
+
+    function opened(){
+        Sortable.create(sortContainer, {
+            animation: 200,
+            handle: ".handle",
+            onEnd: (evt: Sortable.SortableEvent): void => {
+				const { oldIndex, newIndex } = evt;
+				if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
+					return;
+				}
+				const updatedSteps: string[] = [...gradientSteps];
+				const [movedItem]: string[] = updatedSteps.splice(oldIndex, 1);
+				updatedSteps.splice(newIndex, 0, movedItem);
+				gradientSteps = updatedSteps;
+            }
+        })
+    }
 </script>
 
-<Modal title="Color Gradient" bind:this={gradientDialog} key="G">
-    <div class="flex w-full flex-col space-y-2">
+<Modal title="Color Gradient" bind:this={gradientDialog} onOpen={opened} key="G">
+    <div class="flex w-full flex-col space-y-1">
         <p>Add colours to the gradient below:</p>
-        <div class="flex flex-col space-y-1">
+        <div class="flex flex-col space-y-1" bind:this={sortContainer}>
             {#each gradientSteps ?? [] as _, i}
                 <div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
+                    <IconHandle class="handle cursor-move text-zinc-500" />
                     <div class="grow">
                         <ColorPicker
                             bind:hex={gradientSteps[i]}
@@ -86,15 +108,15 @@
                     {/if}
                 </div>
             {/each}
-            <button
-                onclick={() => {
-                    gradientSteps.push("#ffffff");
-                    gradientSteps = gradientSteps;
-                }}
-                class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-                <IconCustom class="m-auto" />
-            </button>
         </div>
+        <button
+            onclick={() => {
+                gradientSteps.push("#ffffff");
+                gradientSteps = gradientSteps;
+            }}
+            class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            <IconCustom class="m-auto" />
+        </button>
         <p class="my-2">Preview</p>
         <div class="font-minecraft bg-zinc-950 px-4 py-2 text-2xl">
             <span
@@ -117,7 +139,7 @@
                 applyGradient(editor, gradientSteps);
                 gradientDialog.close();
             }}
-            class="btn">
+            class="btn mt-2">
             Apply Gradient
         </button>
     </div>

@@ -28,10 +28,10 @@
 
     export async function open() {
         opened = true;
+        await tick();
         if (onOpen) {
             onOpen();
         }
-        await tick();
     }
 
     export async function close() {

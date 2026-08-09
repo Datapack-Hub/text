@@ -170,10 +170,25 @@ export function convert(
 ): string {
     exportVersion = get(outputVersion);
     let out = translateJSON(jsonContent, { exportType, optimise });
+
+    // Convert from JSON string to NBT string if required
     if (exportVersion.index >= 1 && !forceJson) {
         // only remove string keys
         out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
+
+        // nbt number type fix for shadow colour
+        // moved from translateJSON function
+        const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
+        for (const match of shadowColorMatches) {
+            if (match[1]) {
+                const num = parseInt(match[1]);
+                if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
+                    out = out.replaceAll(match[0], `"shadow_color":${num}L`);
+                }
+            }
+        }
     }
+
     return out;
 }
 
@@ -233,16 +248,6 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         }
 
         let finalResult = JSON.stringify(data);
-
-        const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/gu);
-        for (const match of shadowColorMatches) {
-            if (match[1]) {
-                const num = parseInt(match[1]);
-                if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
-                    finalResult = finalResult.replaceAll(match[0], `"shadow_color":${num}L`);
-                }
-            }
-        }
 
         return finalResult;
     } else if (options.exportType === "item_lore") {

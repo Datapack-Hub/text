@@ -9,6 +9,22 @@
     import IconCustom from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
     import IconHandle from "~icons/tabler/grip-vertical"
+    import IconRecent from "~icons/tabler/clock-hour-4"
+    import IconCircle from "~icons/tabler/circle-filled"
+    import IconBack from "~icons/tabler/arrow-back-up";
+
+    let recentsPageOpen: boolean = $state(false)
+    let recentGradients: Array<string[]> = $state([])
+
+    function openRecentsPage() {
+        if (localStorage.getItem("recent_gradients")) {
+            recentGradients = JSON.parse(localStorage.getItem("recent_gradients")!);
+        } else {
+            recentGradients = [];
+            localStorage.setItem("recent_gradients", "[]");
+        }
+        recentsPageOpen = true;
+    }
 
     let { gradientDialog = $bindable(), gradientSteps = $bindable(), editor } = $props();
     let sortContainer: HTMLDivElement | undefined = $state();
@@ -58,9 +74,33 @@
         chain.focus().setTextSelection({ from, to });
 
         chain.run();
+
+        // Add to recents if nevessary
+        if (recentGradients.includes(gradientSteps)) {
+            recentGradients = recentGradients.filter(grad => grad !== gradientSteps)
+        }
+        
+        recentGradients.push(gradientSteps)
+
+        if (recentGradients.length > 10) {
+            recentGradients.shift()
+        }
+
+        localStorage.setItem("recent_gradients", JSON.stringify(recentGradients));
     }
 
     function opened(){
+        recentsPageOpen = false
+
+        // Load recent gradients 
+        if (localStorage.getItem("recent_gradients")) {
+            recentGradients = JSON.parse(localStorage.getItem("recent_gradients")!);
+        } else {
+            recentGradients = [];
+            localStorage.setItem("recent_gradients", "[]");
+        }
+
+        // Create sortable
         Sortable.create(sortContainer, {
             animation: 200,
             handle: ".handle",
@@ -80,8 +120,10 @@
 
 <Modal title="Color Gradient" bind:this={gradientDialog} onOpen={opened} key="G">
     <div class="flex w-full flex-col space-y-1">
+    {#if !recentsPageOpen}
         <p>Add colours to the gradient below:</p>
         <div class="flex flex-col space-y-1" bind:this={sortContainer}>
+            {#key gradientSteps}
             {#each gradientSteps ?? [] as _, i}
                 <div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
                     <IconHandle class="handle cursor-move text-zinc-500" />
@@ -108,17 +150,20 @@
                     {/if}
                 </div>
             {/each}
+            {/key}
         </div>
-        <button
-            onclick={() => {
-                gradientSteps.push("#ffffff");
-                gradientSteps = gradientSteps;
-            }}
-            class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
-            <IconCustom class="m-auto" />
-        </button>
-        <p class="my-2">Preview</p>
-        <div class="font-minecraft bg-zinc-950 px-4 py-2 text-2xl">
+        <div class="flex space-x-2 justify-between">
+            <button
+                onclick={() => {
+                    gradientSteps.push("#ffffff");
+                    gradientSteps = gradientSteps;
+                }}
+                class="aspect-square h-9 w-9 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+                <IconCustom class="m-auto" />
+            </button>
+        </div>
+        <p class="mt-2">Preview</p>
+        <div class="font-minecraft bg-zinc-950 px-4 py-2 text-2xl rounded-md">
             <span
                 style="background: -webkit-linear-gradient(0, {gradientSteps.join(
                     ',',
@@ -134,13 +179,53 @@
             <b>Note:</b> you need to select text in the editor before you try and apply a gradient.
         </p>
 
+        <div class="flex items-center justify-between mt-2">
+            <button
+                onclick={() => {
+                    applyGradient(editor, gradientSteps);
+                    gradientDialog.close();
+                }}
+                class="btn">
+                Apply Gradient
+            </button>
+            
+            <button
+                onclick={openRecentsPage}
+                class="btn flex items-center space-x-1">
+                <IconRecent />
+                <span>Recent gradients</span>
+            </button>
+        </div>
+    {:else}
+        <div class="flex items-center">
+            <p class="grow">Your top 10 most recent gradients are shown below:</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {#each recentGradients ?? [] as gradient}
+            <div class="flex space-x-1 items-center">
+                <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+                    <!-- <span>Colours: </span> -->
+                    <div class="flex grow items-center space-x-1">
+                        {#each gradient ?? [] as step}
+                        <IconCircle class="text-xl" style={"color: " + step + ";"} />
+                        {/each}
+                    </div>
+                </div>
+                <button class="btn" onclick={() => {
+                    gradientSteps = gradient;
+                    opened()
+                }}>Use</button>
+            </div>
+            {/each}
+        </div>
+        
         <button
-            onclick={() => {
-                applyGradient(editor, gradientSteps);
-                gradientDialog.close();
-            }}
-            class="btn mt-2">
-            Apply Gradient
-        </button>
+            onclick={() => (recentsPageOpen = false)}
+            class="mt-2 flex h-full w-fit cursor-pointer items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50">
+            <IconBack />
+            <span>Back</span>
+        </button>   
+
+    {/if}
     </div>
 </Modal>

@@ -181,7 +181,7 @@ export function convert(
 
         for (const match of deduplicatedRelevantShadowColorMatches) {
             const num = parseInt(match)
-            out = out.replaceAll(match, `"shadow_color":${num}L`);
+            out = out.replaceAll(`"shadow_color":${match}`, `"shadow_color":${num}L`);
         }
         
         // remove string marks from json keys only

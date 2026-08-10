@@ -170,10 +170,24 @@ export function convert(
 ): string {
     exportVersion = get(outputVersion);
     let out = translateJSON(jsonContent, { exportType, optimise });
+
+    // Convert from JSON string to NBT string if required
     if (exportVersion.index >= 1 && !forceJson) {
-        // only remove string keys
+        // nbt number type fix for shadow colour
+        // moved from translateJSON function
+        const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
+        const relevantShadowColorMatches = shadowColorMatches.filter(item => (parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)).toArray().map(item => item[1])
+        const deduplicatedRelevantShadowColorMatches = [...new Set(relevantShadowColorMatches)];
+
+        for (const match of deduplicatedRelevantShadowColorMatches) {
+            const num = parseInt(match)
+            out = out.replaceAll(`"shadow_color":${match}`, `"shadow_color":${num}L`);
+        }
+        
+        // remove string marks from json keys only
         out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
     }
+
     return out;
 }
 
@@ -233,16 +247,6 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         }
 
         let finalResult = JSON.stringify(data);
-
-        const shadowColorMatches = finalResult.matchAll(/"shadow_color":(-?\d+)/gu);
-        for (const match of shadowColorMatches) {
-            if (match[1]) {
-                const num = parseInt(match[1]);
-                if (num > 2 ** 31 - 1 || num < (-2) ** 31) {
-                    finalResult = finalResult.replaceAll(match[0], `"shadow_color":${num}L`);
-                }
-            }
-        }
 
         return finalResult;
     } else if (options.exportType === "item_lore") {

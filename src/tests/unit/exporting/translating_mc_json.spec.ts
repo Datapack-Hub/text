@@ -1,5 +1,5 @@
 import { outputVersion } from "$lib/stores";
-import { translateJSON } from "$lib/text/nbt/export";
+import { convert, translateJSON } from "$lib/text/nbt/export";
 import { versions, type TranslateOptions } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
 import { expect, it } from "vitest";
@@ -95,16 +95,16 @@ it("handles shadowColor mark", async () => {
     const json: JSONContent = (await readTestJSONFile(
         "clean/json/shadow_color.json",
     )) as JSONContent;
-    const result = translateJSON(json, baseOptions);
-    expect(result).toContain('"shadow_color":4294902015L');
+    const result = convert(json, true, "standard");
+    expect(result).toContain('shadow_color:4294902015L');
 });
 
 it("handles shadowColor transparency", async () => {
     const json: JSONContent = (await readTestJSONFile(
         "clean/json/shadow_color_transparent.json",
     )) as JSONContent;
-    const result = translateJSON(json, baseOptions);
-    expect(result).toContain('"shadow_color":4294923348L');
+    const result = convert(json, true, "standard");
+    expect(result).toContain('shadow_color:4294923348L');
 });
 
 it("should remove shadow_color if out of range", async () => {

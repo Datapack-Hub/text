@@ -413,5 +413,5 @@
 {/await}
 
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
-    <modal.default bind:exportSelectionDialog {editor} {recentlyCopied} />
+    <modal.default bind:exportSelectionDialog editor={editor!} shouldOptimise={shouldOptimise} />
 {/await}

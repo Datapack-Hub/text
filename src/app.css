@@ -66,9 +66,12 @@ strong {
     background-color: #45454e80;
     border: solid #45454e 1px;
     border-bottom: solid #9448e0 2px;
-    padding-bottom: 4px;
     z-index: 10;
     --custom-source-align: top;
+}
+
+.clickEvent:has(.hoverEvent) {
+    padding-bottom: 0.25rem;
 }
 
 .hoverEvent {

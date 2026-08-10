@@ -12,6 +12,7 @@
 
     let files: FileList | null = $state(null);
     let dropZone: HTMLLabelElement | null = $state(null);
+    let sizeWarning = $state(false);
 
     function handleDrop(event: DragEvent) {
         event.preventDefault();
@@ -32,11 +33,25 @@
                 image.src = imageDataUrl;
                 image.onload = () => {
                     processImage(image);
+                    image.remove();
                 };
             });
             
             reader.readAsDataURL(files[0]);
         }
+    }
+
+    function checkFileSize(file: File) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const image = new Image();
+            image.src = reader.result as string;
+            image.onload = () => {
+                sizeWarning = image.width > 24 || image.height > 24
+                image.remove();
+            };
+        };
+        reader.readAsDataURL(file);
     }
 
     function handleDragOver(e: DragEvent) {
@@ -99,6 +114,14 @@
             }
         }
     }
+
+    $effect(() => {
+        if(files && files.length > 0) {
+            checkFileSize(files[0]);
+        } else {
+            sizeWarning = false;
+        }
+    })
 </script>
 
 <svelte:window ondragover={handleWindowDrag} ondrop={(e) => e.preventDefault()} />
@@ -128,6 +151,11 @@
             </label>
         {:else}
             <p>Selected file: <span class="font-mono bg-zinc-900 p-1 rounded-md text-orange-300">{files[0].name}</span></p>
+            {#if sizeWarning}
+                <div class="border-red-500 border-2 bg-stone-900 p-2 rounded-md">
+                    <p>This image may be too large to display properly, and may also cause performance issues to process, you have been warned!</p>
+                </div>
+            {/if}
             <div class="flex gap-2">
                 <button class="btn" onclick={() => (files = null)}>Remove</button>
                 <button class="btn" onclick={insertImage}>Insert</button>

@@ -36,6 +36,7 @@
     import TopUI from "$lib/components/TopUI.svelte";
     import { onDestroy, onMount } from "svelte";
     import { appSettings } from "$lib/settings";
+    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
 
     let tiptapJSON: JSONContent = $state()!;
 
@@ -49,6 +50,8 @@
     let recentlyCopied = $state(false);
 
     let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
+    
+    let exportSelectionDialog: Modal = $state()!;
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -113,6 +116,12 @@
                     placeholder:
                         "Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",
                 }),
+                ExportButtonExtension.configure({
+                    onClick: () => {
+                        exportSelectionDialog.open()
+                    },
+                }),
+
             ],
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
@@ -122,6 +131,18 @@
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
             },
+            // onSelectionUpdate: ({ editor }) => {
+            //     const { state } = editor;
+            //     const { from, to, empty } = state.selection;
+
+            //     // Do nothing if it's just a cursor click without a highlighted range
+            //     if (empty) return; 
+
+            //     // Extract the selection slice as JSON
+            //     const selectionJson = state.doc.slice(from, to).content.toJSON();
+                
+            //     console.log("Selected content as JSON:", selectionJson);
+            // }
         });
 
         appSettings.subscribe(() => {
@@ -389,4 +410,8 @@
 
 {#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />
+{/await}
+
+{#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
+    <modal.default bind:exportSelectionDialog {editor} {recentlyCopied} />
 {/await}

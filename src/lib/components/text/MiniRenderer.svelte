@@ -58,6 +58,11 @@
                 FontsExtension,
             ],
             content: value,
+            editorProps: {
+                attributes: {
+                    class: 'tiptap-minirenderer',
+                },
+            },
         }).setEditable(false);
     });
 </script>

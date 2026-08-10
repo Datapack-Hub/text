@@ -7,6 +7,7 @@
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
     import { appSettings } from "$lib/settings";
+    import { json } from "svelte-highlight/languages";
 
     // Icons
     import IconItem from "~icons/tabler/swords";
@@ -17,7 +18,6 @@
     import IconCopy from "~icons/tabler/copy";
     import IconCheck from "~icons/tabler/check";
     import IconDownload from "~icons/tabler/download";
-    import { json } from "svelte-highlight/languages";
 
     // UI
     let showOutput: string | null = $state(null);

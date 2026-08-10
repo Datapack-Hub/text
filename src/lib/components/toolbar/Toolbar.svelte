@@ -28,7 +28,6 @@
     let colourDialog: Modal = $state()!;
 
     let gradientDialog: Modal = $state()!;
-    let gradientSteps: string[] = $state(["#ffffff"]);
 
     let keybindDialog: Modal = $state()!;
 
@@ -326,7 +325,7 @@
 {/await}
 
 {#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
-    <modal.default {editor} bind:gradientSteps bind:gradientDialog />
+    <modal.default {editor} bind:gradientDialog />
 {/await}
 {#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
     <modal.default editor={editor!} bind:unicodeSelectorDialog />

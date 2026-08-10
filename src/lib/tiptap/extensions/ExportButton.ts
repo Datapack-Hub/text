@@ -1,6 +1,8 @@
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { EditorView } from '@tiptap/pm/view';
+import { appSettings } from "$lib/settings";
+import { get } from 'svelte/store';
 
 // Define the shape of configuration options for type safety
 export interface ExportButtonOptions {
@@ -26,6 +28,10 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
                 view(editorView: EditorView) {
                     return {
                         update(view: EditorView) {
+                            if (get(appSettings).hideSelectionExport == true) {
+                                return;
+                            }
+                            
                             const { state } = view;
                             const { selection } = state;
 

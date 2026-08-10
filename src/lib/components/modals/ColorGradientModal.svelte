@@ -114,7 +114,7 @@
         // Create sortable
         Sortable.create(document.querySelector("#gradientsort")!, {
             animation: 200,
-            // handle: ".handle",
+            handle: ".handle",
             onEnd: (evt: Sortable.SortableEvent): void => {
                 const { oldIndex, newIndex } = evt;
                 if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {

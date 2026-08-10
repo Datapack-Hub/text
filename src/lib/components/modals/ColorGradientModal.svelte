@@ -88,8 +88,7 @@
         });
 
         if (alreadyAppeared) {
-            console.log("gradient has appeared before, removing")
-            recentGradients = recentGradients.filter((grad) => JSON.stringify(grad) != JSON.stringify(gradientHexes));
+            recentGradients = recentGradients.filter((grad) => JSON.stringify(grad) !== JSON.stringify(gradientHexes));
         }
 
         recentGradients.push(gradientHexes);

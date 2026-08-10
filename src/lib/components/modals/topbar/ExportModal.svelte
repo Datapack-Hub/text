@@ -1,10 +1,9 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte";
-    import { outputVersion } from "$lib/stores";
     import { translateMOTD } from "$lib/text/motd";
     import { convert } from "$lib/text/nbt/export";
     import CheckBox from "../../CheckBox.svelte";
-    import { domToPng, domToJpeg, domToWebp, domToSvg, type Options } from "modern-screenshot";
+    import { domToPng,  type Options } from "modern-screenshot";
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
     import { appSettings } from "$lib/settings";

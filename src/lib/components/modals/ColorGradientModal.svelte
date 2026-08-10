@@ -1,7 +1,6 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte";
     import type { Editor } from "@tiptap/core";
-    import { onMount } from "svelte";
     import ColorPicker from "svelte-awesome-color-picker";
     import Sortable from "sortablejs"
     import { generateGradient } from "typescript-color-gradient";
@@ -12,6 +11,7 @@
     import IconRecent from "~icons/tabler/clock-hour-4"
     import IconCircle from "~icons/tabler/circle-filled"
     import IconBack from "~icons/tabler/arrow-back-up";
+    import { tick } from "svelte";
 
     let recentsPageOpen: boolean = $state(false)
     let recentGradients: Array<string[]> = $state([])
@@ -101,9 +101,9 @@
         }
 
         // Create sortable
-        Sortable.create(sortContainer, {
+        Sortable.create(document.querySelector("#gradientsort"), {
             animation: 200,
-            handle: ".handle",
+            // handle: ".handle",
             onEnd: (evt: Sortable.SortableEvent): void => {
 				const { oldIndex, newIndex } = evt;
 				if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
@@ -122,8 +122,8 @@
     <div class="flex w-full flex-col space-y-1">
     {#if !recentsPageOpen}
         <p>Add colours to the gradient below:</p>
-        <div class="flex flex-col space-y-1" bind:this={sortContainer}>
-            {#key gradientSteps}
+        <div class="flex flex-col space-y-1" id="gradientsort">
+        {#key gradientSteps}
             {#each gradientSteps ?? [] as _, i}
                 <div class="flex w-full items-center rounded-md bg-zinc-900 p-2">
                     <IconHandle class="handle cursor-move text-zinc-500" />
@@ -150,7 +150,7 @@
                     {/if}
                 </div>
             {/each}
-            {/key}
+        {/key}
         </div>
         <div class="flex space-x-2 justify-between">
             <button
@@ -211,8 +211,10 @@
                         {/each}
                     </div>
                 </div>
-                <button class="btn" onclick={() => {
+                <button class="btn" onclick={async () => {
                     gradientSteps = gradient;
+                    recentsPageOpen = false;
+                    await tick()
                     opened()
                 }}>Use</button>
             </div>

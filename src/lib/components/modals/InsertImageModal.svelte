@@ -66,7 +66,7 @@
             for (let x = 0; x < image.width; x++) {
                 const pixel = ctx.getImageData(x, y, 1, 1);
                 const data = pixel.data;
-                if (data && data[3] !== 0) {
+                if (data[3] !== 0) {
                     const hexColor = `#${data[0].toString(16).padStart(2, "0")}${data[1]
                         .toString(16)
                         .padStart(2, "0")}${data[2].toString(16).padStart(2, "0")}`;

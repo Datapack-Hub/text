@@ -81,11 +81,18 @@
         chain.run();
 
         // Add to recents if necessary
-        if (recentGradients.includes(gradientSteps.map((step) => step.color))) {
-            recentGradients = recentGradients.filter((grad) => grad !== gradientSteps.map((step) => step.color));
+        let gradientHexes = gradientSteps.map((step) => step.color)
+
+        const alreadyAppeared = recentGradients.some(elem =>{
+            return JSON.stringify(gradientHexes) === JSON.stringify(elem);
+        });
+
+        if (alreadyAppeared) {
+            console.log("gradient has appeared before, removing")
+            recentGradients = recentGradients.filter((grad) => JSON.stringify(grad) != JSON.stringify(gradientHexes));
         }
 
-        recentGradients.push(gradientSteps.map((step) => step.color));
+        recentGradients.push(gradientHexes);
 
         if (recentGradients.length > 10) {
             recentGradients.shift();
@@ -149,7 +156,6 @@
                                 }}
                                 class="flex aspect-square h-9 w-fit items-center justify-center rounded-md bg-zinc-900 p-2 hover:bg-black/20">
                                 <IconDelete />
-                                <p>{i}</p>
                             </button>
                         {/if}
                     </li>
@@ -202,7 +208,7 @@
                 <p class="grow">Your top 10 most recent gradients are shown below:</p>
             </div>
             <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
-                {#each recentGradients ?? [] as gradient}
+                {#each recentGradients.slice().reverse() ?? [] as gradient}
                     <div class="flex items-center space-x-1">
                         <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
                             <!-- <span>Colours: </span> -->

@@ -143,8 +143,7 @@
                     ? editor!.chain().focus().unsetFont().run()
                     : fontDialog.open()}
             styleVar={editor.getAttributes("textStyle").font}
-            ariaLabel="Font"
-            desktopOnly />
+            ariaLabel="Font" />
 
         <div class="mx-2 h-5 w-px bg-zinc-600"></div>
 

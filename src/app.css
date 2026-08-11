@@ -65,13 +65,14 @@ strong {
 .clickEvent {
     background-color: #45454e80;
     border: solid #45454e 1px;
-    border-bottom: solid #9448e0 2px;
+    border-bottom: solid #a868e7 2px;
     z-index: 10;
     --custom-source-align: top;
+    padding-bottom: 1px
 }
 
 .clickEvent:has(.hoverEvent) {
-    padding-bottom: 0.25rem;
+    padding-bottom: 3px;
 }
 
 .hoverEvent {
@@ -80,6 +81,7 @@ strong {
     border-bottom: solid #e57e2b 2px;
     z-index: 10;
     --custom-source-align: top;
+    padding-bottom: 1px
 }
 
 .obfuscated {

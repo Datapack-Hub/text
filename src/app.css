@@ -96,7 +96,7 @@ strong {
 
 .export-button {
     @apply items-center p-1 px-1.5 bg-zinc-900 text-zinc-200 hover:text-white rounded-md font-lexend text-xs h-6;
-    @apply w-0 invisible md:w-fit md:visible; /* hide on mobile */
+    @apply w-0 invisible sm:w-fit sm:visible; /* hide on mobile */
 }
 
 /* Useful */

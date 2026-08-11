@@ -158,7 +158,7 @@
             Icon={IconGradient}
             onClick={gradientDialog.open}
             ariaLabel="Color Gradient" />
-        <div class="flex items-center space-x-0 mx-1">
+        <div id="colorBtns" class="flex items-center space-x-0 mx-1">
             {#each colourMap as colour}
                 <button
                     aria-label={toTitleCase(colour.name.replace("_", " "))}

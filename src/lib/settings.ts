@@ -33,6 +33,6 @@ export const appSettings: Writable<Settings> = createPersistentStore("settings",
     showCharacterCount: true,
     syntaxHighlight: true,
     realisticLineHeight: false,
-    hideSelectionExport: false,
+    hideSelectionExport: true,
     fontSize: 1,
 });

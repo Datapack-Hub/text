@@ -259,7 +259,7 @@
             <br />
         {/if}
         <div class="bg-zinc-950 p-3">
-            <div class="flex max-h-48 max-w-screen items-start space-x-2 overflow-auto">
+            <div class="flex max-h-32 max-w-screen items-start space-x-2 overflow-auto">
                 <button
                     {@attach tooltip}
                     class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"

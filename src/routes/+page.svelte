@@ -130,19 +130,7 @@
             onUpdate: ({ editor }) => {
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
-            },
-            // onSelectionUpdate: ({ editor }) => {
-            //     const { state } = editor;
-            //     const { from, to, empty } = state.selection;
-
-            //     // Do nothing if it's just a cursor click without a highlighted range
-            //     if (empty) return; 
-
-            //     // Extract the selection slice as JSON
-            //     const selectionJson = state.doc.slice(from, to).content.toJSON();
-                
-            //     console.log("Selected content as JSON:", selectionJson);
-            // }
+            }
         });
 
         appSettings.subscribe(() => {

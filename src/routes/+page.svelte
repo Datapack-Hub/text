@@ -1,4 +1,6 @@
 <script lang="ts">
+  import WelcomeScreen from '../lib/components/WelcomeScreen.svelte';
+
     import { openDataStore } from "$lib/db";
     import { outputVersion } from "$lib/stores";
     import { convert } from "$lib/text/nbt/export";
@@ -52,6 +54,8 @@
     let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
     
     let exportSelectionDialog: Modal = $state()!;
+
+    let showWelcomeScreen: boolean = true;  
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -396,6 +400,11 @@
     </div>
 </noscript>
 
+{#if showWelcomeScreen}
+    <WelcomeScreen></WelcomeScreen>
+{/if}
+
+
 {#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />
 {/await}
@@ -403,3 +412,4 @@
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} shouldOptimise={shouldOptimise} />
 {/await}
+

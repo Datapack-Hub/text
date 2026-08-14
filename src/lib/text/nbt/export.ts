@@ -254,24 +254,24 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
 /**
  * Constructs a component from a given Tiptap JSON content object
  */
-function constructComponent(c: JSONContent, includeInteractivity: boolean = true) {
+function constructComponent(content: JSONContent, includeInteractivity: boolean = true) {
     // Construct basic styled component
     let currentComponent: MinecraftText = {
-        color: defaultColorLUT(c.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
-        bold: trueMarkOrUndefined(c, "bold"),
-        italic: trueMarkOrUndefined(c, "italic"),
-        strikethrough: trueMarkOrUndefined(c, "strike"),
-        underlined: trueMarkOrUndefined(c, "underline"),
-        obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-        font: c.marks?.find(obj => obj.type == "textStyle")?.attrs?.font || undefined,
+        color: defaultColorLUT(content.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
+        bold: trueMarkOrUndefined(content, "bold"),
+        italic: trueMarkOrUndefined(content, "italic"),
+        strikethrough: trueMarkOrUndefined(content, "strike"),
+        underlined: trueMarkOrUndefined(content, "underline"),
+        obfuscated: trueMarkOrUndefined(content, "obfuscated"),
+        font: content.marks?.find(obj => obj.type == "textStyle")?.attrs?.font || undefined,
     };
 
     // Add shadow colour
-    const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
+    const shadowColorMark = content.marks?.find((m) => m.type === "shadowColor");
     if (shadowColorMark) {
         let colorVal: string = shadowColorMark.attrs?.shadowColor.replace(/^#/u, "");
         if (colorVal && colorVal.length <= 8) {
-            c.shadow_color = parseInt(
+            currentComponent.shadow_color = parseInt(
                 rgbaToArgbHex(colorVal.padEnd(8, "FF")).replace(/^#/u, ""),
                 16,
             );
@@ -279,7 +279,7 @@ function constructComponent(c: JSONContent, includeInteractivity: boolean = true
     }
 
     // Add content values (e.g. text and custom sources) depending on the component type
-    currentComponent = addTypeSpecificValues(currentComponent, c, includeInteractivity);
+    currentComponent = addTypeSpecificValues(currentComponent, content, includeInteractivity);
 
     return currentComponent
 }

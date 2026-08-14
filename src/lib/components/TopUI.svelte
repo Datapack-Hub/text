@@ -28,10 +28,8 @@
 
     function importToEditor() {
         const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
-        console.log("importing to editor", jsonContent);
         editor?.commands.setContent(jsonContent, { emitUpdate: true });
         importDialog?.close();
-        console.log("imported to editor");
     }
 </script>
 

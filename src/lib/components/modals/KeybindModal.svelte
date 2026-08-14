@@ -31,6 +31,7 @@
         { keys: [modifierKey, "Shift", "I"], action: "Import Menu" },
         { keys: [modifierKey, "Shift", "E"], action: "Export Menu" },
         { keys: [modifierKey, "Shift", "L"], action: "Load a snapshot" },
+        { keys: [modifierKey, "Shift", "M"], action: "Load an image (with block characters)" },
     ];
 </script>
 

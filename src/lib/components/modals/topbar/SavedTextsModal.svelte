@@ -28,37 +28,39 @@
 </script>
 
 <Modal title="Saved texts" bind:this={loadDialog} key="L">
-    <div class="flex w-full flex-col space-y-2">
+    <div class="">
         {#if snapshots.length == 0}
             <p>You have not saved anything yet!</p>
         {/if}
-        {#each snapshots as snapshot (snapshot)}
-            <div class="flex flex-col">
-                <div class="rounded-t-md rounded-br-md bg-zinc-900">
-                    <MiniRenderer value={snapshot} />
+        <div class="flex max-h-[50vh] flex-col overflow-y-auto">
+            {#each snapshots as snapshot (snapshot)}
+                <div class="flex flex-col border-b-2 border-zinc-600 py-2">
+                    <div class="rounded-md bg-zinc-900">
+                        <MiniRenderer value={snapshot} />
+                    </div>
+                    <div class="mt-1 flex w-fit gap-1">
+                        <button
+                            {@attach tooltip}
+                            aria-label="Load snapshot"
+                            class="btn"
+                            onclick={() => {
+                                editor?.commands.setContent(snapshot);
+                                editor?.commands.focus();
+                            }}>Load</button>
+                        <button
+                            {@attach tooltip}
+                            aria-label="Delete snapshot"
+                            class="btn"
+                            onclick={() => {
+                                snapshots = snapshots.filter(
+                                    (_, index) => index !== snapshots.indexOf(snapshot),
+                                );
+                                localStorage.setItem("snapshots", JSON.stringify(snapshots));
+                            }}>Delete</button>
+                    </div>
                 </div>
-                <div class="flex w-fit rounded-b-md bg-zinc-950">
-                    <button
-                        {@attach tooltip}
-                        aria-label="Load snapshot"
-                        class="border-r border-zinc-800 px-3 py-2 hover:bg-white/3"
-                        onclick={() => {
-                            editor?.commands.setContent(snapshot);
-                            editor?.commands.focus();
-                        }}><IconLoad /></button>
-                    <button
-                        {@attach tooltip}
-                        aria-label="Delete snapshot"
-                        class="px-3 py-2 hover:bg-white/3"
-                        onclick={() => {
-                            snapshots = snapshots.filter(
-                                (_, index) => index !== snapshots.indexOf(snapshot),
-                            );
-                            localStorage.setItem("snapshots", JSON.stringify(snapshots));
-                        }}><IconDelete /></button>
-                </div>
-            </div>
-        {/each}
-        <button class="btn" onclick={saveSnapshot}>Save current text</button>
+            {/each}
+        </div>
+        <button class="btn mt-6" onclick={saveSnapshot}>Save current text</button>
     </div>
 </Modal>

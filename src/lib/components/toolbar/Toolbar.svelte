@@ -14,6 +14,7 @@
     import IconHoverEvent from "~icons/tabler/pointer";
     import IconSquare from "~icons/tabler/square-filled";
     import IconHollow from "~icons/tabler/square-x";
+    import IconUploadImage from "~icons/tabler/photo-scan";
     import Modal from "../Modal.svelte";
     import TextStyleButtons from "./TextStyleButtons.svelte";
     import ToolbarButton from "./ToolbarButton.svelte";
@@ -47,6 +48,7 @@
     let customDialog: Modal = $state()!;
 
     let unicodeSelectorDialog: Modal = $state()!;
+    let insertImageDialog: Modal = $state()!;
 
     function toTitleCase(str: string) {
         return str.replace(
@@ -262,6 +264,11 @@
         <button
             {@attach tooltip}
             class="toolbar-btn nomob"
+            onclick={insertImageDialog?.open}
+            aria-label="Insert Image"><IconUploadImage /></button>
+        <button
+            {@attach tooltip}
+            class="toolbar-btn nomob"
             onclick={fontUploadModal?.open}
             aria-label="Upload Font"><IconUploadFont /></button>
         <button
@@ -295,6 +302,10 @@
 
 {#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
     <modal.default bind:customDialog bind:customType {editor} />
+{/await}
+
+{#await import("$lib/components/modals/InsertImageModal.svelte") then modal}
+    <modal.default bind:insertImageDialog {editor} />
 {/await}
 
 <Modal title="Custom Colour" bind:this={colourDialog} small nopad key="C">

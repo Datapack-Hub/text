@@ -54,6 +54,13 @@ strong {
     @apply text-xl;
 }
 
+.tiptap-minirenderer {
+    @apply h-full w-full p-2;
+    @apply focus:outline-none;
+    font-family: Minecraft;
+    @apply text-xl;
+}
+
 .tiptap p.is-editor-empty:first-child::before {
     color: #7f7f7f;
     content: attr(data-placeholder);
@@ -90,6 +97,11 @@ strong {
 
 .obfuscated:not(:hover) {
     filter: blur(3px);
+}
+
+.export-button {
+    @apply items-center p-1 px-1.5 bg-zinc-900 text-zinc-200 hover:text-white rounded-md font-lexend text-xs h-6;
+    @apply w-0 invisible sm:w-fit sm:visible; /* hide on mobile */
 }
 
 /* Useful */

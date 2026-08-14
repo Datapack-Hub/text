@@ -160,14 +160,16 @@
             Icon={IconGradient}
             onClick={gradientDialog.open}
             ariaLabel="Color Gradient" />
-        <div id="colorBtns">
+        <div id="colorBtns" class="flex items-center space-x-0 mx-1">
             {#each colourMap as colour}
-                <ToolbarButton
-                    Icon={IconSquare}
-                    onClick={() => editor!.chain().focus().setColor(colour.value).run()}
-                    styleVar={editor.isActive("textStyle", { color: colour.value })}
-                    colour={colour.value}
-                    ariaLabel={toTitleCase(colour.name.replace("_", " "))} />
+                <button
+                    aria-label={toTitleCase(colour.name.replace("_", " "))}
+                    onclick={() => editor!.chain().focus().setColor(colour.value).run()}
+                    {@attach tooltip}
+                    style="color: {colour.value || 'inherit'}"
+                    class="rounded-md py-1 px-0 text-lg font-medium hover:bg-white/3 {editor.isActive("textStyle", { color: colour.value }) ? ' bg-zinc-800' : ''}">
+                    <IconSquare />
+                </button>
             {/each}
         </div>
         {#if editor.getAttributes("textStyle").color}
@@ -260,22 +262,9 @@
         <ToolbarButton onClick={() => editor?.commands.redo()} ariaLabel="Redo" Icon={IconRedo} />
 
         <div class="grow"></div>
-
-        <button
-            {@attach tooltip}
-            class="toolbar-btn nomob"
-            onclick={insertImageDialog?.open}
-            aria-label="Insert Image"><IconUploadImage /></button>
-        <button
-            {@attach tooltip}
-            class="toolbar-btn nomob"
-            onclick={fontUploadModal?.open}
-            aria-label="Upload Font"><IconUploadFont /></button>
-        <button
-            {@attach tooltip}
-            class="toolbar-btn nomob"
-            onclick={keybindDialog?.open}
-            aria-label="Keybinds"><IconKeybinds /></button>
+          
+        <ToolbarButton onClick={insertImageDialog?.open} ariaLabel="Insert Image" Icon={IconUploadImage} desktopOnly />
+        <ToolbarButton onClick={keybindDialog?.open} ariaLabel="Keybinds" Icon={IconKeybinds} desktopOnly />
     {/if}
 </div>
 

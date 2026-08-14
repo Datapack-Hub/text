@@ -167,7 +167,6 @@ export function rgbaToArgbHex(rgbaHex: string): string {
 }
 
 export function rgbToHex(color: string): string {
-    console.log(color)
     if (color.startsWith('rgb')) {
         const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/u.exec(color);
         return result

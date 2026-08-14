@@ -70,7 +70,7 @@
 
             content.forEach((c) => {
                 current = {
-                    color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
+                    color: defaultColorLUT(c.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
                     bold: trueMarkOrUndefined(c, "bold"),
                     italic: trueMarkOrUndefined(c, "italic"),
                     strikethrough: trueMarkOrUndefined(c, "strike"),

@@ -3,6 +3,8 @@ import type { HoverEventAttributes } from "../index";
 
 export const HoverEventMark = Mark.create({
     name: "hoverEvent",
+    spanning: true,
+    priority: 1000,
 
     addAttributes(): HoverEventAttributes {
         return {

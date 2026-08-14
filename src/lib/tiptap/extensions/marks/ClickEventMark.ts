@@ -4,6 +4,8 @@ import { type ClickEventAttributes } from "../index";
 
 export const ClickEventMark = Mark.create({
     name: "clickEvent",
+    spanning: true,
+    priority: 1000,
 
     addAttributes(): ClickEventAttributes {
         return {

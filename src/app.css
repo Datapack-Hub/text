@@ -75,7 +75,7 @@ strong {
     border-bottom: solid #a868e7 2px;
     z-index: 10;
     --custom-source-align: top;
-    padding-bottom: 1px
+    padding-bottom: 1px;
 }
 
 .clickEvent:has(.hoverEvent) {
@@ -88,7 +88,7 @@ strong {
     border-bottom: solid #e57e2b 2px;
     z-index: 10;
     --custom-source-align: top;
-    padding-bottom: 1px
+    padding-bottom: 1px;
 }
 
 .obfuscated {

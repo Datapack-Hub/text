@@ -222,11 +222,11 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
 
         if (data.length === 2 && data[0] == "") {
             return JSON.stringify(data[1]);
+        } else if (data.length === 1) {
+            return JSON.stringify(data[0])
         }
 
-        let finalResult = JSON.stringify(data);
-
-        return finalResult;
+        return JSON.stringify(data);
     } else if (options.exportType === "item_lore") {
         let data: (StringyMCText[] | StringyMCText)[] = [];
 

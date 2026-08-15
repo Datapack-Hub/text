@@ -23,7 +23,7 @@ it("should return a basic color string", async () => {
         exportType: "standard",
         optimise: true,
     });
-    expect(JSON.parse(snbt)).toEqual(["", { text: "test", color: "dark_red" }]);
+    expect(JSON.parse(snbt)).toEqual({ text: "test", color: "dark_red" });
 });
 
 const baseOptions: TranslateOptions = {
@@ -140,10 +140,10 @@ it("uses older format output when exportVersion=old", async () => {
     const result = translateJSON(json, {
         ...baseOptions,
     });
-    expect(JSON.parse(result)).toHaveProperty("[1].clickEvent");
-    expect(JSON.parse(result)).not.toHaveProperty("[1].click_event");
-    expect(JSON.parse(result)).toHaveProperty("[1].hoverEvent");
-    expect(JSON.parse(result)).not.toHaveProperty("[1].hover_event");
+    expect(JSON.parse(result)).toHaveProperty("clickEvent");
+    expect(JSON.parse(result)).not.toHaveProperty("click_event");
+    expect(JSON.parse(result)).toHaveProperty("hoverEvent");
+    expect(JSON.parse(result)).not.toHaveProperty("hover_event");
 });
 
 it("handles exportType=item_lore", () => {

@@ -32,7 +32,7 @@
             class="z-50 w-[95%] md:w-[50%] 2xl:w-[40%] m-auto py-4">
             <div class="flex items-center rounded-t-lg bg-zinc-900 p-2 text-xl">
                 <img src="/dph.svg" class="h-8 ml-1 " alt="logo" />  
-                <span class="text-lg font-black m-2 bg-linear-to-r from-red-500 to-yellow-600 bg-clip-text text-transparent">Minecraft Text Editor</span>
+                <span class="text-lg font-black m-2 bg-linear-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">Minecraft Text Editor</span>
                 <div class="grow"></div>
                 <button aria-label="close" class="p-2 hover:bg-black/15 rounded-md" onclick={() => visible = false}><IconClose /></button>
             </div>

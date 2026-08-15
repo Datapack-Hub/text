@@ -220,8 +220,8 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
             data.unshift("");
         }
 
-        if (data.length === 1) {
-            return JSON.stringify(data[0]);
+        if (data.length === 2 && data[0] == "") {
+            return JSON.stringify(data[1]);
         }
 
         let finalResult = JSON.stringify(data);

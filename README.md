@@ -4,7 +4,7 @@ This is an online and open source Minecraft Text Component WYSIWYG editor, updat
 
 Check it out at: https://text.datapackhub.net/
 
-![image](https://github.com/user-attachments/assets/2c16718a-c8dd-49cc-9eb5-90167834e76e)
+<img width="730" height="313" alt="image" src="https://github.com/user-attachments/assets/98a803d9-30b5-40c5-9cc0-33e54d63a78b" />
 
 :eyes: To prove it works, the generated text from the image above is below:
 

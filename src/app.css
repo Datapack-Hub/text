@@ -120,6 +120,10 @@ strong {
     @apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
 }
 
+.input-basic {
+    @apply rounded-md bg-zinc-900 p-2;
+}
+
 .tippy-box[data-theme~="dph"] {
     background-color: var(--color-zinc-700);
     font-family: "Lexend", sans-serif;

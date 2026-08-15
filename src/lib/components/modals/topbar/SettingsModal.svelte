@@ -55,7 +55,7 @@
             <select
                 name="fontSize"
                 bind:value={$appSettings.fontSize}
-                class="rounded-md bg-zinc-900 p-2">
+                class="input-basic">
                 <option value={0}>Small</option>
                 <option value={1}>Default</option>
                 <option value={2}>Large</option>

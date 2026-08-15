@@ -55,7 +55,7 @@
     
     let exportSelectionDialog: Modal = $state()!;
 
-    let showWelcomeScreen: boolean = true;  
+    let showWelcomeScreen: boolean = $state(true);  
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -233,7 +233,7 @@
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col">
-    <TopUI {editor} />
+    <TopUI {editor} bind:welcomeScreenVisible={showWelcomeScreen} />
 
     <ControlBar {editor} />
 
@@ -400,10 +400,7 @@
     </div>
 </noscript>
 
-{#if showWelcomeScreen}
-    <WelcomeScreen></WelcomeScreen>
-{/if}
-
+<WelcomeScreen bind:visible={showWelcomeScreen} />
 
 {#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />

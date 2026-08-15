@@ -75,9 +75,11 @@
                     </div>
                 </div>
 
-                <!-- <p class="text-sm text-zinc-200 mt-2">Click <Key>ESC</Key> to dismiss.</p> -->
+                <p class="text-sm text-zinc-400 mt-2"><b class="text-zinc-300">Feedback?</b> We are a small team and would love to hear any feedback you have! Let us know what you think on our <a href="https://discord.datapackhub.net/" class="link">Discord server</a>.</p>
 
-                <p class="text-zinc-400 text-xs mt-2">This site is maintained by Datapack Hub, and is <b>not</b> endorsed by Mojang Studios.</p>
+                <p class="text-sm text-zinc-400 mt-1"><b class="text-zinc-300">Bugs?</b> Report them on our <a href="https://discord.datapackhub.net/" class="link">Discord server</a>, or create an issue on <a href="https://github.com/Datapack-Hub/text/issues" class="link">Github</a>.</p>
+
+                <p class="text-zinc-500 text-xs mt-2">This site is maintained by Datapack Hub, and is <b>not</b> endorsed by Mojang Studios.</p>
                     
                 <noscript>
                     <div class="rounded-md border-2 border-red-500 bg-red-500/20 px-3 py-2 mt-2 text-rose-200">

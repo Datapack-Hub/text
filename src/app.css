@@ -124,6 +124,10 @@ strong {
     @apply rounded-md bg-zinc-900 p-2;
 }
 
+.link {
+    @apply font-bold underline
+}
+
 .tippy-box[data-theme~="dph"] {
     background-color: var(--color-zinc-700);
     font-family: "Lexend", sans-serif;

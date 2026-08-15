@@ -391,7 +391,7 @@
                             enabled, please refresh. If that doesn't work, then try a different
                             browser. If that still doesn't work, then ask for help in <a
                                 href="https://discord.datapackhub.net/"
-                                class="font-bold underline">our Discord</a
+                                class="link">our Discord</a
                             ></span>
                     </div>
                 </div>

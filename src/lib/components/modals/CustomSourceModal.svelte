@@ -303,7 +303,7 @@
                 Add NBT Value
             </button>
         {:else if customValues.nbt.sourceType === "block"}
-            <p class="mt-2">Entity</p>
+            <p class="mt-2">Block</p>
             <input
                 type="text"
                 class="rounded-md bg-zinc-900 p-2"

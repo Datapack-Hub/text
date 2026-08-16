@@ -1,10 +1,12 @@
 <script lang="ts">
+    const welcomeScreenFormat = "1"
+
     import IconImport from "~icons/tabler/upload";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconLore from "~icons/tabler/swords";
     import IconCode from "~icons/tabler/code";
     import IconClose from "~icons/tabler/X"
-    import Key from "./Key.svelte";
+    import { onMount } from "svelte";
 
     let { visible = $bindable(false) }: { visible: boolean } = $props()
 
@@ -13,6 +15,16 @@
             visible = false;
         }
     }
+
+    onMount(() => {
+        let seenWelcome = localStorage.getItem("seen_welcome")
+        if (seenWelcome && seenWelcome == welcomeScreenFormat) {
+            visible = false
+        } else {
+            visible = true
+            localStorage.setItem("seen_welcome", welcomeScreenFormat);
+        }
+    })
 </script>
 
 <svelte:window onkeydown={handleKeydown} />

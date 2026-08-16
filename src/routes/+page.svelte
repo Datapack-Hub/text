@@ -55,7 +55,7 @@
     
     let exportSelectionDialog: Modal = $state()!;
 
-    let showWelcomeScreen: boolean = $state(true);  
+    let showWelcomeScreen: boolean = $state(false);  
 
     async function loadData() {
         if (localStorage.getItem("content")) {

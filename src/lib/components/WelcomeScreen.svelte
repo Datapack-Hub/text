@@ -1,12 +1,11 @@
 <script lang="ts">
-    const welcomeScreenFormat = "1"
-
     import IconImport from "~icons/tabler/upload";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconLore from "~icons/tabler/swords";
     import IconCode from "~icons/tabler/code";
     import IconClose from "~icons/tabler/X"
     import { onMount } from "svelte";
+    import { welcomeScreenFormat } from "$lib/globals";
 
     let { visible = $bindable(false) }: { visible: boolean } = $props()
 

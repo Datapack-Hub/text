@@ -66,7 +66,7 @@
                         <IconGradient class="w-[7.5%] lg:w-1/10" />
                         <div class="flex flex-col space-y-1 my-1 w-[92.5%] lg:w-9/10">
                             <span class="uppercase text-xs text-rose-500 font-bold">Gradient</span>
-                            <span class="text-sm text-rose-100">Easily add gradients to text, we'll do the rest.</span>
+                            <span class="text-sm text-rose-100">Add gradients to text, while keeping styles and interactivity.</span>
                         </div>
                     </div>
 

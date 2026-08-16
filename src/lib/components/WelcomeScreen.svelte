@@ -36,7 +36,7 @@
         style="font-family: Lexend">
         <div
             aria-hidden="true"
-            onclick={() => close()}
+            onclick={() => visible = false}
             class="fixed top-0 left-0 z-40 h-screen w-screen bg-transparent"
             tabindex="-1">
         </div>

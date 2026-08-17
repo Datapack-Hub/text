@@ -81,6 +81,10 @@
     onMount(async () => {
         await loadData();
 
+        function convertRemToPixels(rem: number): number {    
+            return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+        }
+
         editor = new Editor({
             element: element,
             content: tiptapJSON,
@@ -128,24 +132,34 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
+                let el = document.querySelector(".tiptap") as HTMLElement;
+                let pageCount = 1;
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
+
+                const metrics = element.getBoundingClientRect()
+                const maxHeight = parseInt(getComputedStyle(el).fontSize) * 14
+
+                while((metrics.height - (maxHeight * pageCount)) >= 0) {
+                    pageCount++;
+                }
+                console.log("split result", metrics, maxHeight, pageCount)
             }
         });
 
         appSettings.subscribe(() => {
-            var el = document.querySelector(".tiptap") as HTMLElement;
+            let el = document.querySelector(".tiptap") as HTMLElement;
 
             if ($appSettings.realisticLineHeight == true) {
-                var lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
+                let lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
                 el.style.lineHeight = lineHeight.toString() + "rem";
                 // TODO fix the overlap from objects and event marks
             } else {
-                var lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
+                let lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
                 el.style.lineHeight = lineHeight.toString() + "rem";
             }
 
-            var fontSize = 1 + 0.25 * $appSettings.fontSize;
+            let fontSize = 1 + 0.25 * $appSettings.fontSize;
             el.style.fontSize = fontSize.toString() + "rem";
         });
     });
@@ -233,13 +247,15 @@
 
     <ControlBar {editor} />
 
+    <!-- input box -->
     <div
-        class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
+        class="font-minecraft grow overflow-auto bg-zinc-800 first:focus:outline-none"
         spellcheck="false"
         id="wysiwyg-box"
         bind:this={element}>
     </div>
 
+    <!-- output box(es) -->
     <div>
         {#if page.url.searchParams.has("dev")}
             <code class="inline-block overflow-x-scroll p-3 text-xs"

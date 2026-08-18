@@ -133,17 +133,27 @@
             },
             onUpdate: ({ editor }) => {
                 let el = document.querySelector(".tiptap") as HTMLElement;
-                let pageCount = 1;
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
 
-                const metrics = element.getBoundingClientRect()
+                // TODO: actually fill with content
+                let splitPages = [[]]
+
+                // const metrics = el.getBoundingClientRect()
                 const maxHeight = parseInt(getComputedStyle(el).fontSize) * 14
 
-                while((metrics.height - (maxHeight * pageCount)) >= 0) {
-                    pageCount++;
+                // const pages = Math.ceil(metrics.height / maxHeight)
+                let currentHeight = 0;
+                for(let child of el.children) {
+                    const metrics = child.getBoundingClientRect()
+                    currentHeight += metrics.height
+                    if(currentHeight > maxHeight) {
+                        currentHeight = 0
+                        // TODO: actually fill with the content
+                        splitPages.push([])
+                    }
                 }
-                console.log("split result", metrics, maxHeight, pageCount)
+                console.log("results", currentHeight, maxHeight, splitPages)
             }
         });
 

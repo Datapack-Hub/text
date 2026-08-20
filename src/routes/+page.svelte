@@ -132,25 +132,25 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
-                let el = document.querySelector(".tiptap") as HTMLElement;
+                const el = editor.view.dom;
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
 
                 // TODO: actually fill with content
-                let splitPages = [[]]
-
-                // const metrics = el.getBoundingClientRect()
-                const maxHeight = parseInt(getComputedStyle(el).fontSize) * 14
-
-                // const pages = Math.ceil(metrics.height / maxHeight)
+                const splitPages: JSONContent[][] = [[]]
+                const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14
                 let currentHeight = 0;
-                for(let child of el.children) {
+                let currentPage = 0;
+
+                for(let i = 0; i < el.children.length; i++) {
+                    const child = el.children[i];
                     const metrics = child.getBoundingClientRect()
                     currentHeight += metrics.height
+                    splitPages[currentPage].push(editor.getJSON().content[i])
                     if(currentHeight > maxHeight) {
                         currentHeight = 0
-                        // TODO: actually fill with the content
                         splitPages.push([])
+                        currentPage++
                     }
                 }
                 console.log("results", currentHeight, maxHeight, splitPages)
@@ -158,7 +158,11 @@
         });
 
         appSettings.subscribe(() => {
-            let el = document.querySelector(".tiptap") as HTMLElement;
+            const el = editor?.view.dom
+
+            if(!el) {
+                return;
+            }
 
             if ($appSettings.realisticLineHeight == true) {
                 let lineHeight = 0.8 + 0.2 * $appSettings.fontSize;

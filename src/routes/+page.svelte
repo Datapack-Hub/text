@@ -81,10 +81,6 @@
     onMount(async () => {
         await loadData();
 
-        function convertRemToPixels(rem: number): number {    
-            return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
-        }
-
         editor = new Editor({
             element: element,
             content: tiptapJSON,
@@ -132,28 +128,10 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
-                const el = editor.view.dom;
+                const pageOutputs = calculateBookOutput(editor)
+                console.log("pageOutputs", `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`)
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
-
-                // TODO: actually fill with content
-                const splitPages: JSONContent[][] = [[]]
-                const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14
-                let currentHeight = 0;
-                let currentPage = 0;
-
-                for(let i = 0; i < el.children.length; i++) {
-                    const child = el.children[i];
-                    const metrics = child.getBoundingClientRect()
-                    currentHeight += metrics.height
-                    splitPages[currentPage].push(editor.getJSON().content[i])
-                    if(currentHeight > maxHeight) {
-                        currentHeight = 0
-                        splitPages.push([])
-                        currentPage++
-                    }
-                }
-                console.log("results", currentHeight, maxHeight, splitPages)
             }
         });
 
@@ -202,6 +180,31 @@
         return navigator.platform.startsWith("Mac") || navigator.platform.includes("iPhone")
             ? event.metaKey
             : event.ctrlKey;
+    }
+
+    function calculateBookOutput(edit: Editor): string[][] {
+        const el = edit.view.dom;
+                
+        // TODO: actually fill with content
+        const splitPages: JSONContent[][] = [[]]
+        const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14
+        let currentHeight = 0;
+        let currentPage = 0;
+        
+        for(let i = 0; i < el.children.length; i++) {
+            const child = el.children[i];
+            const metrics = child.getBoundingClientRect()
+            currentHeight += metrics.height
+            splitPages[currentPage].push(edit.getJSON().content[i])
+            if(currentHeight > maxHeight) {
+                currentHeight = 0
+                splitPages.push([])
+                currentPage++
+            }
+        }
+
+        console.log("results", currentHeight, maxHeight, splitPages)
+        return splitPages.filter((page) => page.length > 0).map((page) => [convert({type: "doc", content: page }, shouldOptimise)])
     }
 
     function clearMarksHandler(event: KeyboardEvent) {
@@ -256,7 +259,7 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<main class="flex h-screen max-h-screen flex-col">
+<main class="flex h-screen max-h-screen flex-col items-center">
     <TopUI {editor} />
 
     <ControlBar {editor} />
@@ -264,6 +267,7 @@
     <!-- input box -->
     <div
         class="font-minecraft grow overflow-auto bg-zinc-800 first:focus:outline-none"
+        style="width: 17rem;"
         spellcheck="false"
         id="wysiwyg-box"
         bind:this={element}>

@@ -61,7 +61,7 @@
             content: value,
             editorProps: {
                 attributes: {
-                    class: 'tiptap-minirenderer',
+                    class: "tiptap-minirenderer",
                 },
             },
         }).setEditable(false);

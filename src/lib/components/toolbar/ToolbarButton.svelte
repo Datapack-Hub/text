@@ -8,7 +8,7 @@
         ariaLabel: string;
         Icon: Component;
         colour?: string;
-        desktopOnly?: boolean
+        desktopOnly?: boolean;
     };
 
     const { onClick, styleVar, Icon, ariaLabel, colour, desktopOnly }: Props = $props();

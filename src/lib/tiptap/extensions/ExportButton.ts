@@ -1,8 +1,8 @@
-import { Extension } from '@tiptap/core';
-import { Plugin, PluginKey } from '@tiptap/pm/state';
-import { EditorView } from '@tiptap/pm/view';
+import { Extension } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { EditorView } from "@tiptap/pm/view";
 import { appSettings } from "$lib/settings";
-import { get } from 'svelte/store';
+import { get } from "svelte/store";
 
 // Define the shape of configuration options for type safety
 export interface ExportButtonOptions {
@@ -10,11 +10,11 @@ export interface ExportButtonOptions {
 }
 
 export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
-    name: 'ExportButton',
+    name: "ExportButton",
 
     addOptions() {
         return {
-            onClick: () => { },
+            onClick: () => {},
         };
     },
 
@@ -24,14 +24,14 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
 
         return [
             new Plugin({
-                key: new PluginKey('ExportButton'),
+                key: new PluginKey("ExportButton"),
                 view(editorView: EditorView) {
                     return {
                         update(view: EditorView) {
                             if (get(appSettings).hideSelectionExport == true) {
                                 return;
                             }
-                            
+
                             const { state } = view;
                             const { selection } = state;
 
@@ -39,20 +39,22 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
                             if (!parentNode) return;
 
                             if ((selection.empty || !view.hasFocus()) && buttonDom) {
-                                buttonDom.style.display = 'none';
+                                buttonDom.style.display = "none";
                                 return;
                             }
 
                             if (!buttonDom) {
-                                buttonDom = document.createElement('button');
-                                buttonDom.innerText = '↪ Export this';
-                                buttonDom.className = 'export-button';
-                                buttonDom.style.position = 'absolute';
-                                buttonDom.style.zIndex = '10';
+                                buttonDom = document.createElement("button");
+                                buttonDom.innerText = "↪ Export this";
+                                buttonDom.className = "export-button";
+                                buttonDom.style.position = "absolute";
+                                buttonDom.style.zIndex = "10";
 
-                                buttonDom.addEventListener('mousedown', (e: MouseEvent) => e.preventDefault());
-                                buttonDom.addEventListener('click', onClick);
-                                
+                                buttonDom.addEventListener("mousedown", (e: MouseEvent) =>
+                                    e.preventDefault(),
+                                );
+                                buttonDom.addEventListener("click", onClick);
+
                                 parentNode.appendChild(buttonDom);
                             }
 
@@ -60,9 +62,9 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
                             const top = coords.top + 19;
                             const left = coords.left - 90;
 
-                            buttonDom.style.display = 'block';
+                            buttonDom.style.display = "block";
                             buttonDom.style.top = `${top}px`;
-                            buttonDom.style.left = `${left + 5}px`; 
+                            buttonDom.style.left = `${left + 5}px`;
                         },
 
                         destroy() {
@@ -70,7 +72,7 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
                                 buttonDom.remove();
                                 buttonDom = null;
                             }
-                        }
+                        },
                     };
                 },
             }),

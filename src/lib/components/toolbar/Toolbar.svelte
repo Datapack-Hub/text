@@ -160,14 +160,19 @@
             Icon={IconGradient}
             onClick={gradientDialog.open}
             ariaLabel="Color Gradient" />
-        <div id="colorBtns" class="flex items-center space-x-0 mx-1">
+        <div id="colorBtns" class="mx-1 flex items-center space-x-0">
             {#each colourMap as colour}
                 <button
                     aria-label={toTitleCase(colour.name.replace("_", " "))}
                     onclick={() => editor!.chain().focus().setColor(colour.value).run()}
                     {@attach tooltip}
                     style="color: {colour.value || 'inherit'}"
-                    class="rounded-md py-1 px-0 text-lg font-medium hover:bg-white/3 {editor.isActive("textStyle", { color: colour.value }) ? ' bg-zinc-800' : ''}">
+                    class="rounded-md px-0 py-1 text-lg font-medium hover:bg-white/3 {editor.isActive(
+                        'textStyle',
+                        { color: colour.value },
+                    )
+                        ? ' bg-zinc-800'
+                        : ''}">
                     <IconSquare />
                 </button>
             {/each}
@@ -262,9 +267,17 @@
         <ToolbarButton onClick={() => editor?.commands.redo()} ariaLabel="Redo" Icon={IconRedo} />
 
         <div class="grow"></div>
-          
-        <ToolbarButton onClick={insertImageDialog?.open} ariaLabel="Insert Image" Icon={IconUploadImage} desktopOnly />
-        <ToolbarButton onClick={keybindDialog?.open} ariaLabel="Keybinds" Icon={IconKeybinds} desktopOnly />
+
+        <ToolbarButton
+            onClick={insertImageDialog?.open}
+            ariaLabel="Insert Image"
+            Icon={IconUploadImage}
+            desktopOnly />
+        <ToolbarButton
+            onClick={keybindDialog?.open}
+            ariaLabel="Keybinds"
+            Icon={IconKeybinds}
+            desktopOnly />
     {/if}
 </div>
 

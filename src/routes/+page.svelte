@@ -50,7 +50,8 @@
     let recentlyCopied = $state(false);
 
     let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
-    
+    let pageOutputs = $derived(editor ? calculateBookOutput(editor) : [["Loading..."]]);
+
     let exportSelectionDialog: Modal = $state()!;
 
     async function loadData() {
@@ -118,27 +119,29 @@
                 }),
                 ExportButtonExtension.configure({
                     onClick: () => {
-                        exportSelectionDialog.open()
+                        exportSelectionDialog.open();
                     },
                 }),
-
             ],
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
-                const pageOutputs = calculateBookOutput(editor)
-                console.log("pageOutputs", `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`)
+                console.log(
+                    "pageOutputs",
+                    `[written_book_content={pages:[${pageOutputs}],title:"Your Title Here",author:"You"}]`,
+                );
+                pageOutputs = calculateBookOutput(editor);
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
-            }
+            },
         });
 
         appSettings.subscribe(() => {
-            const el = editor?.view.dom
+            const el = document.querySelector(".tiptap") as HTMLElement;
 
-            if(!el) {
+            if (!el) {
                 return;
             }
 
@@ -153,6 +156,17 @@
 
             let fontSize = 1 + 0.25 * $appSettings.fontSize;
             el.style.fontSize = fontSize.toString() + "rem";
+            if ($appSettings.mode === "book") {
+                el.style.width = 11.5 + 2.3 * $appSettings.fontSize + "rem";
+                el.style.borderRight = "1px solid #676767";
+                el.style.backgroundColor = "#fdf8ed";
+                el.style.color = "#000000";
+            } else {
+                el.style.width = "100%";
+                el.style.borderRight = "none";
+                el.style.backgroundColor = "";
+                el.style.color = "";
+            }
         });
     });
 
@@ -184,27 +198,28 @@
 
     function calculateBookOutput(edit: Editor): string[][] {
         const el = edit.view.dom;
-                
+
         // TODO: actually fill with content
-        const splitPages: JSONContent[][] = [[]]
-        const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14
+        const splitPages: JSONContent[][] = [[]];
+        const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14;
         let currentHeight = 0;
         let currentPage = 0;
-        
-        for(let i = 0; i < el.children.length; i++) {
+
+        for (let i = 0; i < el.children.length; i++) {
             const child = el.children[i];
-            const metrics = child.getBoundingClientRect()
-            currentHeight += metrics.height
-            splitPages[currentPage].push(edit.getJSON().content[i])
-            if(currentHeight > maxHeight) {
-                currentHeight = 0
-                splitPages.push([])
-                currentPage++
+            const metrics = child.getBoundingClientRect();
+            currentHeight += metrics.height;
+            splitPages[currentPage].push(edit.getJSON().content[i]);
+            if (currentHeight > maxHeight) {
+                currentHeight = 0;
+                splitPages.push([]);
+                currentPage++;
             }
         }
 
-        console.log("results", currentHeight, maxHeight, splitPages)
-        return splitPages.filter((page) => page.length > 0).map((page) => [convert({type: "doc", content: page }, shouldOptimise)])
+        return splitPages
+            .filter((page) => page.length > 0)
+            .map((page) => [convert({ type: "doc", content: page }, shouldOptimise)]);
     }
 
     function clearMarksHandler(event: KeyboardEvent) {
@@ -266,8 +281,7 @@
 
     <!-- input box -->
     <div
-        class="font-minecraft grow overflow-auto bg-zinc-800 first:focus:outline-none"
-        style="width: 17rem;"
+        class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
         spellcheck="false"
         id="wysiwyg-box"
         bind:this={element}>
@@ -280,8 +294,8 @@
                 >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
             <br />
         {/if}
-        <div class="bg-zinc-950 p-3">
-            <div class="flex max-h-32 max-w-screen items-start space-x-2 overflow-auto">
+        <div class="w-screen bg-zinc-950 p-3">
+            <div class="flex max-h-32 items-start space-x-2 overflow-auto">
                 <button
                     {@attach tooltip}
                     class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -299,10 +313,16 @@
                 <code id="outputbox">
                     <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
                     {#if $appSettings.syntaxHighlight}
-                        <Highlight language={typescript} code={finalOutput} />
+                        <Highlight
+                            language={typescript}
+                            code={$appSettings.mode === "book"
+                                ? `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`
+                                : finalOutput} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? finalOutput
+                                ? $appSettings.mode === "book"
+                                    ? `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`
+                                    : finalOutput
                                 : "Loading..."}</pre>
                     {/if}
                 </code>
@@ -435,5 +455,5 @@
 {/await}
 
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
-    <modal.default bind:exportSelectionDialog editor={editor!} shouldOptimise={shouldOptimise} />
+    <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
 {/await}

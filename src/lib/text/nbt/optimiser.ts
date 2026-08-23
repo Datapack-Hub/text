@@ -45,7 +45,7 @@ export function optimise(stringyTextElements: StringyMCText[], lore = false): St
     if (lore) {
         output.unshift({ italic: false, color: "white", text: "" });
     }
-    
+
     return output;
 }
 

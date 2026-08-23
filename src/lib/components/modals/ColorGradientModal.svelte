@@ -15,7 +15,7 @@
 
     let recentsPageOpen: boolean = $state(false);
     let recentGradients: Array<string[]> = $state([]);
-    let gradientSteps: { id: number; color: string }[] = $state([{ id: 0, color: "#ffffff"}]);
+    let gradientSteps: { id: number; color: string }[] = $state([{ id: 0, color: "#ffffff" }]);
 
     interface Props {
         gradientDialog: Modal;
@@ -81,14 +81,16 @@
         chain.run();
 
         // Add to recents if necessary
-        let gradientHexes = gradientSteps.map((step) => step.color)
+        let gradientHexes = gradientSteps.map((step) => step.color);
 
-        const alreadyAppeared = recentGradients.some(elem =>{
+        const alreadyAppeared = recentGradients.some((elem) => {
             return JSON.stringify(gradientHexes) === JSON.stringify(elem);
         });
 
         if (alreadyAppeared) {
-            recentGradients = recentGradients.filter((grad) => JSON.stringify(grad) !== JSON.stringify(gradientHexes));
+            recentGradients = recentGradients.filter(
+                (grad) => JSON.stringify(grad) !== JSON.stringify(gradientHexes),
+            );
         }
 
         recentGradients.push(gradientHexes);
@@ -120,7 +122,10 @@
                 if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
                     return;
                 }
-                const [movedItem]: { id: number; color: string }[] = gradientSteps.splice(oldIndex, 1);
+                const [movedItem]: { id: number; color: string }[] = gradientSteps.splice(
+                    oldIndex,
+                    1,
+                );
                 gradientSteps.splice(newIndex, 0, movedItem);
                 gradientSteps = gradientSteps;
             },
@@ -173,9 +178,11 @@
             <p class="mt-2">Preview</p>
             <div class="font-minecraft rounded-md bg-zinc-950 px-4 py-2 text-2xl">
                 <span
-                    style="background: -webkit-linear-gradient(0, {gradientSteps.map((step) => step.color).join(
-                        ',',
-                    )}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                    style="background: -webkit-linear-gradient(0, {gradientSteps
+                        .map((step) => step.color)
+                        .join(
+                            ',',
+                        )}); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
                     >{editor?.state.doc.textBetween(
                         editor.state.selection.from,
                         editor.state.selection.to,
@@ -190,7 +197,10 @@
             <div class="mt-2 flex items-center justify-between">
                 <button
                     onclick={() => {
-                        applyGradient(editor!, gradientSteps.map((step) => step.color));
+                        applyGradient(
+                            editor!,
+                            gradientSteps.map((step) => step.color),
+                        );
                         gradientDialog.close();
                     }}
                     class="btn">
@@ -221,7 +231,10 @@
                             class="btn"
                             onclick={async () => {
                                 // im 90% sure this solution is slow as hell and probably unstable too, but i hate this so much i dont care
-                                gradientSteps = gradient.map((color, i) => ({ id: Date.now() - i, color }));
+                                gradientSteps = gradient.map((color, i) => ({
+                                    id: Date.now() - i,
+                                    color,
+                                }));
                                 recentsPageOpen = false;
                                 await tick();
                                 opened();

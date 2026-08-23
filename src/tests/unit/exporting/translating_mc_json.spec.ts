@@ -96,7 +96,7 @@ it("handles shadowColor mark", async () => {
         "clean/json/shadow_color.json",
     )) as JSONContent;
     const result = convert(json, true, "standard");
-    expect(result).toContain('shadow_color:4294902015L');
+    expect(result).toContain("shadow_color:4294902015L");
 });
 
 it("handles shadowColor transparency", async () => {
@@ -104,7 +104,7 @@ it("handles shadowColor transparency", async () => {
         "clean/json/shadow_color_transparent.json",
     )) as JSONContent;
     const result = convert(json, true, "standard");
-    expect(result).toContain('shadow_color:4294923348L');
+    expect(result).toContain("shadow_color:4294923348L");
 });
 
 it("should remove shadow_color if out of range", async () => {

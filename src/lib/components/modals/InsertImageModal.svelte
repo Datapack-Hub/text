@@ -36,7 +36,7 @@
                     image.remove();
                 };
             });
-            
+
             reader.readAsDataURL(files[0]);
         }
     }
@@ -47,7 +47,7 @@
             const image = new Image();
             image.src = reader.result as string;
             image.onload = () => {
-                sizeWarning = image.width > 24 || image.height > 24
+                sizeWarning = image.width > 24 || image.height > 24;
                 image.remove();
             };
         };
@@ -65,11 +65,11 @@
             }
         }
     }
-    
+
     function processImage(image: HTMLImageElement): JSONContent[] {
         if (!files || !editor) return [];
         let completeContent: JSONContent[] = [];
-        
+
         const canvas = new OffscreenCanvas(image.width, image.height);
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         ctx?.reset();
@@ -116,12 +116,12 @@
     }
 
     $effect(() => {
-        if(files && files.length > 0) {
+        if (files && files.length > 0) {
             checkFileSize(files[0]);
         } else {
             sizeWarning = false;
         }
-    })
+    });
 </script>
 
 <svelte:window ondragover={handleWindowDrag} ondrop={(e) => e.preventDefault()} />
@@ -150,10 +150,16 @@
                 <p>Drag and drop an image here</p>
             </label>
         {:else}
-            <p>Selected file: <span class="font-mono bg-zinc-900 p-1 rounded-md text-orange-300">{files[0].name}</span></p>
+            <p>
+                Selected file: <span class="rounded-md bg-zinc-900 p-1 font-mono text-orange-300"
+                    >{files[0].name}</span>
+            </p>
             {#if sizeWarning}
-                <div class="border-red-500 border-2 bg-stone-900 p-2 rounded-md">
-                    <p>This image may be too large to display properly, and may also cause performance issues to process, you have been warned!</p>
+                <div class="rounded-md border-2 border-red-500 bg-stone-900 p-2">
+                    <p>
+                        This image may be too large to display properly, and may also cause
+                        performance issues to process, you have been warned!
+                    </p>
                 </div>
             {/if}
             <div class="flex gap-2">

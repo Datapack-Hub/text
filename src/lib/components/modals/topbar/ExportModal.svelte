@@ -3,7 +3,7 @@
     import { translateMOTD } from "$lib/text/motd";
     import { convert } from "$lib/text/nbt/export";
     import CheckBox from "../../CheckBox.svelte";
-    import { domToPng,  type Options } from "modern-screenshot";
+    import { domToPng, type Options } from "modern-screenshot";
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
     import { appSettings } from "$lib/settings";
@@ -28,7 +28,6 @@
         recentlyCopied = $bindable(),
         shouldOptimise = true,
     } = $props();
-
 
     // Image output
     let imgPreview: HTMLImageElement | undefined = $state();
@@ -140,37 +139,23 @@
             </div>
             <code class="max-h-56 w-full space-x-3 overflow-auto rounded-lg bg-zinc-950 p-3">
                 {#if $appSettings.syntaxHighlight}
-                <Highlight
-                    language={json}
-                    code={
-                        JSON.stringify(
-                            JSON.parse(
-                                convert(
-                                    editor.getJSON(),
-                                    shouldOptimise,
-                                    "standard",
-                                    true,
-                                )
-                            ),
+                    <Highlight
+                        language={json}
+                        code={JSON.stringify(
+                            JSON.parse(convert(editor.getJSON(), shouldOptimise, "standard", true)),
                             null,
-                            indent ? 4 : undefined
-                        )
-                    } />
+                            indent ? 4 : undefined,
+                        )} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                        ? JSON.stringify(
-                            JSON.parse(
-                                convert(
-                                    editor.getJSON(),
-                                    shouldOptimise,
-                                    "standard",
-                                    true,
-                                )
-                            ),
-                            null,
-                            indent ? 4 : undefined
-                        )
-                        : "Loading..."}</pre>
+                            ? JSON.stringify(
+                                  JSON.parse(
+                                      convert(editor.getJSON(), shouldOptimise, "standard", true),
+                                  ),
+                                  null,
+                                  indent ? 4 : undefined,
+                              )
+                            : "Loading..."}</pre>
                 {/if}
             </code>
 
@@ -184,17 +169,10 @@
                 onclick={() => {
                     navigator.clipboard.writeText(
                         JSON.stringify(
-                            JSON.parse(
-                                convert(
-                                    editor.getJSON(),
-                                    shouldOptimise,
-                                    "standard",
-                                    true,
-                                )
-                            ),
+                            JSON.parse(convert(editor.getJSON(), shouldOptimise, "standard", true)),
                             null,
-                            indent ? 4 : undefined
-                        )
+                            indent ? 4 : undefined,
+                        ),
                     );
                     recentlyCopied = true;
                     setTimeout(() => (recentlyCopied = false), 2000);

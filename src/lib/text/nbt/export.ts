@@ -176,14 +176,17 @@ export function convert(
         // nbt number type fix for shadow colour
         // moved from translateJSON function
         const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
-        const relevantShadowColorMatches = shadowColorMatches.filter(item => (parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)).toArray().map(item => item[1])
+        const relevantShadowColorMatches = shadowColorMatches
+            .filter((item) => parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)
+            .toArray()
+            .map((item) => item[1]);
         const deduplicatedRelevantShadowColorMatches = [...new Set(relevantShadowColorMatches)];
 
         for (const match of deduplicatedRelevantShadowColorMatches) {
-            const num = parseInt(match)
+            const num = parseInt(match);
             out = out.replaceAll(`"shadow_color":${match}`, `"shadow_color":${num}L`);
         }
-        
+
         // remove string marks from json keys only
         out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
     }
@@ -223,7 +226,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         if (data.length === 2 && data[0] == "") {
             return JSON.stringify(data[1]);
         } else if (data.length === 1) {
-            return JSON.stringify(data[0])
+            return JSON.stringify(data[0]);
         }
 
         return JSON.stringify(data);
@@ -257,13 +260,15 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
 function constructComponent(content: JSONContent, includeInteractivity: boolean = true) {
     // Construct basic styled component
     let currentComponent: MinecraftText = {
-        color: defaultColorLUT(content.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
+        color: defaultColorLUT(
+            content.marks?.find((obj) => obj.type == "textStyle")?.attrs?.color || undefined,
+        ),
         bold: trueMarkOrUndefined(content, "bold"),
         italic: trueMarkOrUndefined(content, "italic"),
         strikethrough: trueMarkOrUndefined(content, "strike"),
         underlined: trueMarkOrUndefined(content, "underline"),
         obfuscated: trueMarkOrUndefined(content, "obfuscated"),
-        font: content.marks?.find(obj => obj.type == "textStyle")?.attrs?.font || undefined,
+        font: content.marks?.find((obj) => obj.type == "textStyle")?.attrs?.font || undefined,
     };
 
     // Add shadow colour
@@ -281,5 +286,5 @@ function constructComponent(content: JSONContent, includeInteractivity: boolean 
     // Add content values (e.g. text and custom sources) depending on the component type
     currentComponent = addTypeSpecificValues(currentComponent, content, includeInteractivity);
 
-    return currentComponent
+    return currentComponent;
 }

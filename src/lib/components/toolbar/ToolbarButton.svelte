@@ -8,9 +8,10 @@
         ariaLabel: string;
         Icon: Component;
         colour?: string;
+        desktopOnly?: boolean
     };
 
-    const { onClick, styleVar, Icon, ariaLabel, colour }: Props = $props();
+    const { onClick, styleVar, Icon, ariaLabel, colour, desktopOnly }: Props = $props();
 </script>
 
 <button
@@ -18,6 +19,6 @@
     onclick={onClick}
     {@attach tooltip}
     style="color: {colour || 'inherit'}"
-    class="toolbar-btn{styleVar ? ' bg-zinc-800' : ''}">
+    class="toolbar-btn{styleVar ? ' bg-zinc-800' : ''} {desktopOnly ? 'nomob' : ''}">
     <Icon />
 </button>

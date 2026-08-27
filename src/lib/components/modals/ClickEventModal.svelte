@@ -11,7 +11,7 @@
 
 <Modal title="Click Event" bind:this={clickEventDialog} key="T">
     <p>Event Type</p>
-    <select bind:value={clickEventType} class="rounded-md bg-zinc-900 p-2">
+    <select bind:value={clickEventType} class="input-basic">
         <option value="open_url">Open URL</option>
         <option value="run_command">Run Command</option>
         <option value="suggest_command">Suggest Command</option>
@@ -32,7 +32,7 @@
         <p class="mt-2">Command:</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="/give @s apple"
             bind:value={clickEventValue} />
         <p class="text-zinc-400">Note: the player must have permission to run the command!</p>
@@ -40,7 +40,7 @@
         <p class="mt-2">Command:</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="/give @s apple"
             bind:value={clickEventValue} />
         <p class="text-zinc-400">Note: the player must have permission to run the command!</p>
@@ -48,21 +48,21 @@
         <p class="mt-2">Text to copy:</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="I love the Wuppertal Suspension Railway"
             bind:value={clickEventValue} />
     {:else if clickEventType == "change_page"}
         <p class="mt-2">Page to go to:</p>
         <input
             type="number"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="32"
             bind:value={clickEventValue} />
     {:else if clickEventType == "open_dialog"}
         <p class="mt-2">Dialog ID:</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="namespace:example_dialog"
             bind:value={clickEventValue} />
     {/if}

@@ -22,7 +22,7 @@ let exportVersion = get(outputVersion);
  * @param outputVersion the version to export to
  * @returns the current component with new properties
  */
-export function addTypeSpecificValues(
+export function addTypeSpecificValues( // TODO maybe merge this into constructComponent()
     current: MinecraftText,
     c: JSONContent,
     includeInteractivity = true,
@@ -203,29 +203,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         for (const [i, p] of paragraphs.entries()) {
             const content = p.content ?? [];
             for (const c of content) {
-                let current: MinecraftText = {
-                    color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-                    bold: trueMarkOrUndefined(c, "bold"),
-                    italic: trueMarkOrUndefined(c, "italic"),
-                    strikethrough: trueMarkOrUndefined(c, "strike"),
-                    underlined: trueMarkOrUndefined(c, "underline"),
-                    obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-                    font: c.marks?.at(0)?.attrs?.font || undefined,
-                };
-
-                const shadowColorMark = c.marks?.find((m) => m.type === "shadowColor");
-                if (shadowColorMark) {
-                    let colorVal: string = shadowColorMark.attrs?.shadowColor.replace(/^#/u, "");
-                    if (colorVal && colorVal.length <= 8) {
-                        current.shadow_color = parseInt(
-                            rgbaToArgbHex(colorVal.padEnd(8, "FF")).replace(/^#/u, ""),
-                            16,
-                        );
-                    }
-                }
-
-                current = addTypeSpecificValues(current, c, true);
-                data.push(current);
+                data.push(constructComponent(c));
             }
             if (i < paragraphs.length - 1) data.push("\n");
         }
@@ -242,13 +220,13 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
             data.unshift("");
         }
 
-        if (data.length === 1) {
-            return JSON.stringify(data[0]);
+        if (data.length === 2 && data[0] == "") {
+            return JSON.stringify(data[1]);
+        } else if (data.length === 1) {
+            return JSON.stringify(data[0])
         }
 
-        let finalResult = JSON.stringify(data);
-
-        return finalResult;
+        return JSON.stringify(data);
     } else if (options.exportType === "item_lore") {
         let data: (StringyMCText[] | StringyMCText)[] = [];
 
@@ -257,18 +235,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
             let currentLine: StringyMCText[] = [];
 
             for (const [_, c] of content.entries()) {
-                let currentComponent: MinecraftText = {
-                    color: defaultColorLUT(c.marks?.at(0)?.attrs?.color),
-                    bold: trueMarkOrUndefined(c, "bold"),
-                    italic: trueMarkOrUndefined(c, "italic"),
-                    strikethrough: trueMarkOrUndefined(c, "strike"),
-                    underlined: trueMarkOrUndefined(c, "underline"),
-                    obfuscated: trueMarkOrUndefined(c, "obfuscated"),
-                    font: c.marks?.at(0)?.attrs?.font || undefined,
-                };
-
-                currentComponent = addTypeSpecificValues(currentComponent, c, false);
-                currentLine.push(currentComponent);
+                currentLine.push(constructComponent(c, false));
             }
 
             data.push(currentLine);
@@ -282,4 +249,37 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
     }
 
     return "[]";
+}
+
+/**
+ * Constructs a component from a given Tiptap JSON content object
+ */
+function constructComponent(content: JSONContent, includeInteractivity: boolean = true) {
+    // Construct basic styled component
+    let currentComponent: MinecraftText = {
+        color: defaultColorLUT(content.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
+        bold: trueMarkOrUndefined(content, "bold"),
+        italic: trueMarkOrUndefined(content, "italic"),
+        strikethrough: trueMarkOrUndefined(content, "strike"),
+        underlined: trueMarkOrUndefined(content, "underline"),
+        obfuscated: trueMarkOrUndefined(content, "obfuscated"),
+        font: content.marks?.find(obj => obj.type == "textStyle")?.attrs?.font || undefined,
+    };
+
+    // Add shadow colour
+    const shadowColorMark = content.marks?.find((m) => m.type === "shadowColor");
+    if (shadowColorMark) {
+        let colorVal: string = shadowColorMark.attrs?.shadowColor.replace(/^#/u, "");
+        if (colorVal && colorVal.length <= 8) {
+            currentComponent.shadow_color = parseInt(
+                rgbaToArgbHex(colorVal.padEnd(8, "FF")).replace(/^#/u, ""),
+                16,
+            );
+        }
+    }
+
+    // Add content values (e.g. text and custom sources) depending on the component type
+    currentComponent = addTypeSpecificValues(currentComponent, content, includeInteractivity);
+
+    return currentComponent
 }

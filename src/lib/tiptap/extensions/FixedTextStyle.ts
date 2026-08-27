@@ -1,3 +1,4 @@
+import { rgbToHex } from "$lib/text/utils";
 import { TextStyle } from "@tiptap/extension-text-style";
 
 export const FixedTextStyle = TextStyle.extend({
@@ -13,15 +14,3 @@ export const FixedTextStyle = TextStyle.extend({
         ];
     },
 });
-
-// Helper function to convert rgb() to hex
-function rgbToHex(rgb: string): string {
-    const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/u.exec(rgb);
-    return result
-        ? "#" +
-              [1, 2, 3]
-                  .map((n) => parseInt(result[n]).toString(16).padStart(2, "0"))
-                  .join("")
-                  .toUpperCase()
-        : rgb;
-}

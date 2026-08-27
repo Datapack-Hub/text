@@ -44,7 +44,7 @@ export function trueMarkOrUndefined(content: JSONContent, mark: string): true | 
     return value ? value : undefined;
 }
 /**
- * A LUT to find the name of a color
+ * A LUT to get the correct color value
  *
  * @param color the hex code
  * @returns the color name
@@ -53,6 +53,9 @@ export function defaultColorLUT(color: string): string | undefined {
     if (!color || color === "null") {
         return;
     }
+
+    color = rgbToHex(color)
+
     return colourMap.find((e) => e.value.toUpperCase() === color)?.name || color;
 }
 
@@ -161,4 +164,19 @@ export function rgbaToArgbHex(rgbaHex: string): string {
 
     // Return with alpha placed at the beginning
     return `#${alpha}${rgb}`;
+}
+
+export function rgbToHex(color: string): string {
+    if (color.startsWith('rgb')) {
+        const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/u.exec(color);
+        return result
+        ? "#" +
+              [1, 2, 3]
+                  .map((n) => parseInt(result[n]).toString(16).padStart(2, "0"))
+                  .join("")
+                  .toUpperCase()
+        : color;
+    } else {
+        return color.toUpperCase()
+    }
 }

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import WelcomeScreen from '../lib/components/WelcomeScreen.svelte';
+
     import { openDataStore } from "$lib/db";
     import { outputVersion } from "$lib/stores";
     import { convert } from "$lib/text/nbt/export";
@@ -36,6 +38,7 @@
     import TopUI from "$lib/components/TopUI.svelte";
     import { onDestroy, onMount } from "svelte";
     import { appSettings } from "$lib/settings";
+    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
 
     let tiptapJSON: JSONContent = $state()!;
 
@@ -49,6 +52,10 @@
     let recentlyCopied = $state(false);
 
     let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
+    
+    let exportSelectionDialog: Modal = $state()!;
+
+    let showWelcomeScreen: boolean = $state(false);  
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -113,6 +120,12 @@
                     placeholder:
                         "Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",
                 }),
+                ExportButtonExtension.configure({
+                    onClick: () => {
+                        exportSelectionDialog.open()
+                    },
+                }),
+
             ],
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
@@ -121,7 +134,7 @@
             onUpdate: ({ editor }) => {
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
-            },
+            }
         });
 
         appSettings.subscribe(() => {
@@ -220,7 +233,7 @@
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col">
-    <TopUI {editor} />
+    <TopUI {editor} bind:welcomeScreenVisible={showWelcomeScreen} />
 
     <ControlBar {editor} />
 
@@ -238,7 +251,7 @@
             <br />
         {/if}
         <div class="bg-zinc-950 p-3">
-            <div class="flex max-h-48 max-w-screen items-start space-x-2 overflow-auto">
+            <div class="flex max-h-32 max-w-screen items-start space-x-2 overflow-auto">
                 <button
                     {@attach tooltip}
                     class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
@@ -378,7 +391,7 @@
                             enabled, please refresh. If that doesn't work, then try a different
                             browser. If that still doesn't work, then ask for help in <a
                                 href="https://discord.datapackhub.net/"
-                                class="font-bold underline">our Discord</a
+                                class="link">our Discord</a
                             ></span>
                     </div>
                 </div>
@@ -387,6 +400,13 @@
     </div>
 </noscript>
 
+<WelcomeScreen bind:visible={showWelcomeScreen} />
+
 {#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />
 {/await}
+
+{#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
+    <modal.default bind:exportSelectionDialog editor={editor!} shouldOptimise={shouldOptimise} />
+{/await}
+

@@ -2,18 +2,28 @@ import { Mark, mergeAttributes } from "@tiptap/core";
 
 export const Obfuscation = Mark.create({
     name: "obfuscated",
+    
     renderHTML({ HTMLAttributes }) {
         return [
             "span",
             mergeAttributes(
                 {
-                    class: "obfuscated",
+                    class: "obfuscated"
                 },
                 HTMLAttributes,
             ),
             0,
         ];
     },
+
+    parseHTML() {
+        return [
+            {
+                tag: "span.obfuscated",
+            },
+        ];
+    },
+
     addOptions() {
         return {
             HTMLAttributes: {},

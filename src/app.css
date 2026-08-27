@@ -54,6 +54,13 @@ strong {
     @apply text-xl;
 }
 
+.tiptap-minirenderer {
+    @apply h-full w-full p-2;
+    @apply focus:outline-none;
+    font-family: Minecraft;
+    @apply text-xl;
+}
+
 .tiptap p.is-editor-empty:first-child::before {
     color: #7f7f7f;
     content: attr(data-placeholder);
@@ -63,20 +70,25 @@ strong {
 }
 
 .clickEvent {
-    background-color: #3c3c40aa;
-    border-bottom: solid #ff5555 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
+    background-color: #45454e80;
+    border: solid #45454e 1px;
+    border-bottom: solid #a868e7 2px;
     z-index: 10;
     --custom-source-align: top;
+    padding-bottom: 1px;
+}
+
+.clickEvent:has(.hoverEvent) {
+    padding-bottom: 3px;
 }
 
 .hoverEvent {
-    background-color: #3c3c40aa;
-    border-bottom: solid #ffff55 2px;
-    padding-top: 4px;
+    background-color: #45454e80;
+    border: solid #45454e 1px;
+    border-bottom: solid #e57e2b 2px;
     z-index: 10;
     --custom-source-align: top;
+    padding-bottom: 1px;
 }
 
 .obfuscated {
@@ -85,6 +97,11 @@ strong {
 
 .obfuscated:not(:hover) {
     filter: blur(3px);
+}
+
+.export-button {
+    @apply items-center p-1 px-1.5 bg-zinc-900 text-zinc-200 hover:text-white rounded-md font-lexend text-xs h-6;
+    @apply w-0 invisible sm:w-fit sm:visible; /* hide on mobile */
 }
 
 /* Useful */
@@ -101,6 +118,14 @@ strong {
 
 .toolbar-btn {
     @apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
+}
+
+.input-basic {
+    @apply rounded-md bg-zinc-900 p-2;
+}
+
+.link {
+    @apply font-bold underline;
 }
 
 .tippy-box[data-theme~="dph"] {

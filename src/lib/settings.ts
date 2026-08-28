@@ -7,7 +7,6 @@ export type Settings = {
     realisticLineHeight: boolean; // whether to use smaller line height
     hideSelectionExport: boolean; // whether to hide the export this button
     fontSize: number; // 0 = small, 1 = default, 2 = large
-    mode: "normal" | "book";
 };
 
 function createPersistentStore(key: string, startValue: any) {
@@ -35,6 +34,5 @@ export const appSettings: Writable<Settings> = createPersistentStore("settings",
     syntaxHighlight: true,
     realisticLineHeight: false,
     hideSelectionExport: true,
-    fontSize: 1,
-    mode: "book",
+    fontSize: 1
 });

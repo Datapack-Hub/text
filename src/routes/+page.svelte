@@ -85,6 +85,11 @@
         editor = new Editor({
             element: element,
             content: tiptapJSON,
+            editorProps: {
+                attributes: {
+                    class: "tiptap-base",
+                },
+            },
             extensions: [
                 StarterKit.configure({
                     blockquote: false,
@@ -156,17 +161,6 @@
 
             let fontSize = 1 + 0.25 * $appSettings.fontSize;
             el.style.fontSize = fontSize.toString() + "rem";
-            if ($appSettings.mode === "book") {
-                el.style.width = 11.5 + 2.3 * $appSettings.fontSize + "rem";
-                el.style.borderRight = "1px solid #676767";
-                el.style.backgroundColor = "#fdf8ed";
-                el.style.color = "#000000";
-            } else {
-                el.style.width = "100%";
-                el.style.borderRight = "none";
-                el.style.backgroundColor = "";
-                el.style.color = "";
-            }
         });
     });
 
@@ -315,14 +309,10 @@
                     {#if $appSettings.syntaxHighlight}
                         <Highlight
                             language={typescript}
-                            code={$appSettings.mode === "book"
-                                ? `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`
-                                : finalOutput} />
+                            code={finalOutput} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? $appSettings.mode === "book"
-                                    ? `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`
-                                    : finalOutput
+                                ? finalOutput
                                 : "Loading..."}</pre>
                     {/if}
                 </code>

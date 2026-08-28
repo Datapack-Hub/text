@@ -67,19 +67,5 @@
                     >This alters the font size in the editor, but not the output.</span>
             </label>
         </div>
-        <div class="flex items-center space-x-2">
-            <select
-                name="editorMode"
-                bind:value={$appSettings.mode}
-                class="rounded-md bg-zinc-900 p-2">
-                <option value="normal">Normal</option>
-                <option value="book">Book</option>
-            </select>
-            <label for="editorMode" class="flex flex-col">
-                <span>Editor mode (BETA)</span>
-                <span class="text-xs text-zinc-500"
-                    >This alters the limits of the editor to support features such as book editing.</span>
-            </label>
-        </div>
     </div>
 </Modal>

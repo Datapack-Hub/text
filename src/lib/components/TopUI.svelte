@@ -12,6 +12,7 @@
 
     let snapshots = $state<object[]>([]);
     let importText: string = $state("");
+    let importAppend: boolean = $state(false)
 
     let loadDialog: Modal = $state()!;
     let importDialog: Modal = $state()!;
@@ -25,12 +26,6 @@
             localStorage.setItem("snapshots", "[]");
         }
     });
-
-    function importToEditor() {
-        const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
-        editor?.commands.setContent(jsonContent, { emitUpdate: true });
-        importDialog?.close();
-    }
 </script>
 
 <div class="flex w-full items-center bg-zinc-950 text-sm text-zinc-300" style="font-family: Lexend">
@@ -76,7 +71,7 @@
 {/await}
 
 {#await import("$lib/components/modals/topbar/ImportModal.svelte") then modal}
-    <modal.default bind:importDialog bind:importText {importToEditor} />
+    <modal.default bind:importDialog {editor} />
 {/await}
 
 {#await import("$lib/components/modals/topbar/SettingsModal.svelte") then modal}

@@ -95,6 +95,10 @@
         <!-- big screens -->
         <div class="w-239 h-0"></div>
         <div class="space-y-2">
+            <div class="flex items-center space-x-2">
+                <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = true)}>Expand All</button>
+                <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = false)}>Collapse All</button>
+            </div>
             {#each sections as sect}
             <div class="flex flex-col space-y-1">
                 <button class="flex items-center space-x-2 w-fit" onclick={() => sect.open = !sect.open}>

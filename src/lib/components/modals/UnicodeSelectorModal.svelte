@@ -3,6 +3,7 @@
     import { Editor } from "@tiptap/core";
     import IconRight from "~icons/tabler/chevron-right"
     import IconDown from "~icons/tabler/chevron-down"
+    import CheckBox from "../CheckBox.svelte";
 
     // prettier-ignore
     // const chars = ["¶","×","Ø","Þ","÷","ø","þ","…","™","►","•","♦","≈","❛","∘","∙","✿","⚈","∆","∇","≡","≣","≪","≫","⋘","⋙","‡","₪","۩","۞","⌗","⌘","∅","∏","∑","√","∞","〰","〽","╱","╲","╳","᜵","᜶","ᚋ","ᚌ","ᚍ","ᚎ","ᚏ","⊏","⊐","⊓","⊔","⊕","⊖","⊗","⊘","⊙","⊞","⊟","⊠","⊡","╭","╮","╰","╯","←","↑","→","↓","↔","↕","↖","↗","↘","↙","↩","↪","▶","◀","⤴","⤵","⇐","⇑","⇒","⇓","⇔","⇕","⇦","⇧","⇨","⇩","➡","⬅","⬆","⬇","☚","☛","☜","☝","☞","☟","∎","▁","▂","▃","▄","▅","▆","▇","█","▉","▊","▋","▌","▍","▎","▏","▐","░","▒","▓","▚","▞","■","□","▢","▣","▤","▥","▦","◧","◨","◩","◪","▲","△","▶","▷","◆","◇","◊","○","◌","●","◐","◑","◒","◓","◔","◕","◢","◣","◤","◥","★","☆","⭐","◻","◼","◽","◾","⚪","⚫","✳","✴","❇","፠","።","፧","፨","⁂","⁑","⁎","ᐁ","ᐃ","ᐅ","ᐊ","ᑌ","ᑎ","ᑐ","ᑕ","ᒣ","ᒥ","ᒧ","ᒪ","⬖","⬗","⬘","⬙","⬚","⬛","⬜","⬝","⬞","⬟","⬠","⬡","⬢","⬣","⬤","⬥","⬦","⬧","⬨","─","│","┅","┇","┌","┐","└","┘","├","┤","┬","┴","┼","═","║","╔","╗","╚","╝","╠","╣","╧","╩","╬","⓪","①","②","③","④","⑤","⑥","⑦","⑧","⑨","⑩","⑪","⑫","⑬","⑭","⑮","⑯","⑰","⑱","⑲","⑳","⓿","❶","❷","❸","❹","❺","❻","❼","❽","❾","❿","⓫","⓬","⓭","⓮","⓯","⓰","⓱","⓲","⓳","⓴","⓵","⓶","⓷","⓸","⓹","⓺","⓻","⓼","⓽","⓾","☐","☑","☒","⚐","⚑","♠","♣","♥","♦","✔","✖","❤","©","®","‼","⁉","™","Ⓜ","♻","⚠","⚡","☠","☢","☮","☯","☺","☻","☹","♀","♂","♩","♪","♫","♬","⚀","⚁","⚂","⚃","⚄","⚅","☀","☁","☂","☔","☃","☼","☽","☾","❄","⌚","⌛","☎","✂","✉","✎","✏","✒","♿","⚓","✈","✌","☕","♨","☺","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
@@ -80,6 +81,8 @@
         }
     ])
 
+    let show_bold = $state(false)
+
     let {
         unicodeSelectorDialog = $bindable(),
         editor,
@@ -96,6 +99,10 @@
         <div class="w-239 h-0"></div>
         <div class="space-y-2">
             <div class="flex items-center space-x-2">
+                <div class="mr-3 flex items-center text-sm space-x-2">
+                    <CheckBox bind:value={show_bold} label="bold" />
+                    <label for="bold">Show bold symbols</label>
+                </div>
                 <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = true)}>Expand All</button>
                 <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = false)}>Collapse All</button>
             </div>
@@ -109,7 +116,7 @@
                 <div class="grid grid-flow-dense grid-cols-8 sm:grid-cols-12 md:grid-cols-17 lg:grid-cols-20 xl:grid-cols-24 gap-1 w-fit">
                     {#each sect.chars as char}
                         <button
-                            class="grid place-items-center m-auto font-minecraft aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl hover:text-white text-zinc-300"
+                            class="grid place-items-center m-auto {show_bold ? "font-minecraft-bold" : "font-minecraft"} aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl hover:text-white text-zinc-300"
                             onclick={() => editor.chain().focus().insertContent(char!).run()}>
                             <span class="translate-x-px">{char}</span>
                         </button>

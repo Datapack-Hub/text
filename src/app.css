@@ -19,6 +19,7 @@
 @theme {
     --font-lexend: Lexend, sans-serif;
     --font-minecraft: Minecraft, sans-serif;
+    --font-minecraft-bold: MinecraftBold, sans-serif;
 }
 
 button {

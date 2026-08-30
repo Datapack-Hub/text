@@ -106,7 +106,7 @@
                     <span class="font-bold">{sect.name}</span>
                 </button>
                 {#if sect.open}
-                <div class="grid grid-flow-dense grid-cols-8 md:grid-cols-17 xl:grid-cols-24 gap-1 w-fit">
+                <div class="grid grid-flow-dense grid-cols-8 sm:grid-cols-12 md:grid-cols-17 lg:grid-cols-20 xl:grid-cols-24 gap-1 w-fit">
                     {#each sect.chars as char}
                         <button
                             class="grid place-items-center m-auto font-minecraft aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl hover:text-white text-zinc-300"

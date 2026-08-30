@@ -94,7 +94,7 @@
 
 <Modal title="Insert Special Character" bind:this={unicodeSelectorDialog} key="U" flexible>
     <div class="flex flex-col">
-        <p class="text-sm mb-2 text-zinc-400 max-w-239">In Minecraft, these special Unicode characters display in the pixely Minecraft font, and can be used to spice up text without needing a custom font. Source: <a class="underline hover:text-zinc-300" href="https://gist.github.com/tarkodev/ec3604b007e543d2f9e596f4e1d63d9c" target="_blank">tarkodev on GitHub</a>.</p>
+        <p class="text-sm mb-2 text-zinc-400 max-w-239">In Minecraft, these special Unicode characters display in the pixely Minecraft font, and can be used to spice up text without needing a custom font. Source: <a class="link" href="https://gist.github.com/tarkodev/ec3604b007e543d2f9e596f4e1d63d9c" target="_blank">tarkodev on GitHub</a>.</p>
         <!-- big screens -->
         <div class="w-239 h-0"></div>
         <div class="space-y-2">

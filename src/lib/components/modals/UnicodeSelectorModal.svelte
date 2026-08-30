@@ -91,7 +91,7 @@
 
 <Modal title="Insert Special Character" bind:this={unicodeSelectorDialog} key="U" flexible>
     <div class="flex flex-col">
-        <p class="text-sm mb-2 text-zinc-400 max-w-239">In Minecraft, thse special Unicode characters display in the pixely Minecraft font, and can be used to spice up text without needing a custom font.</p>
+        <p class="text-sm mb-2 text-zinc-400 max-w-239">In Minecraft, these special Unicode characters display in the pixely Minecraft font, and can be used to spice up text without needing a custom font. Source: <a class="underline hover:text-zinc-300" href="https://gist.github.com/tarkodev/ec3604b007e543d2f9e596f4e1d63d9c" target="_blank">tarkodev on GitHub</a>.</p>
         <!-- big screens -->
         <div class="w-239 h-0"></div>
         <div class="space-y-2">
@@ -106,7 +106,7 @@
                     <span class="font-bold">{sect.name}</span>
                 </button>
                 {#if sect.open}
-                <div class="hidden grid-flow-dense grid-cols-24 gap-1 xl:grid w-fit">
+                <div class="grid grid-flow-dense grid-cols-8 md:grid-cols-17 xl:grid-cols-24 gap-1 w-fit">
                     {#each sect.chars as char}
                         <button
                             class="grid place-items-center m-auto font-minecraft aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl hover:text-white text-zinc-300"

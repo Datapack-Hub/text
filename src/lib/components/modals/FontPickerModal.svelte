@@ -99,7 +99,7 @@
         <p class="my-2">Or, if you want to use a custom font without importing it, enter the ID:</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="namespace:id"
             bind:value={fontName} />
 

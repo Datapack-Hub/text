@@ -96,7 +96,7 @@
         <p>
             Enter font identifier <span class="font-mono text-white/60">(namespace:font_name)</span>
         </p>
-        <input type="text" class="rounded-md bg-zinc-900 p-2" bind:value={identifier} />
+        <input type="text" class="input-basic" bind:value={identifier} />
         <button onclick={addToFontLUT} class="btn"> Add font </button>
     {/if}
 </Modal>

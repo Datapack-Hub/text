@@ -122,7 +122,7 @@
             {/if}
         </div>
     {:else}
-        <select bind:value={customType} class="rounded-md bg-zinc-900 p-2">
+        <select bind:value={customType} class="input-basic">
             <option value="translate">Translate Key</option>
             <option value="score">Score Value</option>
             <option value="nbt">NBT Value</option>
@@ -136,14 +136,14 @@
         <p class="mt-2">Translate Key</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="item.minecraft.beef"
             bind:value={customValues.translate.key} />
 
         <p class="mt-2">Fallback</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="This text is shown if the key does not exist"
             bind:value={customValues.translate.fallback} />
 
@@ -198,13 +198,13 @@
         <p class="mt-2">Objective</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="money"
             bind:value={customValues.score.objective} />
         <p class="mt-2">Player, Fake Player, or Entity</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="@s"
             bind:value={customValues.score.name} />
 
@@ -225,7 +225,7 @@
         </button>
     {:else if customType === "nbt"}
         <p class="mt-2">NBT Source type</p>
-        <select bind:value={customValues.nbt.sourceType} class="rounded-md bg-zinc-900 p-2">
+        <select bind:value={customValues.nbt.sourceType} class="input-basic">
             <option value="storage">Storage</option>
             <option value="block">Block</option>
             <option value="entity">Entity</option>
@@ -234,14 +234,14 @@
             <p class="mt-2">Storage ID</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="example:storage"
                 bind:value={customValues.nbt.storage} />
 
             <p class="mt-2">NBT path</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="Items[0].id"
                 bind:value={customValues.nbt.path} />
 
@@ -270,14 +270,14 @@
             <p class="mt-2">Entity</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="@e[type=villager,limit=1,sort=nearest]"
                 bind:value={customValues.nbt.entity} />
 
             <p class="mt-2">NBT path</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="Items[0].id"
                 bind:value={customValues.nbt.path} />
 
@@ -306,14 +306,14 @@
             <p class="mt-2">Block</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="~ ~ ~"
                 bind:value={customValues.nbt.block} />
 
             <p class="mt-2">NBT path</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 placeholder="Items[0].id"
                 bind:value={customValues.nbt.path} />
 
@@ -343,7 +343,7 @@
         <p class="mt-2">Keybind</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="key.jump"
             bind:value={customValues.keybind.key} />
         <button
@@ -358,7 +358,7 @@
         <p class="mt-2">Selector</p>
         <input
             type="text"
-            class="rounded-md bg-zinc-900 p-2"
+            class="input-basic"
             placeholder="@p[tag=something]"
             bind:value={customValues.selector.selector} />
         <button
@@ -375,7 +375,7 @@
         </button>
     {:else if customType === "object"}
         <p class="mt-2">Object Type</p>
-        <select bind:value={customValues.object.object} class="rounded-md bg-zinc-900 p-2">
+        <select bind:value={customValues.object.object} class="input-basic">
             <option value="atlas">Atlas (sprite)</option>
             <option value="player">Player Head</option>
         </select>
@@ -393,7 +393,7 @@
             <p class="mt-2">Sprite</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 bind:value={customValues.object.sprite} />
 
             <button
@@ -415,7 +415,7 @@
             <p class="mt-2">Username</p>
             <input
                 type="text"
-                class="rounded-md bg-zinc-900 p-2"
+                class="input-basic"
                 bind:value={customValues.object.player.name} />
 
             <div class="mt-2 flex items-center space-x-2">

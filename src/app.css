@@ -64,8 +64,8 @@ strong {
     background-size: cover;
     image-rendering: pixelated;
     aspect-ratio: 73 / 90;
-    font-size: 1.75rem;
-    line-height: 1.4rem;
+    font-size: 1.75rem !important;
+    line-height: 1.4rem !important;
 }
 
 .page-preview {
@@ -141,6 +141,14 @@ strong {
 
 .toolbar-btn {
     @apply rounded-md p-1 text-lg font-medium hover:bg-white/3;
+}
+
+.input-basic {
+    @apply rounded-md bg-zinc-900 p-2;
+}
+
+.link {
+    @apply font-bold underline;
 }
 
 .tippy-box[data-theme~="dph"] {

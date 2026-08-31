@@ -1,7 +1,15 @@
+import { welcomeScreenFormat } from "$lib/globals";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/");
+    await page.waitForLoadState();
+
+    await page.evaluate((format) => {
+        localStorage.setItem('hasSeenWelcome', format); 
+    }, welcomeScreenFormat);
+
+    await page.reload();
 });
 
 test("home page loads", async ({ page }) => {

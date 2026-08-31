@@ -1,12 +1,15 @@
 <script lang="ts">
+    import { page } from "$app/state";
+    import Modal from "$lib/components/Modal.svelte";
+    import BookMiniRenderer from "$lib/components/text/BookMiniRenderer.svelte";
+    import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
+    import TopUI from "$lib/components/TopUI.svelte";
+    import WelcomeScreen from "$lib/components/WelcomeScreen.svelte";
     import { openDataStore } from "$lib/db";
+    import { appSettings } from "$lib/settings";
     import { outputVersion } from "$lib/stores";
     import { convert } from "$lib/text/nbt/export";
-    import { tooltip } from "$lib/tooltip";
-    import { versions, type Version } from "$lib/types";
-    import Modal from "$lib/components/Modal.svelte";
-    import { Highlight } from "svelte-highlight";
-    import typescript from "svelte-highlight/languages/typescript";
+    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
     import {
         AtlasObjectNode,
@@ -25,20 +28,21 @@
         StorageNBTNode,
         TranslateNode,
     } from "$lib/tiptap/extensions/index";
+    import { tooltip } from "$lib/tooltip";
+    import { versions, type Version } from "$lib/types";
     import { Editor, type JSONContent } from "@tiptap/core";
     import Color from "@tiptap/extension-color";
     import Placeholder from "@tiptap/extension-placeholder";
     import StarterKit from "@tiptap/starter-kit";
+    import { onDestroy, onMount } from "svelte";
+    import { Highlight } from "svelte-highlight";
+    import typescript from "svelte-highlight/languages/typescript";
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
-    import { page } from "$app/state";
-    import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
-    import TopUI from "$lib/components/TopUI.svelte";
-    import { onDestroy, onMount } from "svelte";
-    import { appSettings } from "$lib/settings";
-    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
 
-    let tiptapJSON: JSONContent = $state()!;
+    let currentTiptapJSON: JSONContent = $state()!;
+    let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
+    let currentPageIndex: number = $state(0);
 
     let element: HTMLElement = $state()!;
     let editor: Editor | undefined = $state()!;
@@ -49,16 +53,19 @@
     let shouldOptimise = $state(true);
     let recentlyCopied = $state(false);
 
-    let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
-    let pageOutputs = $derived(editor ? calculateBookOutput(editor) : [["Loading..."]]);
+    let finalOutput = $derived(editor ? convert(currentTiptapJSON, shouldOptimise) : "Loading...");
 
     let exportSelectionDialog: Modal = $state()!;
+    let versionPopupConfirmationVisible = $state(false);
+    let temporaryVersionConfirmation: Version | undefined = $state();
+
+    let welcomeScreenVisible = $state(false);
 
     async function loadData() {
         if (localStorage.getItem("content")) {
-            tiptapJSON = JSON.parse(localStorage.getItem("content")!);
+            currentTiptapJSON = JSON.parse(localStorage.getItem("content")!);
         } else {
-            tiptapJSON = [];
+            currentTiptapJSON = [];
             localStorage.setItem("content", "[]");
         }
 
@@ -84,7 +91,7 @@
 
         editor = new Editor({
             element: element,
-            content: tiptapJSON,
+            content: currentTiptapJSON,
             editorProps: {
                 attributes: {
                     class: "tiptap-book",
@@ -133,12 +140,11 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
-                console.log(
-                    "pageOutputs",
-                    `[written_book_content={pages:[${pageOutputs}],title:"Your Title Here",author:"You"}]`,
-                );
-                pageOutputs = calculateBookOutput(editor);
-                tiptapJSON = editor.getJSON();
+                currentTiptapJSON = editor.getJSON();
+                pageJSONs[currentPageIndex] = currentTiptapJSON;
+                console.log("Current page index:", currentPageIndex);
+                console.log("Current page JSON:", currentTiptapJSON);
+                console.log("All page JSONs:", pageJSONs);
                 debounce(saveContent, 1000)();
             },
         });
@@ -170,32 +176,6 @@
             : event.ctrlKey;
     }
 
-    function calculateBookOutput(edit: Editor): string[][] {
-        const el = edit.view.dom;
-
-        // TODO: actually fill with content
-        const splitPages: JSONContent[][] = [[]];
-        const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14;
-        let currentHeight = 0;
-        let currentPage = 0;
-
-        for (let i = 0; i < el.children.length; i++) {
-            const child = el.children[i];
-            const metrics = child.getBoundingClientRect();
-            currentHeight += metrics.height;
-            splitPages[currentPage].push(edit.getJSON().content[i]);
-            if (currentHeight > maxHeight) {
-                currentHeight = 0;
-                splitPages.push([]);
-                currentPage++;
-            }
-        }
-
-        return splitPages
-            .filter((page) => page.length > 0)
-            .map((page) => [convert({ type: "doc", content: page }, shouldOptimise)]);
-    }
-
     function clearMarksHandler(event: KeyboardEvent) {
         if (modifierPressed(event) && event.shiftKey && event.key === "X") {
             editor!.commands.unsetAllMarks();
@@ -214,11 +194,8 @@
         });
 
         editor?.commands.setContent(editorJson);
-        tiptapJSON = editorJson;
+        currentTiptapJSON = editorJson;
     }
-
-    let versionPopupConfirmationVisible = $state(false);
-    let temporaryVersionConfirmation: Version | undefined = $state();
 
     function updateOutputVersion(version: Version | undefined, confirm = false) {
         if (!version) {
@@ -242,39 +219,55 @@
             removeAllNodes("player_object");
         }
 
-        tiptapJSON = editor!.getJSON();
+        currentTiptapJSON = editor!.getJSON();
+    }
+
+    function pageKeyDownHandler(event: KeyboardEvent, index: number) {
+        if (event.key === "Enter" || event.key === " ") {
+            currentPageIndex = index;
+            editor?.commands.setContent(pageJSONs[index]);
+        }
     }
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col items-center">
-    <TopUI {editor} />
+    <TopUI {editor} {welcomeScreenVisible} />
 
     <ControlBar {editor} />
 
     <!-- input box(es) -->
     <div class="flex h-full w-full">
         <div id="page-box" class="w-80 p-4">
-            <div class="page-preview w-64">
-                <div class="font-minecraft w-54 pt-6 pl-8 wrap-break-word text-lg leading-none">
-                    <!--TODO: make preview-->
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
-                    <p>xxxxxxxxxxxxxxxxxxxx</p>
+            {#each pageJSONs as page, index}
+                <div class="w-56">
+                    <p class="text-center">Page {index + 1}</p>
+                    <div
+                        role="button"
+                        tabindex="0"
+                        onkeydown={(event) => pageKeyDownHandler(event, index)}
+                        onclick={() => {
+                            currentPageIndex = index;
+                            editor?.commands.setContent(pageJSONs[index]);
+                        }}
+                        class="page-preview">
+                        <div class="font-minecraft w-54 pl-8 pt-12 leading-3.5 wrap-break-word">
+                            <BookMiniRenderer value={page} />
+                        </div>
+                    </div>
                 </div>
-            </div>
+            {/each}
+            <button
+                onclick={() => {
+                    pageJSONs.push({
+                        type: "doc",
+                        content: [],
+                    });
+                }}
+                class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
+                Add Page
+            </button>
         </div>
         <div
             class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
@@ -288,7 +281,9 @@
     <div>
         {#if page.url.searchParams.has("dev")}
             <code class="inline-block overflow-x-scroll p-3 text-xs"
-                >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
+                >DEV ONLY: {currentTiptapJSON
+                    ? JSON.stringify(currentTiptapJSON)
+                    : "Loading..."}</code>
             <br />
         {/if}
         <div class="w-screen bg-zinc-950 p-3">
@@ -312,10 +307,10 @@
                     {#if $appSettings.syntaxHighlight}
                         <Highlight
                             language={typescript}
-                            code={`[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`} />
+                            code={`[written_book_content={pages:[${pageJSONs.map(j => convert(j, shouldOptimise))}],title:"Hello World",author:"Datapack Hub"}]`} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? `[written_book_content={pages:[${pageOutputs}],title:"Hello World",author:"Datapack Hub"}]`
+                                ? `[written_book_content={pages:[${pageJSONs.map(j => convert(j, shouldOptimise))}],title:"Hello World",author:"Datapack Hub"}]`
                                 : "Loading..."}</pre>
                     {/if}
                 </code>
@@ -410,6 +405,8 @@
         </div>
     </div>
 </main>
+
+<WelcomeScreen bind:visible={welcomeScreenVisible} />
 
 <noscript>
     <div class="absolute">

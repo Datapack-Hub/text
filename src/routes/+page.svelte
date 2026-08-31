@@ -1,12 +1,15 @@
 <script lang="ts">
+  import WelcomeScreen from '../lib/components/WelcomeScreen.svelte';
+
+    import { page } from "$app/state";
+    import Modal from "$lib/components/Modal.svelte";
+    import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
+    import TopUI from "$lib/components/TopUI.svelte";
     import { openDataStore } from "$lib/db";
+    import { appSettings } from "$lib/settings";
     import { outputVersion } from "$lib/stores";
     import { convert } from "$lib/text/nbt/export";
-    import { tooltip } from "$lib/tooltip";
-    import { versions, type Version } from "$lib/types";
-    import Modal from "$lib/components/Modal.svelte";
-    import { Highlight } from "svelte-highlight";
-    import typescript from "svelte-highlight/languages/typescript";
+    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
     import {
         AtlasObjectNode,
@@ -25,18 +28,17 @@
         StorageNBTNode,
         TranslateNode,
     } from "$lib/tiptap/extensions/index";
+    import { tooltip } from "$lib/tooltip";
+    import { versions, type Version } from "$lib/types";
     import { Editor, type JSONContent } from "@tiptap/core";
     import Color from "@tiptap/extension-color";
     import Placeholder from "@tiptap/extension-placeholder";
     import StarterKit from "@tiptap/starter-kit";
+    import { onDestroy, onMount } from "svelte";
+    import { Highlight } from "svelte-highlight";
+    import typescript from "svelte-highlight/languages/typescript";
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
-    import { page } from "$app/state";
-    import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
-    import TopUI from "$lib/components/TopUI.svelte";
-    import { onDestroy, onMount } from "svelte";
-    import { appSettings } from "$lib/settings";
-    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
 
     let tiptapJSON: JSONContent = $state()!;
 
@@ -53,6 +55,8 @@
     let pageOutputs = $derived(editor ? calculateBookOutput(editor) : [["Loading..."]]);
 
     let exportSelectionDialog: Modal = $state()!;
+
+    let showWelcomeScreen: boolean = $state(false);  
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -81,6 +85,11 @@
 
     onMount(async () => {
         await loadData();
+
+        // @ts-expect-error too lazy to define the global for this one function
+        window.dphDebugWriteJsonContent = (c: JSONContent) => {
+            editor?.commands.setContent(c);
+        };
 
         editor = new Editor({
             element: element,
@@ -268,8 +277,8 @@
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<main class="flex h-screen max-h-screen flex-col items-center">
-    <TopUI {editor} />
+<main class="flex h-screen max-h-screen flex-col">
+    <TopUI {editor} bind:welcomeScreenVisible={showWelcomeScreen} />
 
     <ControlBar {editor} />
 
@@ -431,7 +440,7 @@
                             enabled, please refresh. If that doesn't work, then try a different
                             browser. If that still doesn't work, then ask for help in <a
                                 href="https://discord.datapackhub.net/"
-                                class="font-bold underline">our Discord</a
+                                class="link">our Discord</a
                             ></span>
                     </div>
                 </div>
@@ -440,6 +449,8 @@
     </div>
 </noscript>
 
+<WelcomeScreen bind:visible={showWelcomeScreen} />
+
 {#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />
 {/await}
@@ -447,3 +458,4 @@
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
 {/await}
+

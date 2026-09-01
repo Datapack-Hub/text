@@ -64,7 +64,7 @@ strong {
 
 .tiptap-book {
     @apply h-115 w-94 px-12 pt-20 text-black;
-    background-image: url("./book.png");
+    background-image: url("/book.png");
     background-repeat: no-repeat;
     background-size: cover;
     image-rendering: pixelated;
@@ -74,7 +74,7 @@ strong {
 }
 
 .page-preview {
-    background-image: url("./book.png");
+    background-image: url("/book.png");
     background-repeat: no-repeat;
     background-size: cover;
     image-rendering: pixelated;

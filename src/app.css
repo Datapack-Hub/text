@@ -19,6 +19,7 @@
 @theme {
     --font-lexend: Lexend, sans-serif;
     --font-minecraft: Minecraft, sans-serif;
+    --font-minecraft-bold: MinecraftBold, sans-serif;
 }
 
 button {
@@ -129,7 +130,7 @@ strong {
 }
 
 .link {
-    @apply font-bold underline;
+    @apply font-bold underline hover:brightness-125;
 }
 
 .tippy-box[data-theme~="dph"] {

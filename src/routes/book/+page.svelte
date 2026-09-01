@@ -255,12 +255,12 @@
     <ControlBar {editor} />
 
     <!-- input box(es) -->
-    <div class="flex h-full w-full">
+    <div class="h-0  grow flex w-full">
         <div
             id="page-box"
-            class="flex h-[calc(100vh-13rem)] w-80 flex-col items-center gap-4 overflow-y-scroll p-4">
+            class="flex h-full min-h-0 max-h-full w-80 flex-col items-center gap-4 overflow-y-auto p-4">
             {#each pageJSONs as page, index}
-                <div class="w-56">
+                <div class="w-full">
                     <p class="text-center">Page {index + 1}</p>
                     <div
                         role="button"
@@ -303,8 +303,8 @@
                 <div class="h-px w-full bg-zinc-500"></div>
             {/each}
         </div>
-        <div class="w-full grow bg-zinc-800">
-            <div class="book-img">
+        <div class="w-full h-full grow bg-zinc-800">
+            <div class="book-img m-3">
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
                     spellcheck="false"

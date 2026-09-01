@@ -41,6 +41,7 @@
     import IconCopy from "~icons/tabler/copy";
     import IconAdd from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
+    import IconBook from "~icons/tabler/book";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -61,6 +62,9 @@
     let temporaryVersionConfirmation: Version | undefined = $state();
 
     let welcomeScreenVisible = $state(false);
+
+    let title = $state("Title");
+    let author = $state("Author");
 
     async function loadData() {
         if (localStorage.getItem("book_content")) {
@@ -302,6 +306,9 @@
             id="wysiwyg-box"
             bind:this={element}>
         </div>
+        <div class="bg-zinc-800 p-2">
+            <button {@attach tooltip} aria-label="Book Details" onclick={() => bookDetailsDialog?.open()} class="btn"><IconBook/></button>
+        </div>
     </div>
 
     <!-- output box(es) -->
@@ -320,7 +327,7 @@
                     class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
                     onclick={() => {
                         navigator.clipboard.writeText(
-                            `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`,
+                            `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`,
                         );
                         recentlyCopied = true;
                         setTimeout(() => (recentlyCopied = false), 2000);
@@ -336,10 +343,10 @@
                     {#if $appSettings.syntaxHighlight}
                         <Highlight
                             language={typescript}
-                            code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`} />
+                            code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`
+                                ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`
                                 : "Loading..."}</pre>
                     {/if}
                 </code>
@@ -420,7 +427,7 @@
 
                     <p class="font-lexend nomob text-xs text-white/60">
                         <!-- TODO: account for title and author -->
-                        {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length + 25} characters
+                        {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length + title.length + author.length} characters
                     </p>
                 {/if}
             </div>
@@ -467,5 +474,5 @@
 {/await}
 
 {#await import("$lib/components/modals/BookDetailsModal.svelte") then modal}
-    <modal.default bind:bookDetailsDialog />
+    <modal.default bind:bookDetailsDialog bind:title bind:author />
 {/await}

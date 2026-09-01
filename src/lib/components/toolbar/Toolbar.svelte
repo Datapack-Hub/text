@@ -1,27 +1,26 @@
 <script lang="ts">
+    import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
+    import { tooltip } from "$lib/tooltip";
     import type { Editor } from "@tiptap/core";
+    import ColorPicker from "svelte-awesome-color-picker";
     import IconUndo from "~icons/tabler/arrow-back-up";
     import IconRedo from "~icons/tabler/arrow-forward-up";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconFont from "~icons/tabler/function";
-    import IconUploadFont from "~icons/tabler/function-filled";
     import IconClickEvent from "~icons/tabler/hand-finger";
     import IconKeybinds from "~icons/tabler/keyboard";
     import IconEmoji from "~icons/tabler/mood-smile-beam";
     import IconColor from "~icons/tabler/palette";
     import IconEdit from "~icons/tabler/pencil";
+    import IconUploadImage from "~icons/tabler/photo-scan";
     import IconCustom from "~icons/tabler/plus";
     import IconHoverEvent from "~icons/tabler/pointer";
     import IconSquare from "~icons/tabler/square-filled";
     import IconHollow from "~icons/tabler/square-x";
-    import IconUploadImage from "~icons/tabler/photo-scan";
     import Modal from "../Modal.svelte";
+    import MiniEditor from "../text/MiniEditor.svelte";
     import TextStyleButtons from "./TextStyleButtons.svelte";
     import ToolbarButton from "./ToolbarButton.svelte";
-    import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
-    import { tooltip } from "$lib/tooltip";
-    import MiniEditor from "../text/MiniEditor.svelte";
-    import ColorPicker from "svelte-awesome-color-picker";
 
     const { editor }: { editor: Editor | undefined } = $props();
 

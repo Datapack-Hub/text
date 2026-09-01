@@ -1,6 +1,5 @@
 <script lang="ts">
-    import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
-    import type { Editor } from "@tiptap/core";
+    import type { Editor, JSONContent } from "@tiptap/core";
     import { onMount } from "svelte";
     import Modal from "./Modal.svelte";
 
@@ -8,11 +7,16 @@
     import IconUpload from "~icons/tabler/upload";
     import IconSettings from "~icons/tabler/settings";
 
-    let { editor, welcomeScreenVisible = $bindable() }: { editor: Editor | undefined, welcomeScreenVisible: boolean } = $props();
+    interface Props {
+        editor?: Editor;
+        welcomeScreenVisible?: boolean;
+        pages?: JSONContent[];
+        pageIndex?: number;
+    }
+
+    let { editor, welcomeScreenVisible = $bindable(), pages = $bindable(), pageIndex = $bindable() }: Props = $props();
 
     let snapshots = $state<object[]>([]);
-    let importText: string = $state("");
-    let importAppend: boolean = $state(false)
 
     let loadDialog: Modal = $state()!;
     let importDialog: Modal = $state()!;
@@ -39,10 +43,6 @@
         <IconUpload class="text-xs" />
         <span>Import</span>
     </button>
-    <!-- {#if doesContentExist}
-        <button class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3" onclick={outputDialog?.open}
-            >Export</button>
-    {/if} -->
     <button
         class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
         onclick={loadDialog?.open}>
@@ -71,7 +71,7 @@
 {/await}
 
 {#await import("$lib/components/modals/topbar/ImportModal.svelte") then modal}
-    <modal.default bind:importDialog {editor} />
+    <modal.default bind:importDialog bind:pages bind:pageIndex {editor} />
 {/await}
 
 {#await import("$lib/components/modals/topbar/SettingsModal.svelte") then modal}

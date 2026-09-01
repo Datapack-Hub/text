@@ -39,6 +39,8 @@
     import typescript from "svelte-highlight/languages/typescript";
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
+    import IconAdd from "~icons/tabler/plus";
+    import IconDelete from "~icons/tabler/trash";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -47,13 +49,10 @@
     let element: HTMLElement = $state()!;
     let editor: Editor | undefined = $state()!;
 
-    let outputDialog: Modal = $state()!;
     let versionPopup: boolean = $state(false);
 
     let shouldOptimise = $state(true);
     let recentlyCopied = $state(false);
-
-    let finalOutput = $derived(editor ? convert(currentTiptapJSON, shouldOptimise) : "Loading...");
 
     let exportSelectionDialog: Modal = $state()!;
     let versionPopupConfirmationVisible = $state(false);
@@ -62,11 +61,18 @@
     let welcomeScreenVisible = $state(false);
 
     async function loadData() {
-        if (localStorage.getItem("content")) {
-            currentTiptapJSON = JSON.parse(localStorage.getItem("content")!);
+        if (localStorage.getItem("book_content")) {
+            pageJSONs = JSON.parse(localStorage.getItem("book_content")!);
+            currentTiptapJSON = pageJSONs[0];
         } else {
+            pageJSONs = [
+                {
+                    type: "doc",
+                    content: [],
+                },
+            ];
             currentTiptapJSON = [];
-            localStorage.setItem("content", "[]");
+            localStorage.setItem("book_content", "[]");
         }
 
         const db = await openDataStore();
@@ -142,9 +148,6 @@
             onUpdate: ({ editor }) => {
                 currentTiptapJSON = editor.getJSON();
                 pageJSONs[currentPageIndex] = currentTiptapJSON;
-                console.log("Current page index:", currentPageIndex);
-                console.log("Current page JSON:", currentTiptapJSON);
-                console.log("All page JSONs:", pageJSONs);
                 debounce(saveContent, 1000)();
             },
         });
@@ -167,7 +170,7 @@
     };
 
     function saveContent() {
-        localStorage.setItem("content", JSON.stringify(editor!.getJSON()));
+        localStorage.setItem("book_content", JSON.stringify(pageJSONs));
     }
 
     function modifierPressed(event: KeyboardEvent) {
@@ -233,13 +236,19 @@
 <svelte:window onkeydown={clearMarksHandler} />
 
 <main class="flex h-screen max-h-screen flex-col items-center">
-    <TopUI {editor} {welcomeScreenVisible} />
+    <TopUI
+        bind:pages={pageJSONs}
+        bind:pageIndex={currentPageIndex}
+        {editor}
+        {welcomeScreenVisible} />
 
     <ControlBar {editor} />
 
     <!-- input box(es) -->
     <div class="flex h-full w-full">
-        <div id="page-box" class="w-80 p-4">
+        <div
+            id="page-box"
+            class="flex h-[calc(100vh-12rem)] w-80 flex-col items-center gap-4 overflow-y-scroll p-4">
             {#each pageJSONs as page, index}
                 <div class="w-56">
                     <p class="text-center">Page {index + 1}</p>
@@ -252,22 +261,37 @@
                             editor?.commands.setContent(pageJSONs[index]);
                         }}
                         class="page-preview">
-                        <div class="font-minecraft w-54 pl-8 pt-12 leading-3.5 wrap-break-word">
+                        <div
+                            class="font-minecraft h-61 w-54 overflow-clip pt-12 pl-8 leading-3.5 wrap-break-word">
                             <BookMiniRenderer value={page} />
                         </div>
                     </div>
+                    <div class="mt-2 flex items-center justify-between gap-2">
+                        <button
+                            onclick={() => {
+                                pageJSONs.splice(index + 1, 0, {
+                                    type: "doc",
+                                    content: [],
+                                });
+                                saveContent();
+                            }}
+                            class="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-800 p-2 hover:bg-zinc-950"
+                            ><IconAdd />
+                            <p>Add</p></button>
+                        <button
+                            onclick={() => {
+                                pageJSONs.splice(index, 1);
+                                currentPageIndex = Math.max(0, currentPageIndex - 1);
+                                editor?.commands.setContent(pageJSONs[currentPageIndex]);
+                                saveContent();
+                            }}
+                            class="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-800 p-2 hover:bg-zinc-950"
+                            ><IconDelete />
+                            <p>Delete</p></button>
+                    </div>
                 </div>
+                <div class="h-px w-full bg-zinc-500"></div>
             {/each}
-            <button
-                onclick={() => {
-                    pageJSONs.push({
-                        type: "doc",
-                        content: [],
-                    });
-                }}
-                class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700">
-                Add Page
-            </button>
         </div>
         <div
             class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
@@ -292,7 +316,9 @@
                     {@attach tooltip}
                     class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
                     onclick={() => {
-                        navigator.clipboard.writeText(finalOutput);
+                        navigator.clipboard.writeText(
+                            `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`,
+                        );
                         recentlyCopied = true;
                         setTimeout(() => (recentlyCopied = false), 2000);
                     }}
@@ -307,10 +333,10 @@
                     {#if $appSettings.syntaxHighlight}
                         <Highlight
                             language={typescript}
-                            code={`[written_book_content={pages:[${pageJSONs.map(j => convert(j, shouldOptimise))}],title:"Hello World",author:"Datapack Hub"}]`} />
+                            code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? `[written_book_content={pages:[${pageJSONs.map(j => convert(j, shouldOptimise))}],title:"Hello World",author:"Datapack Hub"}]`
+                                ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"Hello World",author:"Datapack Hub"}]`
                                 : "Loading..."}</pre>
                     {/if}
                 </code>
@@ -386,19 +412,12 @@
                     onclick={() => (shouldOptimise = !shouldOptimise)}
                     >{shouldOptimise ? "optimised" : "expanded"}</button>
 
-                <p class="font-lexend nomob text-xs text-white/60">•</p>
-
-                <button
-                    class="font-lexend text-xs text-white/60 underline"
-                    onclick={outputDialog?.open}>
-                    other output formats
-                </button>
-
                 {#if $appSettings.showCharacterCount}
                     <p class="font-lexend nomob text-xs text-white/60">•</p>
 
                     <p class="font-lexend nomob text-xs text-white/60">
-                        {finalOutput.length} characters
+                        <!-- TODO: account for title and author -->
+                        {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length + 25} characters
                     </p>
                 {/if}
             </div>
@@ -439,10 +458,6 @@
         </div>
     </div>
 </noscript>
-
-{#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
-    <modal.default bind:outputDialog {editor} {recentlyCopied} />
-{/await}
 
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />

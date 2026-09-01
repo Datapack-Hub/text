@@ -1,5 +1,5 @@
 <script lang="ts">
-  import WelcomeScreen from '../lib/components/WelcomeScreen.svelte';
+    import WelcomeScreen from "../lib/components/WelcomeScreen.svelte";
 
     import { page } from "$app/state";
     import Modal from "$lib/components/Modal.svelte";
@@ -52,11 +52,10 @@
     let recentlyCopied = $state(false);
 
     let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
-    let pageOutputs = $derived(editor ? calculateBookOutput(editor) : [["Loading..."]]);
 
     let exportSelectionDialog: Modal = $state()!;
 
-    let showWelcomeScreen: boolean = $state(false);  
+    let showWelcomeScreen: boolean = $state(false);
 
     async function loadData() {
         if (localStorage.getItem("content")) {
@@ -142,11 +141,6 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor }) => {
-                console.log(
-                    "pageOutputs",
-                    `[written_book_content={pages:[${pageOutputs}],title:"Your Title Here",author:"You"}]`,
-                );
-                pageOutputs = calculateBookOutput(editor);
                 tiptapJSON = editor.getJSON();
                 debounce(saveContent, 1000)();
             },
@@ -318,10 +312,14 @@
                     {#if $appSettings.syntaxHighlight}
                         <Highlight
                             language={typescript}
-                            code={finalOutput} />
+                            code={finalOutput.length === 0
+                                ? "waiting for input..."
+                                : finalOutput} />
                     {:else}
                         <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? finalOutput
+                                ? finalOutput.length === 0
+                                    ? "waiting for input..."
+                                    : finalOutput
                                 : "Loading..."}</pre>
                     {/if}
                 </code>
@@ -458,4 +456,3 @@
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
 {/await}
-

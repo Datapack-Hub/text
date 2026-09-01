@@ -212,9 +212,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         }
 
         if (data.length === 0) {
-            return Math.random() < 0.002
-                ? "🤓 <- kevin is waiting for you to type something"
-                : "waiting for input...";
+            return JSON.stringify("");
         }
 
         if (options.optimise) {

@@ -63,7 +63,7 @@ strong {
 }
 
 .tiptap-book {
-    @apply h-115 w-94 pt-20 px-12 text-black;
+    @apply h-115 w-94 px-12 pt-20 text-black;
     background-image: url("./book.png");
     background-repeat: no-repeat;
     background-size: cover;
@@ -83,7 +83,7 @@ strong {
 }
 
 .tiptap-minirenderer {
-    @apply h-full w-full p-2;
+    @apply h-full w-full p-2 text-white;
     @apply focus:outline-none;
     font-family: Minecraft;
     @apply text-xl;

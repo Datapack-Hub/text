@@ -9,6 +9,17 @@ import {
 import { type MinecraftText, type OldMinecraftText } from "../../types";
 import { type StringyMCText } from "../../types";
 
+export function importBook(raw: StringyMCText[]): JSONContent[] {
+    const pages: JSONContent[] = [];
+
+    raw.forEach((page) => {
+        const pageDocument = snbtToDocument([page]);
+        pages.push(pageDocument);
+    });
+
+    return pages;
+}
+
 export function snbtToDocument(raw: StringyMCText[]): JSONContent {
     let baseDocument: JSONContent = {
         type: "doc",

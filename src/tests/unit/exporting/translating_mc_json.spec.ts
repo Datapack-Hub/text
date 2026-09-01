@@ -34,10 +34,7 @@ const baseOptions: TranslateOptions = {
 it("returns waiting message for empty content", () => {
     const json: JSONContent = {};
     const result = translateJSON(json, baseOptions);
-    expect(result).toBeOneOf([
-        "waiting for input...",
-        "🤓 <- kevin is waiting for you to type something",
-    ]);
+    expect(result).toBe(JSON.stringify(""));
 });
 
 it("translates simple text node", () => {

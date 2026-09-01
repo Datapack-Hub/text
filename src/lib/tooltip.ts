@@ -3,7 +3,7 @@ import tippy from "tippy.js";
 export function tooltip(e: HTMLElement) {
     const tip = tippy(e, {
         placement: "bottom",
-        animation: "shift-away",
+        animation: "scale-subtle",
         arrow: true,
         theme: "dph",
         content: e.ariaLabel || e.title || e.textContent || "",
@@ -17,7 +17,7 @@ export function tooltip(e: HTMLElement) {
 export function tooltip_right(e: HTMLElement) {
     const tip = tippy(e, {
         placement: "right",
-        animation: "shift-away",
+        animation: "scale-subtle",
         arrow: true,
         theme: "dph",
         content: e.ariaLabel || e.title || e.textContent || "",

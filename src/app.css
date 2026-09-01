@@ -25,6 +25,10 @@ button {
     cursor: pointer;
 }
 
+* {
+    outline: none;
+}
+
 /* Fonts */
 
 /* Use MinecraftEnchantingBold if parent uses MinecraftEnchanting font */
@@ -131,6 +135,7 @@ strong {
 .tippy-box[data-theme~="dph"] {
     background-color: var(--color-zinc-700);
     font-family: "Lexend", sans-serif;
+    font-size: var(--text-xs);
 }
 
 /* Other */

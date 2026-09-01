@@ -35,8 +35,7 @@ export const appSettings: Writable<Settings> = createPersistentStore("settings",
     syntaxHighlight: true,
     realisticLineHeight: false,
     hideSelectionExport: true,
-    fontSize: 1
+    fontSize: 1,
 });
 
 export const outputVersion = writable(versions[versions.length - 1]);
-export const welcomeScreenFormat = "1";

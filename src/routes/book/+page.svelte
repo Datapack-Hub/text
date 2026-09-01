@@ -248,7 +248,10 @@
         {editor}
         {welcomeScreenVisible} />
 
-    <div class="bg-red-700 p-2 w-full text-sm font-bold">(BETA) The book editor is in active development. Report bugs and expect incomplete/broken features (also keep backups!).</div>
+    <div class="w-full bg-red-700 p-2 text-sm font-bold">
+        (BETA) The book editor is in active development. Report bugs and expect incomplete/broken
+        features (also keep backups!).
+    </div>
     <ControlBar {editor} />
 
     <!-- input box(es) -->
@@ -269,7 +272,7 @@
                         }}
                         class="page-preview">
                         <div
-                            class="font-minecraft h-61 w-54 overflow-clip pt-12 pl-8 leading-3.5 wrap-break-word">
+                            class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
                             <BookMiniRenderer value={page} />
                         </div>
                     </div>
@@ -300,14 +303,22 @@
                 <div class="h-px w-full bg-zinc-500"></div>
             {/each}
         </div>
-        <div
-            class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
-            spellcheck="false"
-            id="wysiwyg-box"
-            bind:this={element}>
+        <div class="w-full grow bg-zinc-800">
+            <div class="book-img">
+                <div
+                    class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
+                    spellcheck="false"
+                    id="wysiwyg-box"
+                    bind:this={element}>
+                </div>
+            </div>
         </div>
         <div class="bg-zinc-800 p-2">
-            <button {@attach tooltip} aria-label="Book Details" onclick={() => bookDetailsDialog?.open()} class="btn"><IconBook/></button>
+            <button
+                {@attach tooltip}
+                aria-label="Book Details"
+                onclick={() => bookDetailsDialog?.open()}
+                class="btn"><IconBook /></button>
         </div>
     </div>
 
@@ -427,7 +438,9 @@
 
                     <p class="font-lexend nomob text-xs text-white/60">
                         <!-- TODO: account for title and author -->
-                        {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length + title.length + author.length} characters
+                        {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length +
+                            title.length +
+                            author.length} characters
                     </p>
                 {/if}
             </div>

@@ -14,7 +14,12 @@
         pageIndex?: number;
     }
 
-    let { editor, welcomeScreenVisible = $bindable(), pages = $bindable(), pageIndex = $bindable() }: Props = $props();
+    let {
+        editor,
+        welcomeScreenVisible = $bindable(),
+        pages = $bindable(),
+        pageIndex = $bindable(),
+    }: Props = $props();
 
     let snapshots = $state<object[]>([]);
 
@@ -33,7 +38,9 @@
 </script>
 
 <div class="flex w-full items-center bg-zinc-950 text-sm text-zinc-300" style="font-family: Lexend">
-    <button class="flex items-center px-3 py-2 hover:bg-white/3" onclick={() => welcomeScreenVisible = true}>
+    <button
+        class="flex items-center px-3 py-2 hover:bg-white/3"
+        onclick={() => (welcomeScreenVisible = true)}>
         <img src="/dph.svg" class="size-5" alt="logo" height="20" width="20" />
         <span class="nomob ml-2 font-semibold">Minecraft Text Editor</span>
     </button>

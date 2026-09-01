@@ -26,35 +26,37 @@
     let { value }: { value: JSONContent } = $props();
 
     let html: string = $derived(
-        browser ? generateHTML(value, [
-            StarterKit.configure({
-                blockquote: false,
-                bulletList: false,
-                codeBlock: false,
-                hardBreak: false,
-                heading: false,
-                horizontalRule: false,
-                listItem: false,
-                orderedList: false,
-                link: false,
-            }),
-            Color,
-            FixedTextStyle,
-            Obfuscation,
-            ClickEventMark,
-            HoverEventMark,
-            ShadowColorMark,
-            ScoreNode,
-            TranslateNode,
-            BlockNBTNode,
-            StorageNBTNode,
-            EntityNBTNode,
-            KeybindNode,
-            SelectorNode,
-            AtlasObjectNode,
-            PlayerObjectNode,
-            FontsExtension,
-        ]) : ""
+        browser
+            ? generateHTML(value, [
+                  StarterKit.configure({
+                      blockquote: false,
+                      bulletList: false,
+                      codeBlock: false,
+                      hardBreak: false,
+                      heading: false,
+                      horizontalRule: false,
+                      listItem: false,
+                      orderedList: false,
+                      link: false,
+                  }),
+                  Color,
+                  FixedTextStyle,
+                  Obfuscation,
+                  ClickEventMark,
+                  HoverEventMark,
+                  ShadowColorMark,
+                  ScoreNode,
+                  TranslateNode,
+                  BlockNBTNode,
+                  StorageNBTNode,
+                  EntityNBTNode,
+                  KeybindNode,
+                  SelectorNode,
+                  AtlasObjectNode,
+                  PlayerObjectNode,
+                  FontsExtension,
+              ])
+            : "",
     );
 
     onMount(() => {

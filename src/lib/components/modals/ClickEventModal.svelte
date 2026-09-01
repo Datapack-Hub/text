@@ -53,11 +53,7 @@
             bind:value={clickEventValue} />
     {:else if clickEventType == "change_page"}
         <p class="mt-2">Page to go to</p>
-        <input
-            type="number"
-            class="input-basic"
-            placeholder="32"
-            bind:value={clickEventValue} />
+        <input type="number" class="input-basic" placeholder="32" bind:value={clickEventValue} />
     {:else if clickEventType == "open_dialog"}
         <p class="mt-2">Dialog ID</p>
         <input
@@ -67,7 +63,7 @@
             bind:value={clickEventValue} />
     {/if}
 
-    <div class="flex items-center space-x-2 mt-2">
+    <div class="mt-2 flex items-center space-x-2">
         {#if clickEventType}
             <button
                 onclick={() => {

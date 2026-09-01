@@ -62,15 +62,24 @@ strong {
     @apply h-full w-full p-4;
 }
 
-.tiptap-book {
-    @apply h-115 w-94 px-12 pt-20 text-black;
+.book-img {
+    @apply h-115 w-94 px-10 py-18 text-black;
     background-image: url("$lib/assets/book.png");
     background-repeat: no-repeat;
     background-size: cover;
     image-rendering: pixelated;
     aspect-ratio: 73 / 90;
-    font-size: 1.75rem !important;
+    overflow-y: clip;
+}
+
+.tiptap-book {
+    @apply h-80 text-black;
+    font-size: 1.93rem !important;
     line-height: 1.4rem !important;
+}
+
+.text-book {
+    font-size: 1.15rem;
 }
 
 .page-preview {

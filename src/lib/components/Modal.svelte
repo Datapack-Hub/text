@@ -88,7 +88,10 @@
                         class="rounded-md p-2 hover:bg-black/15"
                         onclick={close}><IconClose /></button>
                 </div>
-                <div class="overflow-auto max-h-130 rounded-b-lg {nopad ? '' : 'p-4'} flex flex-col space-y-1 bg-zinc-800">
+                <div
+                    class="max-h-130 overflow-auto rounded-b-lg {nopad
+                        ? ''
+                        : 'p-4'} flex flex-col space-y-1 bg-zinc-800">
                     {@render children()}
                 </div>
             </div>

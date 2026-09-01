@@ -255,7 +255,7 @@
     <ControlBar {editor} />
 
     <!-- input box(es) -->
-    <div class="h-0  grow flex w-full">
+    <div class="h-0 grow flex w-full">
         <div
             id="page-box"
             class="flex h-full min-h-0 max-h-full w-80 flex-col items-center gap-4 overflow-y-auto p-4">
@@ -303,7 +303,7 @@
                 <div class="h-px w-full bg-zinc-500"></div>
             {/each}
         </div>
-        <div class="w-full h-full grow bg-zinc-800">
+        <div class="w-full h-full grow bg-zinc-800 overflow-auto">
             <div class="book-img m-3">
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"

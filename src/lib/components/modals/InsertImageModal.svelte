@@ -139,15 +139,15 @@
             <label
                 bind:this={dropZone}
                 for="image-upload"
-                class="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-600"
+                class="flex flex-col bg-zinc-900 h-32 cursor-pointer items-center justify-center rounded-md "
                 ondragover={(e) => handleDragOver(e)}
                 ondrop={(e) => handleDrop(e)}>
-                <label for="image-upload" class="btn flex items-center gap-2">
-                    <IconUploadImage /> Upload Image
-                </label>
+                <div class="flex items-center gap-2">
+                    <IconUploadImage /> Click to upload image
+                </div>
+                <p class="mt-2 text-sm text-zinc-400">or drag and drop an image here</p>
+                
                 <input type="file" accept="image/*" class="hidden" id="image-upload" bind:files />
-                <p class="my-2 text-sm text-zinc-400">OR</p>
-                <p>Drag and drop an image here</p>
             </label>
         {:else}
             <p>Selected file: <span class="font-mono bg-zinc-900 p-1 rounded-md text-orange-300">{files[0].name}</span></p>

@@ -3,7 +3,7 @@
 
     let {
         clickEventDialog = $bindable(),
-        clickEventType = $bindable(),
+        clickEventType = $bindable("run_command"),
         editor,
         clickEventValue = $bindable(),
     } = $props();
@@ -21,7 +21,7 @@
     </select>
 
     {#if clickEventType == "open_url"}
-        <p class="mt-2">URL:</p>
+        <p class="mt-2">URL</p>
         <input
             type="url"
             class="rounded-md bg-zinc-900 p-2 invalid:outline-2 invalid:outline-red-500"
@@ -29,7 +29,7 @@
             pattern="https?://.*"
             bind:value={clickEventValue} />
     {:else if clickEventType == "run_command"}
-        <p class="mt-2">Command:</p>
+        <p class="mt-2">Command</p>
         <input
             type="text"
             class="input-basic"
@@ -37,7 +37,7 @@
             bind:value={clickEventValue} />
         <p class="text-zinc-400">Note: the player must have permission to run the command!</p>
     {:else if clickEventType == "suggest_command"}
-        <p class="mt-2">Command:</p>
+        <p class="mt-2">Command</p>
         <input
             type="text"
             class="input-basic"
@@ -45,21 +45,21 @@
             bind:value={clickEventValue} />
         <p class="text-zinc-400">Note: the player must have permission to run the command!</p>
     {:else if clickEventType == "copy_to_clipboard"}
-        <p class="mt-2">Text to copy:</p>
+        <p class="mt-2">Text to copy</p>
         <input
             type="text"
             class="input-basic"
             placeholder="I love the Wuppertal Suspension Railway"
             bind:value={clickEventValue} />
     {:else if clickEventType == "change_page"}
-        <p class="mt-2">Page to go to:</p>
+        <p class="mt-2">Page to go to</p>
         <input
             type="number"
             class="input-basic"
             placeholder="32"
             bind:value={clickEventValue} />
     {:else if clickEventType == "open_dialog"}
-        <p class="mt-2">Dialog ID:</p>
+        <p class="mt-2">Dialog ID</p>
         <input
             type="text"
             class="input-basic"
@@ -67,7 +67,7 @@
             bind:value={clickEventValue} />
     {/if}
 
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-2 mt-2">
         {#if clickEventType}
             <button
                 onclick={() => {

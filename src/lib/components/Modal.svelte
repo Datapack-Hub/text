@@ -66,7 +66,7 @@
 {#if opened}
     <div class="absolute {opened ? '' : 'hidden'}">
         <div
-            class="fixed top-0 left-0 z-40 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
+            class="fixed top-0 left-0 z-40 flex h-screen w-screen flex-col items-center bg-black/65 text-zinc-100"
             style="font-family: Lexend">
             <div
                 aria-hidden="true"
@@ -88,7 +88,7 @@
                         class="rounded-md p-2 hover:bg-black/15"
                         onclick={close}><IconClose /></button>
                 </div>
-                <div class="rounded-b-lg {nopad ? '' : 'p-4'} flex flex-col space-y-1 bg-zinc-800">
+                <div class="overflow-auto max-h-130 rounded-b-lg {nopad ? '' : 'p-4'} flex flex-col space-y-1 bg-zinc-800">
                     {@render children()}
                 </div>
             </div>

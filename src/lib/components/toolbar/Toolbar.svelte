@@ -297,7 +297,7 @@
                 .run();
             hoverEventDialog?.close();
         }}
-        class="btn">
+        class="btn mt-2">
         Add Hover Event
     </button>
 </Modal>

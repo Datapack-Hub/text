@@ -121,7 +121,7 @@ strong {
 }
 
 .input-basic {
-    @apply rounded-md bg-zinc-900 p-2;
+    @apply rounded-md bg-zinc-900 p-2 font-mono;
 }
 
 .link {

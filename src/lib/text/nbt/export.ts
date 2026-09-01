@@ -7,7 +7,7 @@ import {
     trueMarkOrUndefined,
     unescapeUnicode,
 } from "../utils";
-import { outputVersion } from "$lib/stores";
+import { outputVersion } from "$lib/settings";
 import { get } from "svelte/store";
 import { optimise } from "./optimiser";
 

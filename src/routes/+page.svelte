@@ -7,7 +7,7 @@
     import TopUI from "$lib/components/TopUI.svelte";
     import { openDataStore } from "$lib/db";
     import { appSettings } from "$lib/settings";
-    import { outputVersion } from "$lib/stores";
+    import { outputVersion } from "$lib/settings";
     import { convert } from "$lib/text/nbt/export";
     import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";

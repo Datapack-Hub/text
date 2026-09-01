@@ -20,26 +20,28 @@
         { keys: [modifierKey, "Shift", "X"], action: "Clear all formatting" },
     ];
     const modalKeybinds = [
-        { keys: [modifierKey, "Shift", "G"], action: "Add Color Gradient" },
-        { keys: [modifierKey, "Shift", "K"], action: "View Keybinds" },
-        { keys: [modifierKey, "Shift", "T"], action: "Add Click Event" },
-        { keys: [modifierKey, "Shift", "H"], action: "Add Hover Event" },
         { keys: [modifierKey, "Shift", "C"], action: "Add Custom Color" },
-        { keys: [modifierKey, "Shift", "F"], action: "Add a font" },
-        { keys: [modifierKey, "Shift", "W"], action: "Add Custom Source" },
-        { keys: [modifierKey, "Shift", "U"], action: "Unicode Menu" },
-        { keys: [modifierKey, "Shift", "I"], action: "Import Menu" },
+        { keys: [modifierKey, "Shift", "D"], action: "Open Book Details (book mode)" },
         { keys: [modifierKey, "Shift", "E"], action: "Export Menu" },
+        { keys: [modifierKey, "Shift", "F"], action: "Add a font" },
+        { keys: [modifierKey, "Shift", "G"], action: "Add Color Gradient" },
+        { keys: [modifierKey, "Shift", "H"], action: "Add Hover Event" },
+        { keys: [modifierKey, "Shift", "I"], action: "Import Menu" },
+        { keys: [modifierKey, "Shift", "K"], action: "View Keybinds" },
         { keys: [modifierKey, "Shift", "L"], action: "Load a snapshot" },
-        { keys: [modifierKey, "Shift", "M"], action: "Load an image (with block characters)" },
+        { keys: [modifierKey, "Shift", "M"], action: "Load an image" },
+        { keys: [modifierKey, "Shift", "R"], action: "Open Settings" },
+        { keys: [modifierKey, "Shift", "T"], action: "Add Click Event" },
+        { keys: [modifierKey, "Shift", "U"], action: "Unicode Menu" },
+        { keys: [modifierKey, "Shift", "W"], action: "Add Custom Source" },
     ];
 </script>
 
 <Modal title="Keybinds" bind:this={keybindDialog} flexible key="K">
     <p class="col-span-3 text-xl font-bold">Formatting Keybinds</p>
-    <div class="mt-4 grid grid-flow-col-dense grid-cols-2 grid-rows-6 space-x-3">
+    <div class="mt-4 grid grid-flow-col grid-cols-2 grid-rows-8">
         {#each keysAndActions as { keys, action }}
-            <div class="mb-2 flex items-center gap-2">
+            <div class="mb-2 flex items-center gap-1">
                 {#each keys as key}
                     <Key>{key}</Key>
                 {/each}
@@ -49,7 +51,7 @@
         {/each}
     </div>
     <p class="col-span-3 text-xl font-bold">Modal Keybinds</p>
-    <div class="mt-4 grid grid-flow-col-dense grid-cols-2 grid-rows-6 space-x-3">
+    <div class="mt-4 grid grid-flow-col-dense grid-cols-2 grid-rows-8 space-x-3">
         {#each modalKeybinds as { keys, action }}
             <div class="mb-2 flex items-center gap-2">
                 {#each keys as key}

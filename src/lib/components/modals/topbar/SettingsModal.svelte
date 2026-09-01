@@ -10,7 +10,7 @@
     let { settingsDialog = $bindable() }: Props = $props();
 </script>
 
-<Modal title="Settings" bind:this={settingsDialog} key="L">
+<Modal title="Settings" bind:this={settingsDialog} key="R">
     <div class="flex w-full flex-col space-y-2">
         <div class="flex items-center space-x-2">
             <CheckBox label="showCharacterCount" bind:value={$appSettings.showCharacterCount} />

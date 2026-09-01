@@ -3,18 +3,18 @@
     import type { ExternalSources } from "$lib/types";
 
     import IconScore from "~icons/tabler/123";
+    import IconBack from "~icons/tabler/arrow-back-up";
     import IconSelector from "~icons/tabler/at";
+    import IconObject from "~icons/tabler/box";
     import IconNBT from "~icons/tabler/braces";
+    import IconInfo from "~icons/tabler/info-circle";
     import IconKeybind from "~icons/tabler/keyboard";
     import IconTranslate from "~icons/tabler/language";
-    import IconObject from "~icons/tabler/box";
-    import IconInfo from "~icons/tabler/info-circle";
-    import IconBack from "~icons/tabler/arrow-back-up";
 
+    import { outputVersion } from "$lib/settings";
+    import { tooltip_right } from "$lib/tooltip";
     import CheckBox from "../CheckBox.svelte";
     import MiniEditor from "../text/MiniEditor.svelte";
-    import { outputVersion } from "$lib/stores";
-    import { tooltip, tooltip_right } from "$lib/tooltip";
 
     let { customDialog = $bindable(), editor, customType = $bindable() } = $props();
 

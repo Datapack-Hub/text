@@ -1,5 +1,6 @@
-import { writable, type Writable } from "svelte/store";
 import { browser } from "$app/environment";
+import { writable, type Writable } from "svelte/store";
+import { versions } from "./types";
 
 export type Settings = {
     showCharacterCount: boolean; // whether the character count is shown
@@ -36,3 +37,6 @@ export const appSettings: Writable<Settings> = createPersistentStore("settings",
     hideSelectionExport: true,
     fontSize: 1
 });
+
+export const outputVersion = writable(versions[versions.length - 1]);
+export const welcomeScreenFormat = "1";

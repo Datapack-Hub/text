@@ -3,8 +3,6 @@
     import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
     import { tooltip } from "$lib/tooltip";
     import type { Editor } from "@tiptap/core";
-    import IconDelete from "~icons/tabler/trash";
-    import IconLoad from "~icons/tabler/upload";
 
     interface Props {
         editor: Editor | undefined;

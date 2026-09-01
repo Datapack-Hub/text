@@ -7,7 +7,7 @@
     import WelcomeScreen from "$lib/components/WelcomeScreen.svelte";
     import { openDataStore } from "$lib/db";
     import { appSettings } from "$lib/settings";
-    import { outputVersion } from "$lib/stores";
+    import { outputVersion } from "$lib/settings";
     import { convert } from "$lib/text/nbt/export";
     import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
@@ -55,6 +55,8 @@
     let recentlyCopied = $state(false);
 
     let exportSelectionDialog: Modal = $state()!;
+    let bookDetailsDialog: Modal = $state()!;
+
     let versionPopupConfirmationVisible = $state(false);
     let temporaryVersionConfirmation: Version | undefined = $state();
 
@@ -242,13 +244,14 @@
         {editor}
         {welcomeScreenVisible} />
 
+    <div class="bg-red-700 p-2 w-full text-sm font-bold">(BETA) The book editor is in active development. Report bugs and expect incomplete/broken features (also keep backups!).</div>
     <ControlBar {editor} />
 
     <!-- input box(es) -->
     <div class="flex h-full w-full">
         <div
             id="page-box"
-            class="flex h-[calc(100vh-12rem)] w-80 flex-col items-center gap-4 overflow-y-scroll p-4">
+            class="flex h-[calc(100vh-13rem)] w-80 flex-col items-center gap-4 overflow-y-scroll p-4">
             {#each pageJSONs as page, index}
                 <div class="w-56">
                     <p class="text-center">Page {index + 1}</p>
@@ -461,4 +464,8 @@
 
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
+{/await}
+
+{#await import("$lib/components/modals/BookDetailsModal.svelte") then modal}
+    <modal.default bind:bookDetailsDialog />
 {/await}

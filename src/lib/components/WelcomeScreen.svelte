@@ -5,7 +5,7 @@
     import IconCode from "~icons/tabler/code";
     import IconClose from "~icons/tabler/X"
     import { onMount } from "svelte";
-    import { welcomeScreenFormat } from "$lib/globals";
+    import { welcomeScreenFormat } from "$lib/settings";
 
     let { visible = $bindable(false) }: { visible: boolean } = $props()
 

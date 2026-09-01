@@ -1,4 +1,4 @@
-import { outputVersion } from "$lib/stores";
+import { outputVersion } from "$lib/settings";
 import { convert, translateJSON } from "$lib/text/nbt/export";
 import { versions, type TranslateOptions } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";

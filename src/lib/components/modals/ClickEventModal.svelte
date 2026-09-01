@@ -3,7 +3,7 @@
 
     let {
         clickEventDialog = $bindable(),
-        clickEventType = $bindable(),
+        clickEventType = $bindable("run_command"),
         editor,
         clickEventValue = $bindable(),
     } = $props();

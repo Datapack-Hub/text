@@ -285,132 +285,130 @@
     </div>
 
     <!-- output box(es) -->
-    <div>
-        {#if page.url.searchParams.has("dev")}
-            <code class="inline-block overflow-x-scroll p-3 text-xs"
-                >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
-            <br />
-        {/if}
-        <div class="w-screen bg-zinc-950 p-3">
-            <div class="flex max-h-32 items-start space-x-2 overflow-auto">
-                <button
-                    {@attach tooltip}
-                    class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
-                    onclick={() => {
-                        navigator.clipboard.writeText(finalOutput);
-                        recentlyCopied = true;
-                        setTimeout(() => (recentlyCopied = false), 2000);
-                    }}
-                    aria-label="Copy">
-                    {#if recentlyCopied}
-                        <IconTick />
-                    {:else}
-                        <IconCopy />
-                    {/if}</button>
-                <code id="outputbox">
-                    <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
-                    {#if $appSettings.syntaxHighlight}
-                        <Highlight
-                            language={typescript}
-                            code={finalOutput.length === 0
+    {#if page.url.searchParams.has("dev")}
+        <code class="inline-block overflow-x-scroll p-3 text-xs"
+            >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
+        <br />
+    {/if}
+    <div class="w-screen bg-zinc-950 p-3 border-t border-zinc-700">
+        <div class="flex max-h-32 items-start space-x-2 overflow-auto">
+            <button
+                {@attach tooltip}
+                class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
+                onclick={() => {
+                    navigator.clipboard.writeText(finalOutput);
+                    recentlyCopied = true;
+                    setTimeout(() => (recentlyCopied = false), 2000);
+                }}
+                aria-label="Copy">
+                {#if recentlyCopied}
+                    <IconTick />
+                {:else}
+                    <IconCopy />
+                {/if}</button>
+            <code id="outputbox">
+                <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
+                {#if $appSettings.syntaxHighlight}
+                    <Highlight
+                        language={typescript}
+                        code={finalOutput.length === 0
+                            ? "waiting for input..."
+                            : finalOutput} />
+                {:else}
+                    <pre class="inline break-all whitespace-pre-wrap">{editor
+                            ? finalOutput.length === 0
                                 ? "waiting for input..."
-                                : finalOutput} />
-                    {:else}
-                        <pre class="inline break-all whitespace-pre-wrap">{editor
-                                ? finalOutput.length === 0
-                                    ? "waiting for input..."
-                                    : finalOutput
-                                : "Loading..."}</pre>
-                    {/if}
-                </code>
-            </div>
-            <div class="mt-2 flex items-center space-x-2 select-none">
-                <p class="font-lexend nomob text-xs text-white/60">
-                    click to change output settings:
-                </p>
+                                : finalOutput
+                            : "Loading..."}</pre>
+                {/if}
+            </code>
+        </div>
+        <div class="mt-2 flex items-center space-x-2 select-none">
+            <p class="font-lexend nomob text-xs text-white/60">
+                click to change output settings:
+            </p>
 
-                <div class="relative inline-block">
-                    {#if versionPopup}
-                        <div
-                            class="absolute bottom-full left-1/2 z-10 mb-2 flex w-100 -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
-                            {#if versionPopupConfirmationVisible}
-                                <div
-                                    class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">
-                                    <div class="m-auto flex flex-col">
-                                        <b>Warning:</b>
-                                        <span
-                                            >Changing to an earlier version could remove some
-                                            elements of your text that are unsupported in this
-                                            version.</span>
-                                        <div class="mt-2 flex space-x-2">
-                                            <button
-                                                class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
-                                                onclick={() =>
-                                                    updateOutputVersion(
-                                                        temporaryVersionConfirmation,
-                                                        true,
-                                                    )}>Change version</button>
-                                            <button
-                                                class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
-                                                onclick={() => {
-                                                    versionPopupConfirmationVisible = false;
-                                                    temporaryVersionConfirmation = undefined;
-                                                }}>Cancel</button>
-                                        </div>
+            <div class="relative inline-block">
+                {#if versionPopup}
+                    <div
+                        class="absolute bottom-full left-1/2 z-10 mb-2 flex w-100 -translate-x-1/2 flex-col space-y-1 rounded-md bg-zinc-900 shadow-md shadow-zinc-950">
+                        {#if versionPopupConfirmationVisible}
+                            <div
+                                class="absolute flex h-full w-full flex-col items-center rounded-md bg-zinc-900 px-4 py-4 backdrop-blur-md">
+                                <div class="m-auto flex flex-col">
+                                    <b>Warning:</b>
+                                    <span
+                                        >Changing to an earlier version could remove some
+                                        elements of your text that are unsupported in this
+                                        version.</span>
+                                    <div class="mt-2 flex space-x-2">
+                                        <button
+                                            class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
+                                            onclick={() =>
+                                                updateOutputVersion(
+                                                    temporaryVersionConfirmation,
+                                                    true,
+                                                )}>Change version</button>
+                                        <button
+                                            class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"
+                                            onclick={() => {
+                                                versionPopupConfirmationVisible = false;
+                                                temporaryVersionConfirmation = undefined;
+                                            }}>Cancel</button>
                                     </div>
                                 </div>
-                            {/if}
-                            <div class="space-y-1 px-2 py-2">
-                                <div class="ml-[0.3rem] flex items-center">
-                                    <span class="w-1/4 text-sm">version</span>
-                                    <span class="w-3/4 text-sm">description</span>
-                                </div>
-                                {#each versions as v}
-                                    <button
-                                        class="flex w-full items-center rounded-md bg-zinc-800 p-2 text-left select-none hover:bg-zinc-700"
-                                        onclick={() => updateOutputVersion(v)}>
-                                        <b class="w-1/4">{v.friendly}</b>
-                                        <span class="w-3/4 text-xs">{v.description}</span>
-                                    </button>
-                                {/each}
-                                <span class="ml-[0.3rem] text-xs text-zinc-400"
-                                    >* unreleased minecraft version</span>
                             </div>
+                        {/if}
+                        <div class="space-y-1 px-2 py-2">
+                            <div class="ml-[0.3rem] flex items-center">
+                                <span class="w-1/4 text-sm">version</span>
+                                <span class="w-3/4 text-sm">description</span>
+                            </div>
+                            {#each versions as v}
+                                <button
+                                    class="flex w-full items-center rounded-md bg-zinc-800 p-2 text-left select-none hover:bg-zinc-700"
+                                    onclick={() => updateOutputVersion(v)}>
+                                    <b class="w-1/4">{v.friendly}</b>
+                                    <span class="w-3/4 text-xs">{v.description}</span>
+                                </button>
+                            {/each}
+                            <span class="ml-[0.3rem] text-xs text-zinc-400"
+                                >* unreleased minecraft version</span>
                         </div>
-                    {/if}
-
-                    <button
-                        {@attach tooltip}
-                        class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-                        aria-label="Click to change the output version."
-                        onclick={() => {
-                            versionPopup = !versionPopup;
-                        }}>{$outputVersion.friendly}</button>
-                </div>
+                    </div>
+                {/if}
 
                 <button
                     {@attach tooltip}
                     class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
-                    aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
-                    onclick={() => (shouldOptimise = !shouldOptimise)}
-                    >{shouldOptimise ? "optimised" : "expanded"}</button>
+                    aria-label="Click to change the output version."
+                    onclick={() => {
+                        versionPopup = !versionPopup;
+                    }}>{$outputVersion.friendly}</button>
+            </div>
 
+            <button
+                {@attach tooltip}
+                class="ml-1 rounded-md bg-zinc-800 px-1 font-mono select-none hover:bg-zinc-700"
+                aria-label="Click to toggle whether the output should be optimised (shortest output, may have bugs), or expanded (easier to edit, more reliable)."
+                onclick={() => (shouldOptimise = !shouldOptimise)}
+                >{shouldOptimise ? "optimised" : "expanded"}</button>
+
+            <p class="font-lexend nomob text-xs text-white/60">•</p>
+
+            <button
+                class="font-lexend text-xs text-white/60 underline"
+                onclick={outputDialog?.open}>
+                other output formats
+            </button>
+
+            {#if $appSettings.showCharacterCount}
                 <p class="font-lexend nomob text-xs text-white/60">•</p>
 
-                <button
-                    class="font-lexend text-xs text-white/60 underline"
-                    onclick={outputDialog?.open}>
-                    other output formats
-                </button>
-
-                {#if $appSettings.showCharacterCount}
-                    <p class="font-lexend nomob text-xs text-white/60">•</p>
-
-                    <p class="font-lexend nomob text-xs text-white/60">
-                        {finalOutput.length} characters
-                    </p>
-                {/if}
-            </div>
+                <p class="font-lexend nomob text-xs text-white/60">
+                    {finalOutput.length} characters
+                </p>
+            {/if}
         </div>
     </div>
 </main>

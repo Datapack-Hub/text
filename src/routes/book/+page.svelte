@@ -41,7 +41,7 @@
     import IconCopy from "~icons/tabler/copy";
     import IconAdd from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
-    import IconBook from "~icons/tabler/book";
+    import IconSettings from "~icons/tabler/settings";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -258,10 +258,18 @@
     <div class="flex h-0 w-full grow">
         <div
             id="page-box"
-            class="flex h-[calc(100vh-13rem)] w-80 flex-col items-center gap-4 overflow-y-scroll p-4">
+            class="flex h-[calc(100vh-13rem)] w-80 flex-col items-center overflow-y-scroll p-2">
+            <div class="flex w-full pl-2 items-center space-x-2">
+                <span class="font-bold grow">Book Pages</span>
+                <button
+                    {@attach tooltip}
+                    aria-label="Book Details"
+                    onclick={() => bookDetailsDialog?.open()}
+                    class="btn"><IconSettings /></button>
+            </div>
+            {#key pageJSONs}
             {#each pageJSONs as page, index}
-                <div class="w-56">
-                    <p class="text-center">Page {index + 1}</p>
+                <div class="w-55 p-2">
                     <div
                         role="button"
                         tabindex="0"
@@ -270,13 +278,14 @@
                             currentPageIndex = index;
                             editor?.commands.setContent(pageJSONs[index]);
                         }}
-                        class="page-preview">
+                        class="page-preview {currentPageIndex != index ? 'opacity-60' : ''}">
                         <div
                             class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
                             <BookMiniRenderer value={page} />
                         </div>
                     </div>
-                    <div class="mt-2 flex items-center justify-between gap-2">
+                    <div class="mt-1 px-2 flex w-full items-center gap-2">
+                        <p class="text-left grow">Page {index + 1} of {pageJSONs.length}</p>
                         <button
                             onclick={() => {
                                 pageJSONs.splice(index + 1, 0, {
@@ -285,9 +294,12 @@
                                 });
                                 saveContent();
                             }}
-                            class="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-800 p-2 hover:bg-zinc-950"
-                            ><IconAdd />
-                            <p>Add</p></button>
+                            {@attach tooltip}
+                            aria-label="Add new page below"
+                            class="p-0.5">
+                            <IconAdd />
+                        </button>
+                        {#if pageJSONs.length != 1}
                         <button
                             onclick={() => {
                                 pageJSONs.splice(index, 1);
@@ -295,15 +307,18 @@
                                 editor?.commands.setContent(pageJSONs[currentPageIndex]);
                                 saveContent();
                             }}
-                            class="flex w-full items-center justify-center gap-2 rounded-md bg-zinc-800 p-2 hover:bg-zinc-950"
-                            ><IconDelete />
-                            <p>Delete</p></button>
+                            {@attach tooltip}
+                            aria-label="Delete this page"
+                            class="p-0.5">
+                            <IconDelete />
+                        </button>
+                        {/if}
                     </div>
-                    <div class="h-px w-full bg-zinc-500 mt-4"></div>
                 </div>
             {/each}
+            {/key}
         </div>
-        <div class="h-full w-full grow overflow-auto bg-zinc-800">
+        <div class="h-full w-full grow overflow-auto bg-zinc-800 border-l border-zinc-700">
             <div class="book-img m-3">
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
@@ -318,12 +333,11 @@
                 {@attach tooltip}
                 aria-label="Book Details"
                 onclick={() => bookDetailsDialog?.open()}
-                class="btn"><IconBook /></button>
+                class="btn"><IconSettings /></button>
         </div>
     </div>
 
     <!-- output box(es) -->
-    <div>
         {#if page.url.searchParams.has("dev")}
             <code class="inline-block overflow-x-scroll p-3 text-xs"
                 >DEV ONLY: {currentTiptapJSON
@@ -331,7 +345,7 @@
                     : "Loading..."}</code>
             <br />
         {/if}
-        <div class="w-screen bg-zinc-950 p-3">
+        <div class="w-screen bg-zinc-950 p-3 z-50 border-t border-zinc-700">
             <div class="flex max-h-32 items-start space-x-2 overflow-auto">
                 <button
                     {@attach tooltip}
@@ -445,7 +459,6 @@
                 {/if}
             </div>
         </div>
-    </div>
 </main>
 
 <WelcomeScreen bind:visible={welcomeScreenVisible} />

@@ -133,7 +133,7 @@
     }
 </script>
 
-<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
+<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3 border-b border-zinc-700">
     {#if editor}
         <TextStyleButtons {editor} />
 

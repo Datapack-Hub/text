@@ -6,6 +6,9 @@
     import IconSaved from "~icons/tabler/folder";
     import IconUpload from "~icons/tabler/upload";
     import IconSettings from "~icons/tabler/settings";
+    import IconNormalMode from "~icons/tabler/text-recognition";
+    import IconBookMode from "~icons/tabler/book";
+    import { page } from "$app/state";
 
     interface Props {
         editor?: Editor;
@@ -62,6 +65,23 @@
         <IconSettings class="text-xs" />
         <span>Settings</span>
     </button>
+    {#if page.url.pathname == "/book"}
+    <a
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 bg-rose-900 hover:bg-rose-800"
+        href="/">
+        <IconBookMode class="text-xs" />
+        <!-- <span class="font-bold">Mode:</span> -->
+        <span>Book Mode</span>
+    </a>
+    {:else}
+    <a
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        href="/book">
+        <IconNormalMode class="text-xs" />
+        <!-- <span class="font-bold">Mode:</span> -->
+        <span>Normal Mode</span>
+    </a>
+    {/if}
     <div class="grow"></div>
     <a
         href="https://discord.datapackhub.net/"

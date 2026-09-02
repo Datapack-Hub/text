@@ -298,7 +298,7 @@
                                 saveContent();
                             }}
                             {@attach tooltip}
-                            aria-label="Add new page below"
+                            aria-label="Move this page up"
                             class="py-0.5">
                             <IconUp />
                         </button>
@@ -312,7 +312,7 @@
                                 saveContent();
                             }}
                             {@attach tooltip}
-                            aria-label="Add new page below"
+                            aria-label="Move this page down"
                             class="py-0.5">
                             <IconDown />
                         </button>

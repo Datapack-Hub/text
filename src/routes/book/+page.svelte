@@ -37,11 +37,14 @@
     import { onDestroy, onMount } from "svelte";
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
+
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
     import IconAdd from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
     import IconSettings from "~icons/tabler/settings";
+    import IconUp from "~icons/tabler/chevron-up";
+    import IconDown from "~icons/tabler/chevron-down";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -258,7 +261,7 @@
     <div class="flex h-0 w-full grow">
         <div
             id="page-box"
-            class="flex h-[calc(100vh-13rem)] w-80 flex-col items-center overflow-y-scroll p-2">
+            class="flex h-[calc(100vh-11rem )] w-80 flex-col items-center overflow-y-scroll p-2">
             <div class="flex w-full pl-2 items-center space-x-2">
                 <span class="font-bold grow">Book Pages</span>
                 <button
@@ -285,7 +288,35 @@
                         </div>
                     </div>
                     <div class="mt-1 px-2 flex w-full items-center gap-2">
-                        <p class="text-left grow">Page {index + 1} of {pageJSONs.length}</p>
+                        <p class="text-left grow">{index + 1} of {pageJSONs.length}</p>
+                        {#if index > 0}
+                        <button
+                            onclick={() => {
+                                if(index == currentPageIndex) currentPageIndex -= 1;
+                                else if(index - 1 == currentPageIndex) currentPageIndex += 1;
+                                pageJSONs.splice(index - 1, 0, pageJSONs.splice(index, 1)[0]);
+                                saveContent();
+                            }}
+                            {@attach tooltip}
+                            aria-label="Add new page below"
+                            class="py-0.5">
+                            <IconUp />
+                        </button>
+                        {/if}
+                        {#if index + 1 < pageJSONs.length}
+                        <button
+                            onclick={() => {
+                                if(index == currentPageIndex) currentPageIndex += 1;
+                                else if(index + 1 == currentPageIndex) currentPageIndex -= 1;
+                                pageJSONs.splice(index + 1, 0, pageJSONs.splice(index, 1)[0]);
+                                saveContent();
+                            }}
+                            {@attach tooltip}
+                            aria-label="Add new page below"
+                            class="py-0.5">
+                            <IconDown />
+                        </button>
+                        {/if}
                         <button
                             onclick={() => {
                                 pageJSONs.splice(index + 1, 0, {
@@ -296,7 +327,7 @@
                             }}
                             {@attach tooltip}
                             aria-label="Add new page below"
-                            class="p-0.5">
+                            class="py-0.5">
                             <IconAdd />
                         </button>
                         {#if pageJSONs.length != 1}
@@ -309,7 +340,7 @@
                             }}
                             {@attach tooltip}
                             aria-label="Delete this page"
-                            class="p-0.5">
+                            class="py-0.5">
                             <IconDelete />
                         </button>
                         {/if}

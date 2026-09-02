@@ -94,6 +94,7 @@ strong {
     aspect-ratio: 73 / 90;
     color: black;
     --source-background: #e9dfbd;
+    cursor: pointer;
 }
 
 .tiptap-minirenderer {

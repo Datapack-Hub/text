@@ -9,6 +9,7 @@
 :root {
     accent-color: #ff631a;
     color-scheme: dark;
+    --source-background: #18181b;
 }
 
 *::selection {
@@ -76,10 +77,13 @@ strong {
     @apply h-80 text-black;
     font-size: 1.93rem !important;
     line-height: 1.4rem !important;
+    --source-background: #e9dfbd;
+    --source-size: 1.2rem;
 }
 
 .text-book {
     font-size: 1.15rem;
+    --source-size: 0.7rem;
 }
 
 .page-preview {
@@ -89,6 +93,7 @@ strong {
     image-rendering: pixelated;
     aspect-ratio: 73 / 90;
     color: black;
+    --source-background: #e9dfbd;
 }
 
 .tiptap-minirenderer {

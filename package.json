@@ -22,8 +22,8 @@
         "@tailwindcss/vite": "^4.3.3",
         "@types/node": "^26.1.2",
         "@types/sortablejs": "^1.15.9",
-        "@vitest/coverage-v8": "4.1.10",
-        "@vitest/ui": "^4.1.10",
+        "@vitest/coverage-v8": "4.1.11",
+        "@vitest/ui": "^4.1.11",
         "file-type": "^22.0.1",
         "oxlint": "^1.77.0",
         "prettier": "^3.9.6",
@@ -35,7 +35,7 @@
         "typescript": "^6.0.3",
         "unplugin-icons": "^23.0.1",
         "vite": "^8.2.1",
-        "vitest": "^4.1.10"
+        "vitest": "^4.1.11"
     },
     "type": "module",
     "dependencies": {

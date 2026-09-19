@@ -290,7 +290,7 @@
             >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
         <br />
     {/if}
-    <div class="w-screen bg-zinc-950 p-3 border-t border-zinc-700">
+    <div class="w-screen border-t border-zinc-700 bg-zinc-950 p-3">
         <div class="flex max-h-32 items-start space-x-2 overflow-auto">
             <button
                 {@attach tooltip}
@@ -311,9 +311,7 @@
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}
-                        code={finalOutput.length === 0
-                            ? "waiting for input..."
-                            : finalOutput} />
+                        code={finalOutput.length === 0 ? "waiting for input..." : finalOutput} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
                             ? finalOutput.length === 0
@@ -324,9 +322,7 @@
             </code>
         </div>
         <div class="mt-2 flex items-center space-x-2 select-none">
-            <p class="font-lexend nomob text-xs text-white/60">
-                click to change output settings:
-            </p>
+            <p class="font-lexend nomob text-xs text-white/60">click to change output settings:</p>
 
             <div class="relative inline-block">
                 {#if versionPopup}
@@ -338,9 +334,8 @@
                                 <div class="m-auto flex flex-col">
                                     <b>Warning:</b>
                                     <span
-                                        >Changing to an earlier version could remove some
-                                        elements of your text that are unsupported in this
-                                        version.</span>
+                                        >Changing to an earlier version could remove some elements
+                                        of your text that are unsupported in this version.</span>
                                     <div class="mt-2 flex space-x-2">
                                         <button
                                             class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"

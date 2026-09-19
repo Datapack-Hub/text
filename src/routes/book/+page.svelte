@@ -261,9 +261,9 @@
     <div class="flex h-0 w-full grow">
         <div
             id="page-box"
-            class="flex h-[calc(100vh-11rem )] w-80 flex-col items-center overflow-y-scroll p-2">
-            <div class="flex w-full pl-2 items-center space-x-2">
-                <span class="font-bold grow">Book Pages</span>
+            class="h-[calc(100vh-11rem )] flex w-80 flex-col items-center overflow-y-scroll p-2">
+            <div class="flex w-full items-center space-x-2 pl-2">
+                <span class="grow font-bold">Book Pages</span>
                 <button
                     {@attach tooltip}
                     aria-label="Book Details"
@@ -271,85 +271,95 @@
                     class="btn"><IconSettings /></button>
             </div>
             {#key pageJSONs}
-            {#each pageJSONs as page, index}
-                <div class="w-55 p-2">
-                    <div
-                        role="button"
-                        tabindex="0"
-                        onkeydown={(event) => pageKeyDownHandler(event, index)}
-                        onclick={() => {
-                            currentPageIndex = index;
-                            editor?.commands.setContent(pageJSONs[index]);
-                        }}
-                        class="page-preview {currentPageIndex != index ? 'opacity-60' : ''}">
+                {#each pageJSONs as page, index}
+                    <div class="w-55 p-2">
                         <div
-                            class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
-                            <BookMiniRenderer value={page} />
+                            role="button"
+                            tabindex="0"
+                            onkeydown={(event) => pageKeyDownHandler(event, index)}
+                            onclick={() => {
+                                currentPageIndex = index;
+                                editor?.commands.setContent(pageJSONs[index]);
+                            }}
+                            class="page-preview {currentPageIndex != index ? 'opacity-60' : ''}">
+                            <div
+                                class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
+                                <BookMiniRenderer value={page} />
+                            </div>
+                        </div>
+                        <div class="mt-1 flex w-full items-center gap-2 px-2">
+                            <p class="grow text-left">{index + 1} of {pageJSONs.length}</p>
+                            {#if index > 0}
+                                <button
+                                    onclick={() => {
+                                        if (index == currentPageIndex) currentPageIndex -= 1;
+                                        else if (index - 1 == currentPageIndex)
+                                            currentPageIndex += 1;
+                                        pageJSONs.splice(
+                                            index - 1,
+                                            0,
+                                            pageJSONs.splice(index, 1)[0],
+                                        );
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Move this page up"
+                                    class="py-0.5">
+                                    <IconUp />
+                                </button>
+                            {/if}
+                            {#if index + 1 < pageJSONs.length}
+                                <button
+                                    onclick={() => {
+                                        if (index == currentPageIndex) currentPageIndex += 1;
+                                        else if (index + 1 == currentPageIndex)
+                                            currentPageIndex -= 1;
+                                        pageJSONs.splice(
+                                            index + 1,
+                                            0,
+                                            pageJSONs.splice(index, 1)[0],
+                                        );
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Move this page down"
+                                    class="py-0.5">
+                                    <IconDown />
+                                </button>
+                            {/if}
+                            <button
+                                onclick={() => {
+                                    pageJSONs.splice(index + 1, 0, {
+                                        type: "doc",
+                                        content: [],
+                                    });
+                                    saveContent();
+                                }}
+                                {@attach tooltip}
+                                aria-label="Add new page below"
+                                class="py-0.5">
+                                <IconAdd />
+                            </button>
+                            {#if pageJSONs.length != 1}
+                                <button
+                                    onclick={() => {
+                                        pageJSONs.splice(index, 1);
+                                        currentPageIndex = Math.max(0, currentPageIndex - 1);
+                                        editor?.commands.setContent(pageJSONs[currentPageIndex]);
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Delete this page"
+                                    class="py-0.5">
+                                    <IconDelete />
+                                </button>
+                            {/if}
                         </div>
                     </div>
-                    <div class="mt-1 px-2 flex w-full items-center gap-2">
-                        <p class="text-left grow">{index + 1} of {pageJSONs.length}</p>
-                        {#if index > 0}
-                        <button
-                            onclick={() => {
-                                if(index == currentPageIndex) currentPageIndex -= 1;
-                                else if(index - 1 == currentPageIndex) currentPageIndex += 1;
-                                pageJSONs.splice(index - 1, 0, pageJSONs.splice(index, 1)[0]);
-                                saveContent();
-                            }}
-                            {@attach tooltip}
-                            aria-label="Move this page up"
-                            class="py-0.5">
-                            <IconUp />
-                        </button>
-                        {/if}
-                        {#if index + 1 < pageJSONs.length}
-                        <button
-                            onclick={() => {
-                                if(index == currentPageIndex) currentPageIndex += 1;
-                                else if(index + 1 == currentPageIndex) currentPageIndex -= 1;
-                                pageJSONs.splice(index + 1, 0, pageJSONs.splice(index, 1)[0]);
-                                saveContent();
-                            }}
-                            {@attach tooltip}
-                            aria-label="Move this page down"
-                            class="py-0.5">
-                            <IconDown />
-                        </button>
-                        {/if}
-                        <button
-                            onclick={() => {
-                                pageJSONs.splice(index + 1, 0, {
-                                    type: "doc",
-                                    content: [],
-                                });
-                                saveContent();
-                            }}
-                            {@attach tooltip}
-                            aria-label="Add new page below"
-                            class="py-0.5">
-                            <IconAdd />
-                        </button>
-                        {#if pageJSONs.length != 1}
-                        <button
-                            onclick={() => {
-                                pageJSONs.splice(index, 1);
-                                currentPageIndex = Math.max(0, currentPageIndex - 1);
-                                editor?.commands.setContent(pageJSONs[currentPageIndex]);
-                                saveContent();
-                            }}
-                            {@attach tooltip}
-                            aria-label="Delete this page"
-                            class="py-0.5">
-                            <IconDelete />
-                        </button>
-                        {/if}
-                    </div>
-                </div>
-            {/each}
+                {/each}
             {/key}
         </div>
-        <div class="h-full w-full grow overflow-auto bg-zinc-800 border-l border-zinc-700">
+        <div class="h-full w-full grow overflow-auto border-l border-zinc-700 bg-zinc-800">
             <div class="book-img m-3">
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
@@ -364,12 +374,10 @@
     <!-- output box(es) -->
     {#if page.url.searchParams.has("dev")}
         <code class="inline-block overflow-x-scroll p-3 text-xs"
-            >DEV ONLY: {currentTiptapJSON
-                ? JSON.stringify(currentTiptapJSON)
-                : "Loading..."}</code>
+            >DEV ONLY: {currentTiptapJSON ? JSON.stringify(currentTiptapJSON) : "Loading..."}</code>
         <br />
     {/if}
-    <div class="w-screen bg-zinc-950 p-3 border-t border-zinc-700">
+    <div class="w-screen border-t border-zinc-700 bg-zinc-950 p-3">
         <div class="flex max-h-32 items-start space-x-2 overflow-auto">
             <button
                 {@attach tooltip}
@@ -401,9 +409,7 @@
             </code>
         </div>
         <div class="mt-2 flex items-center space-x-2 select-none">
-            <p class="font-lexend nomob text-xs text-white/60">
-                click to change output settings:
-            </p>
+            <p class="font-lexend nomob text-xs text-white/60">click to change output settings:</p>
 
             <div class="relative inline-block">
                 {#if versionPopup}
@@ -415,9 +421,8 @@
                                 <div class="m-auto flex flex-col">
                                     <b>Warning:</b>
                                     <span
-                                        >Changing to an earlier version could remove some
-                                        elements of your text that are unsupported in this
-                                        version.</span>
+                                        >Changing to an earlier version could remove some elements
+                                        of your text that are unsupported in this version.</span>
                                     <div class="mt-2 flex space-x-2">
                                         <button
                                             class="rounded-md bg-zinc-800 px-2 py-1 hover:bg-zinc-700"

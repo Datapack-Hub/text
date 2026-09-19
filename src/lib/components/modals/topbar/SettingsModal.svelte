@@ -64,5 +64,17 @@
                     >This alters the font size in the editor, but not the output.</span>
             </label>
         </div>
+
+        <div class="flex items-center space-x-2">
+            <select name="bookPreviewMode" bind:value={$appSettings.bookPreviewMode} class="input-basic">
+                <option value="normal">Normal</option>
+                <option value="compact">Compact</option>
+            </select>
+            <label for="bookPreviewMode" class="flex flex-col">
+                <span>Book preview mode</span>
+                <span class="text-xs text-zinc-500"
+                    >This alters the way book pages are displayed in the editor.</span>
+            </label>
+        </div>
     </div>
 </Modal>

@@ -6,7 +6,8 @@ export type Settings = {
     showCharacterCount: boolean; // whether the character count is shown
     syntaxHighlight: boolean; // whether to show highlighted output text
     realisticLineHeight: boolean; // whether to use smaller line height
-    hideSelectionExport: boolean; // whether to hide the export this button
+    hideSelectionExport: boolean; // whether to hide the "export this" button
+    bookPreviewMode: "normal" | "compact"; // whether to show the book preview in normal or compact mode
     fontSize: number; // 0 = small, 1 = default, 2 = large
 };
 
@@ -35,6 +36,7 @@ export const appSettings: Writable<Settings> = createPersistentStore("settings",
     syntaxHighlight: true,
     realisticLineHeight: false,
     hideSelectionExport: true,
+    bookPreviewMode: "normal",
     fontSize: 1,
 });
 

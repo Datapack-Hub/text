@@ -5,12 +5,14 @@
         bookDetailsDialog?: Modal;
         title: string;
         author: string;
+        generation?: number;
     }
 
     let {
         bookDetailsDialog = $bindable(),
         title = $bindable("Title"),
         author = $bindable("Author"),
+        generation = $bindable(0),
     }: Props = $props();
 </script>
 
@@ -31,5 +33,13 @@
             placeholder="Book author"
             class="input-basic"
             bind:value={author} />
+
+        <label for="generation" class="mt-2">Book generation</label>
+        <select name="generation" class="input-basic" bind:value={generation}>
+            <option value="0">Original</option>
+            <option value="1">Copy of Original</option>
+            <option value="2">Copy of Copy</option>
+            <option value="3">Tattered</option>
+        </select>
     </div>
 </Modal>

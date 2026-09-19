@@ -48,37 +48,35 @@
         <span class="nomob ml-2 font-semibold">Minecraft Text Editor</span>
     </button>
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={importDialog?.open}>
         <IconUpload class="text-xs" />
         <span>Import</span>
     </button>
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={loadDialog?.open}>
         <IconSaved class="text-xs" />
         <span>Saved</span>
     </button>
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={settingsDialog?.open}>
         <IconSettings class="text-xs" />
         <span>Settings</span>
     </button>
     {#if page.url.pathname == "/book"}
         <a
-            class="flex items-center space-x-[0.45rem] bg-rose-900 px-[0.6rem] py-2 hover:bg-rose-800"
+            class="flex items-center space-x-[0.45rem] bg-orange-800 px-[0.6rem] py-2 hover:bg-orange-900"
             href="/">
             <IconBookMode class="text-xs" />
-            <!-- <span class="font-bold">Mode:</span> -->
             <span>Book Mode</span>
         </a>
     {:else}
         <a
-            class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+            class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
             href="/book">
             <IconNormalMode class="text-xs" />
-            <!-- <span class="font-bold">Mode:</span> -->
             <span>Normal Mode</span>
         </a>
     {/if}

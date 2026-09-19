@@ -42,7 +42,7 @@
     import IconCopy from "~icons/tabler/copy";
     import IconAdd from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
-    import IconSettings from "~icons/tabler/settings";
+    import IconSettings from "~icons/tabler/writing";
     import IconUp from "~icons/tabler/chevron-up";
     import IconDown from "~icons/tabler/chevron-down";
 
@@ -60,7 +60,7 @@
 
     let exportSelectionDialog: Modal = $state()!;
     let bookDetailsDialog: Modal = $state()!;
-
+    let generation = $state(0);
     let versionPopupConfirmationVisible = $state(false);
     let temporaryVersionConfirmation: Version | undefined = $state();
 
@@ -273,20 +273,35 @@
             {#key pageJSONs}
                 {#each pageJSONs as page, index}
                     <div class="w-55 p-2">
-                        <div
-                            role="button"
-                            tabindex="0"
-                            onkeydown={(event) => pageKeyDownHandler(event, index)}
-                            onclick={() => {
-                                currentPageIndex = index;
-                                editor?.commands.setContent(pageJSONs[index]);
-                            }}
-                            class="page-preview {currentPageIndex != index ? 'opacity-60' : ''}">
+                        {#if $appSettings.bookPreviewMode === "normal"}
                             <div
-                                class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
-                                <BookMiniRenderer value={page} />
+                                role="button"
+                                tabindex="0"
+                                onkeydown={(event) => pageKeyDownHandler(event, index)}
+                                onclick={() => {
+                                    currentPageIndex = index;
+                                    editor?.commands.setContent(pageJSONs[index]);
+                                }}
+                                class="page-preview {currentPageIndex != index
+                                    ? 'opacity-60'
+                                    : ''}">
+                                <div
+                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
+                                    <BookMiniRenderer value={page} />
+                                </div>
                             </div>
-                        </div>
+                        {:else if $appSettings.bookPreviewMode === "compact"}
+                            <button
+                                onclick={() => {
+                                    currentPageIndex = index;
+                                    editor?.commands.setContent(pageJSONs[index]);
+                                }}
+                                class="w-full rounded-md bg-zinc-800 px-2 py-1 text-left hover:bg-zinc-700">
+                                <span class="font-minecraft text-book line-clamp-3">
+                                    <BookMiniRenderer value={page} />
+                                </span>
+                            </button>
+                        {/if}
                         <div class="mt-1 flex w-full items-center gap-2 px-2">
                             <p class="grow text-left">{index + 1} of {pageJSONs.length}</p>
                             {#if index > 0}
@@ -384,7 +399,7 @@
                 class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
                 onclick={() => {
                     navigator.clipboard.writeText(
-                        `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`,
+                        `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`,
                     );
                     recentlyCopied = true;
                     setTimeout(() => (recentlyCopied = false), 2000);
@@ -400,10 +415,10 @@
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}
-                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`} />
+                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}"}]`
+                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`
                             : "Loading..."}</pre>
                 {/if}
             </code>
@@ -480,10 +495,9 @@
                 <p class="font-lexend nomob text-xs text-white/60">•</p>
 
                 <p class="font-lexend nomob text-xs text-white/60">
-                    <!-- TODO: account for title and author -->
                     {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length +
                         title.length +
-                        author.length} characters
+                        author.length + 1 + 64} characters
                 </p>
             {/if}
         </div>

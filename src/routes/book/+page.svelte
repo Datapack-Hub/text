@@ -42,7 +42,7 @@
     import IconCopy from "~icons/tabler/copy";
     import IconAdd from "~icons/tabler/plus";
     import IconDelete from "~icons/tabler/trash";
-    import IconSettings from "~icons/tabler/writing";
+    import IconSettings from "~icons/tabler/settings";
     import IconUp from "~icons/tabler/chevron-up";
     import IconDown from "~icons/tabler/chevron-down";
 
@@ -60,14 +60,15 @@
 
     let exportSelectionDialog: Modal = $state()!;
     let bookDetailsDialog: Modal = $state()!;
-    let generation = $state(0);
     let versionPopupConfirmationVisible = $state(false);
     let temporaryVersionConfirmation: Version | undefined = $state();
 
     let welcomeScreenVisible = $state(false);
 
-    let title = $state("Title");
-    let author = $state("Author");
+    let title = $state("Custom Book");
+    let author = $state("Your Name Here");
+    let hideDetails = $state(false);
+    let generation = $state(0);
 
     async function loadData() {
         if (localStorage.getItem("book_content")) {
@@ -415,10 +416,10 @@
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}
-                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`} />
+                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ''}]`} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`
+                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ''}]`
                             : "Loading..."}</pre>
                 {/if}
             </code>
@@ -511,5 +512,5 @@
 {/await}
 
 {#await import("$lib/components/modals/BookDetailsModal.svelte") then modal}
-    <modal.default bind:bookDetailsDialog bind:title bind:author />
+    <modal.default bind:bookDetailsDialog bind:title bind:author bind:hideDetails bind:generation />
 {/await}

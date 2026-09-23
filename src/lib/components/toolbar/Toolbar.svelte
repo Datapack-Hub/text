@@ -1,27 +1,26 @@
 <script lang="ts">
+    import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
+    import { tooltip } from "$lib/tooltip";
     import type { Editor } from "@tiptap/core";
+    import ColorPicker from "svelte-awesome-color-picker";
     import IconUndo from "~icons/tabler/arrow-back-up";
     import IconRedo from "~icons/tabler/arrow-forward-up";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconFont from "~icons/tabler/function";
-    import IconUploadFont from "~icons/tabler/function-filled";
     import IconClickEvent from "~icons/tabler/hand-finger";
     import IconKeybinds from "~icons/tabler/keyboard";
     import IconEmoji from "~icons/tabler/mood-smile-beam";
     import IconColor from "~icons/tabler/palette";
     import IconEdit from "~icons/tabler/pencil";
+    import IconUploadImage from "~icons/tabler/photo-scan";
     import IconCustom from "~icons/tabler/plus";
     import IconHoverEvent from "~icons/tabler/pointer";
     import IconSquare from "~icons/tabler/square-filled";
     import IconHollow from "~icons/tabler/square-x";
-    import IconUploadImage from "~icons/tabler/photo-scan";
     import Modal from "../Modal.svelte";
+    import MiniEditor from "../text/MiniEditor.svelte";
     import TextStyleButtons from "./TextStyleButtons.svelte";
     import ToolbarButton from "./ToolbarButton.svelte";
-    import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
-    import { tooltip } from "$lib/tooltip";
-    import MiniEditor from "../text/MiniEditor.svelte";
-    import ColorPicker from "svelte-awesome-color-picker";
 
     const { editor }: { editor: Editor | undefined } = $props();
 
@@ -134,7 +133,7 @@
     }
 </script>
 
-<div class="flex w-full flex-wrap items-center bg-zinc-900 p-3">
+<div class="flex w-full flex-wrap items-center border-b border-zinc-700 bg-zinc-900 p-3">
     {#if editor}
         <TextStyleButtons {editor} />
 
@@ -160,14 +159,19 @@
             Icon={IconGradient}
             onClick={gradientDialog.open}
             ariaLabel="Color Gradient" />
-        <div id="colorBtns" class="flex items-center space-x-0 mx-1">
+        <div id="colorBtns" class="mx-1 flex items-center space-x-0">
             {#each colourMap as colour}
                 <button
                     aria-label={toTitleCase(colour.name.replace("_", " "))}
                     onclick={() => editor!.chain().focus().setColor(colour.value).run()}
                     {@attach tooltip}
                     style="color: {colour.value || 'inherit'}"
-                    class="rounded-md py-1 px-0 text-lg font-medium hover:bg-white/3 {editor.isActive("textStyle", { color: colour.value }) ? ' bg-zinc-800' : ''}">
+                    class="rounded-md px-0 py-1 text-lg font-medium hover:bg-white/3 {editor.isActive(
+                        'textStyle',
+                        { color: colour.value },
+                    )
+                        ? ' bg-zinc-800'
+                        : ''}">
                     <IconSquare />
                 </button>
             {/each}
@@ -262,9 +266,17 @@
         <ToolbarButton onClick={() => editor?.commands.redo()} ariaLabel="Redo" Icon={IconRedo} />
 
         <div class="grow"></div>
-          
-        <ToolbarButton onClick={insertImageDialog?.open} ariaLabel="Insert Image" Icon={IconUploadImage} desktopOnly />
-        <ToolbarButton onClick={keybindDialog?.open} ariaLabel="Keybinds" Icon={IconKeybinds} desktopOnly />
+
+        <ToolbarButton
+            onClick={insertImageDialog?.open}
+            ariaLabel="Insert Image"
+            Icon={IconUploadImage}
+            desktopOnly />
+        <ToolbarButton
+            onClick={keybindDialog?.open}
+            ariaLabel="Keybinds"
+            Icon={IconKeybinds}
+            desktopOnly />
     {/if}
 </div>
 

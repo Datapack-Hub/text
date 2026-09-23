@@ -54,7 +54,7 @@ export function defaultColorLUT(color: string): string | undefined {
         return;
     }
 
-    color = rgbToHex(color)
+    color = rgbToHex(color);
 
     return colourMap.find((e) => e.value.toUpperCase() === color)?.name || color;
 }
@@ -167,16 +167,16 @@ export function rgbaToArgbHex(rgbaHex: string): string {
 }
 
 export function rgbToHex(color: string): string {
-    if (color.startsWith('rgb')) {
+    if (color.startsWith("rgb")) {
         const result = /^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/u.exec(color);
         return result
-        ? "#" +
-              [1, 2, 3]
-                  .map((n) => parseInt(result[n]).toString(16).padStart(2, "0"))
-                  .join("")
-                  .toUpperCase()
-        : color;
+            ? "#" +
+                  [1, 2, 3]
+                      .map((n) => parseInt(result[n]).toString(16).padStart(2, "0"))
+                      .join("")
+                      .toUpperCase()
+            : color;
     } else {
-        return color.toUpperCase()
+        return color.toUpperCase();
     }
 }

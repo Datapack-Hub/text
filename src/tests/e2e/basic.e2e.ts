@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
     await page.waitForLoadState();
 
     await page.evaluate((format) => {
-        localStorage.setItem('hasSeenWelcome', format); 
+        localStorage.setItem("hasSeenWelcome", format);
     }, welcomeScreenFormat);
 
     await page.reload();
@@ -127,7 +127,6 @@ test("the color buttons should work", async ({ page }) => {
     }
 
     // check unsetting color
-
     await textbox.selectText();
 
     // should be visible, being that it should still have color applied from the last button click

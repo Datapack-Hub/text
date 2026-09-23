@@ -1,4 +1,4 @@
-import { outputVersion } from "$lib/stores";
+import { outputVersion } from "$lib/settings";
 import { addTypeSpecificValues } from "$lib/text/nbt/export";
 import { versions, type MinecraftText, type VersionAgnosticText } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";

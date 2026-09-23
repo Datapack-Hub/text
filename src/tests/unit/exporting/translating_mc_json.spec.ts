@@ -1,4 +1,4 @@
-import { outputVersion } from "$lib/stores";
+import { outputVersion } from "$lib/settings";
 import { convert, translateJSON } from "$lib/text/nbt/export";
 import { versions, type TranslateOptions } from "$lib/types";
 import type { JSONContent } from "@tiptap/core";
@@ -34,10 +34,7 @@ const baseOptions: TranslateOptions = {
 it("returns waiting message for empty content", () => {
     const json: JSONContent = {};
     const result = translateJSON(json, baseOptions);
-    expect(result).toBeOneOf([
-        "waiting for input...",
-        "🤓 <- kevin is waiting for you to type something",
-    ]);
+    expect(result).toBe(JSON.stringify(""));
 });
 
 it("translates simple text node", () => {
@@ -96,7 +93,7 @@ it("handles shadowColor mark", async () => {
         "clean/json/shadow_color.json",
     )) as JSONContent;
     const result = convert(json, true, "standard");
-    expect(result).toContain('shadow_color:4294902015L');
+    expect(result).toContain("shadow_color:4294902015L");
 });
 
 it("handles shadowColor transparency", async () => {
@@ -104,7 +101,7 @@ it("handles shadowColor transparency", async () => {
         "clean/json/shadow_color_transparent.json",
     )) as JSONContent;
     const result = convert(json, true, "standard");
-    expect(result).toContain('shadow_color:4294923348L');
+    expect(result).toContain("shadow_color:4294923348L");
 });
 
 it("should remove shadow_color if out of range", async () => {

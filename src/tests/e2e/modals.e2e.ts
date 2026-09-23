@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
     await page.waitForLoadState();
 
     await page.evaluate((format) => {
-        localStorage.setItem('hasSeenWelcome', format); 
+        localStorage.setItem("hasSeenWelcome", format);
     }, welcomeScreenFormat);
 
     await page.reload();

@@ -68,22 +68,19 @@
                 bind:value={importText}></textarea>
 
             <div class="flex items-center space-x-2">
-                <label for="appendToEditor" class="flex flex-col">
-                    <span>Import behaviour</span>
-                    <span class="text-xs text-zinc-500"
-                        >Determines how to handle the imported text components. Append will add the
-                        text as a new page, replace will replace the current page, and overwrite
-                        will replace all content (book import).</span>
-                </label>
-
                 <select
                     name="importMode"
                     bind:value={bookImportMode}
                     class="rounded-lg border-r-8 border-zinc-900 bg-zinc-900 p-2 text-sm">
-                    <option value="append">Append as page</option>
+                    <option value="append">Create new page</option>
                     <option value="replace">Replace current page</option>
-                    <option value="overwrite">Replace all content</option>
+                    <option value="overwrite">Import as new book</option>
                 </select>
+                <label for="appendToEditor" class="flex flex-col">
+                    <span>Import behaviour</span>
+                    <span class="text-xs text-zinc-500"
+                        >Determines where to insert the imported text into the book. Be mindful so this won't override your book content!</span>
+                </label>
             </div>
 
             <button onclick={importBookToEditor} class="btn">Import</button>

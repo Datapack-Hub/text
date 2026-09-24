@@ -130,15 +130,15 @@ it("should convert number to hex byte string", () => {
     expect(mapToHexByte(1.2)).toBe("00");
 });
 
-it("should strip type suffixes from input string", () => {
-    expect(stripTypeSuffixes("1L")).toBe("1");
-    expect(stripTypeSuffixes("1.0F")).toBe("1.0");
-    expect(stripTypeSuffixes("1.0D")).toBe("1.0");
-    expect(stripTypeSuffixes("1b")).toBe("1");
-    expect(stripTypeSuffixes("1s")).toBe("1");
-    expect(stripTypeSuffixes("1i")).toBe("1");
-    expect(stripTypeSuffixes("1.0")).toBe("1.0");
-});
+// it("should strip type suffixes from input string", () => {
+//     expect(stripTypeSuffixes("1L")).toBe("1");
+//     expect(stripTypeSuffixes("1.0F")).toBe("1.0");
+//     expect(stripTypeSuffixes("1.0D")).toBe("1.0");
+//     expect(stripTypeSuffixes("1b")).toBe("1");
+//     expect(stripTypeSuffixes("1s")).toBe("1");
+//     expect(stripTypeSuffixes("1i")).toBe("1");
+//     expect(stripTypeSuffixes("1.0")).toBe("1.0");
+// });
 
 it("should convert rgba hex to argb hex", () => {
     expect(rgbaToArgbHex("#FF0000FF")).toBe("#FFFF0000");

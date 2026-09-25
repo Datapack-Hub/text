@@ -136,7 +136,7 @@ export function mapToHexByte(value: number): string {
 }
 
 export function stripTypeSuffixes(input: string): string {
-    const regex = /"(?:\\.|[^"\\])*"|(?<=:\s*|)(\d+(?:\.\d+)?)[fdlsib](?=\s*[,:}\]])/gi;
+    const regex = /"(?:\\.|[^"\\])*"|(?<=[:\[,]\s*)(\d+(?:\.\d+)?)[fdlsib](?=\s*[,:}\]])/gi;
     const matches = [...input.matchAll(regex)]
     for (let i = matches.length - 1; i >= 0; i--) {
         const match = matches[i];

@@ -39,9 +39,7 @@ export function optimise(stringyTextElements: StringyMCText[], lore = false): St
     }
 
     output.push(...flattenMCText(stringyTextElements));
-    // console.log("flattened", output);
     output = mergeTextComponents(output);
-    // console.log("merged", output);
 
     // if it is item lore then override
     if (lore) {

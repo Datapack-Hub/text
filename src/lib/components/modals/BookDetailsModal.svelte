@@ -9,7 +9,7 @@
         title: string;
         author: string;
         generation?: number;
-        hideDetails?: boolean
+        hideDetails?: boolean;
     }
 
     let {
@@ -17,7 +17,7 @@
         title = $bindable("Custom Book"),
         author = $bindable("Your Name Here"),
         generation = $bindable(0),
-        hideDetails = $bindable(false)
+        hideDetails = $bindable(false),
     }: Props = $props();
 </script>
 
@@ -57,7 +57,9 @@
             <CheckBox label="realisticLineHeight" bind:value={hideDetails} />
             <label for="realisticLineHeight" class="flex flex-col">
                 <span>Hide book details</span>
-                <span class="text-xs text-zinc-500">If enabled, the author and title will not be visible in the tooltip of the book item.</span>
+                <span class="text-xs text-zinc-500"
+                    >If enabled, the author and title will not be visible in the tooltip of the book
+                    item.</span>
             </label>
         </div>
     </div>

@@ -79,7 +79,8 @@
                 <label for="appendToEditor" class="flex flex-col">
                     <span>Import behaviour</span>
                     <span class="text-xs text-zinc-500"
-                        >Determines where to insert the imported text into the book. Be mindful so this won't override your book content!</span>
+                        >Determines where to insert the imported text into the book. Be mindful so
+                        this won't override your book content!</span>
                 </label>
             </div>
 

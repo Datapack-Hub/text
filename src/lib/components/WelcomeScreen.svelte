@@ -61,13 +61,15 @@
 
                     <div class="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                         <div
-                            class="mb-1 col-span-2 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50">
+                            class="col-span-2 mb-1 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50">
                             <IconBook class="w-[3.75%] lg:w-1/20" />
                             <div class="my-1 flex w-[96.25%] flex-col space-y-1 lg:w-19/20">
                                 <span class="text-xs font-bold text-yellow-500 uppercase"
                                     >New - Book Mode</span>
                                 <span class="text-sm text-white"
-                                    >Fully edit books with an intuitive page-by-page editor. You can edit and rearrange pages, import books, and customise (or hide) book details!</span>
+                                    >Fully edit books with an intuitive page-by-page editor. You can
+                                    edit and rearrange pages, import books, and customise (or hide)
+                                    book details!</span>
                             </div>
                         </div>
 

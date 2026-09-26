@@ -136,18 +136,17 @@ export function mapToHexByte(value: number): string {
 }
 
 export function stripTypeSuffixes(input: string): string {
-    const regex = /"(?:\\.|[^"\\])*"|(?<=[:\[,]\s*)(\d+(?:\.\d+)?)[fdlsib](?=\s*[,:}\]])/gi;
-    const matches = [...input.matchAll(regex)]
+    const regex = /"(?:\\.|[^"\\])*"|(?<=[:[,]\s*)(\d+(?:\.\d+)?)[fdlsib](?=\s*[,:}\]])/gi;
+    const matches = [...input.matchAll(regex)];
     for (let i = matches.length - 1; i >= 0; i--) {
         const match = matches[i];
-        
+
         if (match[1]) {
-            input = input.slice(0, match.index) + match[1] + input.slice(match.index + match[0].length);
+            input =
+                input.slice(0, match.index) + match[1] + input.slice(match.index + match[0].length);
         }
     }
-
-    console.log(input)
-    return input
+    return input;
 }
 
 export function argbToRgbaHex(rgbaHex: string): string {

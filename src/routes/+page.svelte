@@ -140,8 +140,8 @@
                 editor = undefined;
                 editor = newEditor;
             },
-            onUpdate: ({ editor }) => {
-                tiptapJSON = editor.getJSON();
+            onUpdate: ({ editor: currEditor }) => {
+                tiptapJSON = currEditor.getJSON();
                 debounce(saveContent, 1000)();
             },
         });
@@ -191,32 +191,6 @@
         return navigator.platform.startsWith("Mac") || navigator.platform.includes("iPhone")
             ? event.metaKey
             : event.ctrlKey;
-    }
-
-    function calculateBookOutput(edit: Editor): string[][] {
-        const el = edit.view.dom;
-
-        // TODO: actually fill with content
-        const splitPages: JSONContent[][] = [[]];
-        const maxHeight = parseInt(getComputedStyle(el).lineHeight) * 14;
-        let currentHeight = 0;
-        let currentPage = 0;
-
-        for (let i = 0; i < el.children.length; i++) {
-            const child = el.children[i];
-            const metrics = child.getBoundingClientRect();
-            currentHeight += metrics.height;
-            splitPages[currentPage].push(edit.getJSON().content[i]);
-            if (currentHeight > maxHeight) {
-                currentHeight = 0;
-                splitPages.push([]);
-                currentPage++;
-            }
-        }
-
-        return splitPages
-            .filter((page) => page.length > 0)
-            .map((page) => [convert({ type: "doc", content: page }, shouldOptimise)]);
     }
 
     function clearMarksHandler(event: KeyboardEvent) {
@@ -307,7 +281,6 @@
                     <IconCopy />
                 {/if}</button>
             <code id="outputbox">
-                <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}

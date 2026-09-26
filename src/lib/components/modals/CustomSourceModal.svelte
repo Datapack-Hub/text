@@ -73,7 +73,6 @@
     {#if !customType}
         <p>Select a source type to add</p>
         <div class="flex flex-col space-y-2">
-            <!-- <div class="grid grid-cols-2 gap-2"> -->
             <button
                 class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
                 onclick={() => (customType = "translate")}>
@@ -140,15 +139,6 @@
                 </button>
             {/if}
         </div>
-    {:else}
-        <!-- <select bind:value={customType} class="input-basic">
-            <option value="translate">Translate Key</option>
-            <option value="score">Score Value</option>
-            <option value="nbt">NBT Value</option>
-            <option value="selector">Selector</option>
-            <option value="keybind">Keybind</option>
-            <option value="object">Object</option>
-        </select> -->
     {/if}
 
     {#if customType === "translate"}

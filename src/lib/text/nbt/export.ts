@@ -164,12 +164,12 @@ function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
  */
 export function convert(
     jsonContent: JSONContent,
-    optimise: boolean,
+    shouldOptimise: boolean,
     exportType: "standard" | "item_lore" = "standard",
     forceJson: boolean = false,
 ): string {
     exportVersion = get(outputVersion);
-    let out = translateJSON(jsonContent, { exportType, optimise });
+    let out = translateJSON(jsonContent, { exportType, optimise: shouldOptimise });
 
     // Convert from JSON string to NBT string if required
     if (exportVersion.index >= 1 && !forceJson) {

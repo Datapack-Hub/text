@@ -66,7 +66,10 @@
         </div>
 
         <div class="flex items-center space-x-2">
-            <select name="bookPreviewMode" bind:value={$appSettings.bookPreviewMode} class="input-basic">
+            <select
+                name="bookPreviewMode"
+                bind:value={$appSettings.bookPreviewMode}
+                class="input-basic">
                 <option value="normal">Normal</option>
                 <option value="compact">Compact</option>
             </select>

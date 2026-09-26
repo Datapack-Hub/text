@@ -25,7 +25,7 @@ export const ExportButtonExtension = Extension.create<ExportButtonOptions>({
         return [
             new Plugin({
                 key: new PluginKey("ExportButton"),
-                view(editorView: EditorView) {
+                view(_editorView: EditorView) {
                     return {
                         update(view: EditorView) {
                             if (get(appSettings).hideSelectionExport == true) {

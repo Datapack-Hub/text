@@ -67,7 +67,7 @@
     </button>
     {#if page.url.pathname == "/book"}
         <a
-            class="flex items-center space-x-[0.45rem] text-orange-300 px-[0.6rem] py-2 hover:bg-white/5"
+            class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 text-orange-300 hover:bg-white/5"
             href="/">
             <IconBookMode class="text-xs" />
             <span>Book Mode</span>

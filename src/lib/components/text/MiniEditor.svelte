@@ -46,9 +46,9 @@
                 editor = undefined;
                 editor = newEditor;
             },
-            onUpdate: ({ editor }) => {
-                value = JSON.stringify(editor.getJSON());
-                output = JSON.parse(translate(editor.getJSON()));
+            onUpdate: ({ editor: currEditor }) => {
+                value = JSON.stringify(currEditor.getJSON());
+                output = JSON.parse(translate(currEditor.getJSON()));
             },
         });
     });

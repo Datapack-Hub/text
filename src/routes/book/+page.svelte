@@ -155,8 +155,8 @@
                 editor = undefined;
                 editor = newEditor;
             },
-            onUpdate: ({ editor }) => {
-                currentTiptapJSON = editor.getJSON();
+            onUpdate: ({ editor: currEditor }) => {
+                currentTiptapJSON = currEditor.getJSON();
                 pageJSONs[currentPageIndex] = currentTiptapJSON;
                 debounce(saveContent, 1000)();
             },
@@ -252,10 +252,6 @@
         {editor}
         {welcomeScreenVisible} />
 
-    <!-- <div class="w-full bg-red-700 p-2 text-sm font-bold">
-        (BETA) The book editor is in active development. Report bugs and expect incomplete/broken
-        features (also keep backups!).
-    </div> -->
     <ControlBar {editor} />
 
     <!-- input box(es) -->
@@ -416,10 +412,10 @@
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}
-                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ''}]`} />
+                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ""}]`} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ''}]`
+                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ""}]`
                             : "Loading..."}</pre>
                 {/if}
             </code>
@@ -498,7 +494,9 @@
                 <p class="font-lexend nomob text-xs text-white/60">
                     {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length +
                         title.length +
-                        author.length + 1 + 64} characters
+                        author.length +
+                        1 +
+                        64} characters
                 </p>
             {/if}
         </div>

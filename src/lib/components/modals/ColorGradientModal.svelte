@@ -220,7 +220,6 @@
                 {#each recentGradients.slice().reverse() ?? [] as gradient}
                     <div class="flex items-center space-x-1">
                         <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
-                            <!-- <span>Colours: </span> -->
                             <div class="flex grow items-center space-x-1">
                                 {#each gradient ?? [] as step}
                                     <IconCircle class="text-xl" style={"color: " + step + ";"} />

@@ -61,21 +61,21 @@
 
     onMount(() => {
         appSettings.subscribe(() => {
-            var el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
+            const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
 
             if ($appSettings.realisticLineHeight == true) {
-                var lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
+                const lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
                 el.forEach((e) => {
                     e.style.lineHeight = lineHeight.toString() + "rem";
                 });
             } else {
-                var lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
+                const lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
                 el.forEach((e) => {
                     e.style.lineHeight = lineHeight.toString() + "rem";
                 });
             }
 
-            var fontSize = 1 + 0.25 * $appSettings.fontSize;
+            const fontSize = 1 + 0.25 * $appSettings.fontSize;
             el.forEach((e) => {
                 e.style.fontSize = fontSize.toString() + "rem";
             });

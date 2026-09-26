@@ -12,7 +12,7 @@ export type Settings = {
 };
 
 function createPersistentStore(key: string, startValue: any) {
-    var value = browser ? (localStorage.getItem(key) ?? startValue) : startValue;
+    let value = browser ? (localStorage.getItem(key) ?? startValue) : startValue;
     if (typeof value == "string") {
         value = JSON.parse(value);
     } else {

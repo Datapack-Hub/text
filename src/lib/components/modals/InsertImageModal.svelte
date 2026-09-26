@@ -31,10 +31,10 @@
                 const imageDataUrl = reader.result as string;
 
                 image.src = imageDataUrl;
-                image.onload = () => {
+                image.addEventListener("load", () => {
                     processImage(image);
                     image.remove();
-                };
+                });
             });
 
             reader.readAsDataURL(files[0]);
@@ -43,14 +43,14 @@
 
     function checkFileSize(file: File) {
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.addEventListener("load", () => {
             const image = new Image();
             image.src = reader.result as string;
-            image.onload = () => {
+            image.addEventListener("load", () => {
                 sizeWarning = image.width > 24 || image.height > 24;
                 image.remove();
-            };
-        };
+            });
+        });
         reader.readAsDataURL(file);
     }
 

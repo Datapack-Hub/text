@@ -83,4 +83,4 @@
     });
 </script>
 
-<div class="tiptap tiptap-minirenderer">{@html html}</div>
+{@html html}

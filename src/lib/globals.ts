@@ -1,1 +1,1 @@
-export const welcomeScreenFormat = "1";
+export const welcomeScreenFormat = "2";

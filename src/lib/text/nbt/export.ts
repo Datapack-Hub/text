@@ -7,7 +7,7 @@ import {
     trueMarkOrUndefined,
     unescapeUnicode,
 } from "../utils";
-import { outputVersion } from "$lib/stores";
+import { outputVersion } from "$lib/settings";
 import { get } from "svelte/store";
 import { optimise } from "./optimiser";
 
@@ -164,26 +164,29 @@ function oldApplyInteractiveValues(current: OldMinecraftText, c: JSONContent) {
  */
 export function convert(
     jsonContent: JSONContent,
-    optimise: boolean,
+    shouldOptimise: boolean,
     exportType: "standard" | "item_lore" = "standard",
     forceJson: boolean = false,
 ): string {
     exportVersion = get(outputVersion);
-    let out = translateJSON(jsonContent, { exportType, optimise });
+    let out = translateJSON(jsonContent, { exportType, optimise: shouldOptimise });
 
     // Convert from JSON string to NBT string if required
     if (exportVersion.index >= 1 && !forceJson) {
         // nbt number type fix for shadow colour
         // moved from translateJSON function
         const shadowColorMatches = out.matchAll(/"shadow_color":(-?\d+)/gu);
-        const relevantShadowColorMatches = shadowColorMatches.filter(item => (parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)).toArray().map(item => item[1])
+        const relevantShadowColorMatches = shadowColorMatches
+            .filter((item) => parseInt(item[1]) > 2 ** 31 - 1 || parseInt(item[1]) < (-2) ** 31)
+            .toArray()
+            .map((item) => item[1]);
         const deduplicatedRelevantShadowColorMatches = [...new Set(relevantShadowColorMatches)];
 
         for (const match of deduplicatedRelevantShadowColorMatches) {
-            const num = parseInt(match)
+            const num = parseInt(match);
             out = out.replaceAll(`"shadow_color":${match}`, `"shadow_color":${num}L`);
         }
-        
+
         // remove string marks from json keys only
         out = out.replaceAll(/(?<=[{,]\s*)"[^"]*"\s*:/gu, (match) => match.replaceAll(`"`, ""));
     }
@@ -209,9 +212,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         }
 
         if (data.length === 0) {
-            return Math.random() < 0.002
-                ? "🤓 <- kevin is waiting for you to type something"
-                : "waiting for input...";
+            return JSON.stringify("");
         }
 
         if (options.optimise) {
@@ -223,7 +224,7 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
         if (data.length === 2 && data[0] == "") {
             return JSON.stringify(data[1]);
         } else if (data.length === 1) {
-            return JSON.stringify(data[0])
+            return JSON.stringify(data[0]);
         }
 
         return JSON.stringify(data);
@@ -257,13 +258,15 @@ export function translateJSON(json: JSONContent, options: TranslateOptions): str
 function constructComponent(content: JSONContent, includeInteractivity: boolean = true) {
     // Construct basic styled component
     let currentComponent: MinecraftText = {
-        color: defaultColorLUT(content.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
+        color: defaultColorLUT(
+            content.marks?.find((obj) => obj.type == "textStyle")?.attrs?.color || undefined,
+        ),
         bold: trueMarkOrUndefined(content, "bold"),
         italic: trueMarkOrUndefined(content, "italic"),
         strikethrough: trueMarkOrUndefined(content, "strike"),
         underlined: trueMarkOrUndefined(content, "underline"),
         obfuscated: trueMarkOrUndefined(content, "obfuscated"),
-        font: content.marks?.find(obj => obj.type == "textStyle")?.attrs?.font || undefined,
+        font: content.marks?.find((obj) => obj.type == "textStyle")?.attrs?.font || undefined,
     };
 
     // Add shadow colour
@@ -281,5 +284,5 @@ function constructComponent(content: JSONContent, includeInteractivity: boolean 
     // Add content values (e.g. text and custom sources) depending on the component type
     currentComponent = addTypeSpecificValues(currentComponent, content, includeInteractivity);
 
-    return currentComponent
+    return currentComponent;
 }

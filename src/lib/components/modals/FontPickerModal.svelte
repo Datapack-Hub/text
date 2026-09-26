@@ -97,11 +97,7 @@
         </div>
 
         <p class="my-2">Or, if you want to use a custom font without importing it, enter the ID:</p>
-        <input
-            type="text"
-            class="input-basic"
-            placeholder="namespace:id"
-            bind:value={fontName} />
+        <input type="text" class="input-basic" placeholder="namespace:id" bind:value={fontName} />
 
         <p class="text-sm text-white/60">
             <b>Note:</b> in order for a custom font to show up ingame, you will need to add it with a

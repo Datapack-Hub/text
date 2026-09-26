@@ -1,17 +1,30 @@
 <script lang="ts">
-    import { convertToTextOrEmpty, snbtToDocument } from "$lib/text/nbt/import";
-    import type { Editor } from "@tiptap/core";
+    import type { Editor, JSONContent } from "@tiptap/core";
     import { onMount } from "svelte";
     import Modal from "./Modal.svelte";
 
     import IconSaved from "~icons/tabler/folder";
     import IconUpload from "~icons/tabler/upload";
     import IconSettings from "~icons/tabler/settings";
+    import IconNormalMode from "~icons/tabler/text-recognition";
+    import IconBookMode from "~icons/tabler/book";
+    import { page } from "$app/state";
 
-    let { editor, welcomeScreenVisible = $bindable() }: { editor: Editor | undefined, welcomeScreenVisible: boolean } = $props();
+    interface Props {
+        editor?: Editor;
+        welcomeScreenVisible?: boolean;
+        pages?: JSONContent[];
+        pageIndex?: number;
+    }
+
+    let {
+        editor,
+        welcomeScreenVisible = $bindable(),
+        pages = $bindable(),
+        pageIndex = $bindable(),
+    }: Props = $props();
 
     let snapshots = $state<object[]>([]);
-    let importText: string = $state("");
 
     let loadDialog: Modal = $state()!;
     let importDialog: Modal = $state()!;
@@ -25,41 +38,48 @@
             localStorage.setItem("snapshots", "[]");
         }
     });
-
-    function importToEditor() {
-        const jsonContent = snbtToDocument(convertToTextOrEmpty(importText));
-        editor?.commands.setContent(jsonContent, { emitUpdate: true });
-        importDialog?.close();
-    }
 </script>
 
 <div class="flex w-full items-center bg-zinc-950 text-sm text-zinc-300" style="font-family: Lexend">
-    <button class="flex items-center px-3 py-2 hover:bg-white/3" onclick={() => welcomeScreenVisible = true}>
+    <button
+        class="flex items-center px-3 py-2 hover:bg-white/3"
+        onclick={() => (welcomeScreenVisible = true)}>
         <img src="/dph.svg" class="size-5" alt="logo" height="20" width="20" />
         <span class="nomob ml-2 font-semibold">Minecraft Text Editor</span>
     </button>
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={importDialog?.open}>
         <IconUpload class="text-xs" />
         <span>Import</span>
     </button>
-    <!-- {#if doesContentExist}
-        <button class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3" onclick={outputDialog?.open}
-            >Export</button>
-    {/if} -->
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={loadDialog?.open}>
         <IconSaved class="text-xs" />
         <span>Saved</span>
     </button>
     <button
-        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/3"
+        class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
         onclick={settingsDialog?.open}>
         <IconSettings class="text-xs" />
         <span>Settings</span>
     </button>
+    {#if page.url.pathname == "/book"}
+        <a
+            class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 text-orange-300 hover:bg-white/5"
+            href="/">
+            <IconBookMode class="text-xs" />
+            <span>Book Mode</span>
+        </a>
+    {:else}
+        <a
+            class="flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
+            href="/book">
+            <IconNormalMode class="text-xs" />
+            <span>Normal Mode</span>
+        </a>
+    {/if}
     <div class="grow"></div>
     <a
         href="https://discord.datapackhub.net/"
@@ -76,7 +96,7 @@
 {/await}
 
 {#await import("$lib/components/modals/topbar/ImportModal.svelte") then modal}
-    <modal.default bind:importDialog bind:importText {importToEditor} />
+    <modal.default bind:importDialog bind:pages bind:pageIndex {editor} />
 {/await}
 
 {#await import("$lib/components/modals/topbar/SettingsModal.svelte") then modal}

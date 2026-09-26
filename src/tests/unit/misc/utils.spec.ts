@@ -9,6 +9,7 @@ import {
     stripTypeSuffixes,
     rgbaToArgbHex,
     argbToRgbaHex,
+    rgbToHex,
 } from "$lib/text/utils";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
@@ -130,14 +131,34 @@ it("should convert number to hex byte string", () => {
     expect(mapToHexByte(1.2)).toBe("00");
 });
 
-it("should strip type suffixes from input string", () => {
-    expect(stripTypeSuffixes("1L")).toBe("1");
-    expect(stripTypeSuffixes("1.0F")).toBe("1.0");
-    expect(stripTypeSuffixes("1.0D")).toBe("1.0");
-    expect(stripTypeSuffixes("1b")).toBe("1");
-    expect(stripTypeSuffixes("1s")).toBe("1");
-    expect(stripTypeSuffixes("1i")).toBe("1");
-    expect(stripTypeSuffixes("1.0")).toBe("1.0");
+it("should strip type suffixes from inputs correctly", () => {
+    const map = new Map([
+        ["1L", "1"],
+        ["1l", "1"],
+        ["1.0F", "1.0"],
+        ["1.0f", "1.0"],
+        ["1.0D", "1.0"],
+        ["1.0d", "1.0"],
+        ["1B", "1"],
+        ["1b", "1"],
+        ["1S", "1"],
+        ["1s", "1"],
+        ["1I", "1"],
+        ["1i", "1"],
+        ["1.0", "1.0"],
+        ["1", "1"],
+        [
+            JSON.stringify("really cool string, give me 1s"),
+            JSON.stringify("really cool string, give me 1s"),
+        ],
+        [JSON.stringify("1l 1f 1.0d 1b 1s 1i"), JSON.stringify("1l 1f 1.0d 1b 1s 1i")],
+    ]);
+    for (const [input, expected] of map) {
+        expect(stripTypeSuffixes(`{test:${input}}`)).toBe(`{test:${expected}}`);
+        expect(stripTypeSuffixes(`{test :${input}}`)).toBe(`{test :${expected}}`);
+        expect(stripTypeSuffixes(`{test: ${input}}`)).toBe(`{test: ${expected}}`);
+        expect(stripTypeSuffixes(`{test    : ${input}}`)).toBe(`{test    : ${expected}}`);
+    }
 });
 
 it("should convert rgba hex to argb hex", () => {
@@ -154,4 +175,12 @@ it("should convert argb hex to rgba hex", () => {
     expect(argbToRgbaHex("FF0000FF")).toBe("#0000FFFF");
     expect(argbToRgbaHex("FFFFFFFF")).toBe("#FFFFFFFF");
     expect(argbToRgbaHex("00000000")).toBe("#00000000");
+});
+
+it("should convert rgb to hex (no alpha)", () => {
+    expect(rgbToHex("rgb(255, 0, 0)")).toBe("#FF0000");
+    expect(rgbToHex("rgb(0, 255, 0)")).toBe("#00FF00");
+    expect(rgbToHex("rgb(0, 0, 255)")).toBe("#0000FF");
+    expect(rgbToHex("rgb(255, 255, 255)")).toBe("#FFFFFF");
+    expect(rgbToHex("rgb(0, 0, 0)")).toBe("#000000");
 });

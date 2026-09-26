@@ -46,10 +46,10 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
                 "data-player-object-node": "",
                 contenteditable: "false",
                 style: `
-            background-color: #18181b;
+            background-color: var(--source-background, #18181b);
             padding: 0px 5px;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: var(--source-size, 0.9rem);
             display: inline-block;
 			vertical-align: var(--custom-source-align, middle);
 			font-style: normal !important;

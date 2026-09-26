@@ -46,9 +46,9 @@
                 editor = undefined;
                 editor = newEditor;
             },
-            onUpdate: ({ editor }) => {
-                value = JSON.stringify(editor.getJSON());
-                output = JSON.parse(translate(editor.getJSON()));
+            onUpdate: ({ editor: currEditor }) => {
+                value = JSON.stringify(currEditor.getJSON());
+                output = JSON.parse(translate(currEditor.getJSON()));
             },
         });
     });
@@ -70,7 +70,9 @@
 
             content.forEach((c) => {
                 current = {
-                    color: defaultColorLUT(c.marks?.find(obj => obj.type == "textStyle")?.attrs?.color || undefined),
+                    color: defaultColorLUT(
+                        c.marks?.find((obj) => obj.type == "textStyle")?.attrs?.color || undefined,
+                    ),
                     bold: trueMarkOrUndefined(c, "bold"),
                     italic: trueMarkOrUndefined(c, "italic"),
                     strikethrough: trueMarkOrUndefined(c, "strike"),

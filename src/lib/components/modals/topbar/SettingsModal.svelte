@@ -10,7 +10,7 @@
     let { settingsDialog = $bindable() }: Props = $props();
 </script>
 
-<Modal title="Settings" bind:this={settingsDialog} key="L">
+<Modal title="Settings" bind:this={settingsDialog} key="R">
     <div class="flex w-full flex-col space-y-2">
         <div class="flex items-center space-x-2">
             <CheckBox label="showCharacterCount" bind:value={$appSettings.showCharacterCount} />
@@ -47,15 +47,13 @@
             <label for="hideSelectionExport" class="flex flex-col">
                 <span>Hide "Export this" button</span>
                 <span class="text-xs text-zinc-500"
-                    >If enabled, the selection export feature ("export this" button) will be disabled</span>
+                    >If enabled, the selection export feature ("export this" button) will be
+                    disabled</span>
             </label>
         </div>
 
         <div class="flex items-center space-x-2">
-            <select
-                name="fontSize"
-                bind:value={$appSettings.fontSize}
-                class="input-basic">
+            <select name="fontSize" bind:value={$appSettings.fontSize} class="input-basic">
                 <option value={0}>Small</option>
                 <option value={1}>Default</option>
                 <option value={2}>Large</option>
@@ -64,6 +62,21 @@
                 <span>Editor font size</span>
                 <span class="text-xs text-zinc-500"
                     >This alters the font size in the editor, but not the output.</span>
+            </label>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <select
+                name="bookPreviewMode"
+                bind:value={$appSettings.bookPreviewMode}
+                class="input-basic">
+                <option value="normal">Normal</option>
+                <option value="compact">Compact</option>
+            </select>
+            <label for="bookPreviewMode" class="flex flex-col">
+                <span>Book preview mode</span>
+                <span class="text-xs text-zinc-500"
+                    >This alters the way book pages are displayed in the editor.</span>
             </label>
         </div>
     </div>

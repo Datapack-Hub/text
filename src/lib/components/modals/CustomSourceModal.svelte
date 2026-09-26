@@ -3,15 +3,18 @@
     import type { ExternalSources } from "$lib/types";
 
     import IconScore from "~icons/tabler/123";
+    import IconBack from "~icons/tabler/arrow-back-up";
     import IconSelector from "~icons/tabler/at";
+    import IconObject from "~icons/tabler/box";
     import IconNBT from "~icons/tabler/braces";
+    import IconInfo from "~icons/tabler/info-circle";
     import IconKeybind from "~icons/tabler/keyboard";
     import IconTranslate from "~icons/tabler/language";
-    import IconObject from "~icons/tabler/box";
 
+    import { outputVersion } from "$lib/settings";
+    import { tooltip_right } from "$lib/tooltip";
     import CheckBox from "../CheckBox.svelte";
     import MiniEditor from "../text/MiniEditor.svelte";
-    import { outputVersion } from "$lib/stores";
 
     let { customDialog = $bindable(), editor, customType = $bindable() } = $props();
 
@@ -67,87 +70,123 @@
 </script>
 
 <Modal title="Add Custom Source" bind:this={customDialog} key="W">
-    <p>Select a source type to add</p>
     {#if !customType}
-        <div class="grid grid-cols-3 gap-2">
+        <p>Select a source type to add</p>
+        <div class="flex flex-col space-y-2">
             <button
-                class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                onclick={() => {
-                    customType = "translate";
-                }}>
-                <IconTranslate class="text-2xl" />
-                <span>Translate Key</span>
+                class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                onclick={() => (customType = "translate")}>
+                <IconTranslate class="flex w-10 shrink-0 justify-center text-2xl" />
+                <div class="flex grow flex-col items-start">
+                    <span>Translate Key</span>
+                    <span class="text-left text-xs text-zinc-400"
+                        >A translate key changes based on the player's language.</span>
+                </div>
             </button>
             <button
-                class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                onclick={() => {
-                    customType = "nbt";
-                }}>
-                <IconNBT class="text-2xl" />
-                <span>NBT Value</span>
+                class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                onclick={() => (customType = "nbt")}>
+                <IconNBT class="flex w-10 shrink-0 justify-center text-2xl" />
+                <div class="flex grow flex-col items-start">
+                    <span>NBT Value</span>
+                    <span class="text-left text-xs text-zinc-400"
+                        >Display a value from an NBT store. This only works in certain contexts.</span>
+                </div>
             </button>
             <button
-                class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                onclick={() => {
-                    customType = "score";
-                }}>
-                <IconScore class="text-2xl" />
-                <span>Score Value</span>
+                class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                onclick={() => (customType = "score")}>
+                <IconScore class="flex w-10 shrink-0 justify-center text-2xl" />
+                <div class="flex grow flex-col items-start">
+                    <span>Scoreboard Value</span>
+                    <span class="text-left text-xs text-zinc-400"
+                        >Display a number from a scoreboard. This only works in certain contexts.</span>
+                </div>
             </button>
             <button
-                class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                onclick={() => {
-                    customType = "selector";
-                }}>
-                <IconSelector class="text-2xl" />
-                <span>Selector</span>
+                class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                onclick={() => (customType = "selector")}>
+                <IconSelector class="flex w-10 shrink-0 justify-center text-2xl" />
+                <div class="flex grow flex-col items-start">
+                    <span>Selector</span>
+                    <span class="text-left text-xs text-zinc-400"
+                        >Display an entity name, or a list of entity names. This only works in
+                        certain contexts.</span>
+                </div>
             </button>
             <button
-                class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                onclick={() => {
-                    customType = "keybind";
-                }}>
-                <IconKeybind class="text-2xl" />
-                <span>Keybind</span>
+                class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                onclick={() => (customType = "keybind")}>
+                <IconKeybind class="flex w-10 shrink-0 justify-center text-2xl" />
+                <div class="flex grow flex-col items-start">
+                    <span>Keybind</span>
+                    <span class="text-left text-xs text-zinc-400"
+                        >Display the player's keybind for an action (e.g. "key.jump" would be
+                        "Space" by default).</span>
+                </div>
             </button>
             {#if $outputVersion.index >= 2}
                 <button
-                    class="flex h-full w-full flex-col items-center space-y-2 rounded-md bg-zinc-900 p-3 hover:bg-black/50"
-                    onclick={() => {
-                        customType = "object";
-                    }}>
-                    <IconObject class="text-2xl" />
-                    <span>Object</span>
+                    class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2 hover:bg-black/50"
+                    onclick={() => (customType = "object")}>
+                    <IconObject class="flex w-10 shrink-0 justify-center text-2xl" />
+                    <div class="flex grow flex-col items-start">
+                        <span>Object</span>
+                        <span class="text-left text-xs text-zinc-400"
+                            >Display either a game texture (e.g. a block) or the front of a player
+                            head.</span>
+                    </div>
                 </button>
             {/if}
         </div>
-    {:else}
-        <select bind:value={customType} class="input-basic">
-            <option value="translate">Translate Key</option>
-            <option value="score">Score Value</option>
-            <option value="nbt">NBT Value</option>
-            <option value="selector">Selector</option>
-            <option value="keybind">Keybind</option>
-            <option value="object">Object</option>
-        </select>
     {/if}
 
     {#if customType === "translate"}
-        <p class="mt-2">Translate Key</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconTranslate class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>Translate Key</span>
+                <span class="text-xs text-zinc-400"
+                    >A translate key changes based on the player's language.</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Translate Key</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The translate key, as defined in a resource pack's language files." />
+        </div>
         <input
             type="text"
             class="input-basic"
             placeholder="item.minecraft.beef"
             bind:value={customValues.translate.key} />
 
-        <p class="mt-2">Fallback</p>
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Fallback</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="What to show if the translate key does not exist (e.g. if the resource pack is not installed)" />
+        </div>
         <input
             type="text"
             class="input-basic"
             placeholder="This text is shown if the key does not exist"
             bind:value={customValues.translate.fallback} />
 
-        <p class="mt-2">Parameters</p>
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Parameters</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="Some advanced translate keys allow you to insert custom text inside the translated value." />
+        </div>
         <div class="flex w-full flex-col space-y-1">
             {#each customValues.translate.params ?? [] as p, i}
                 <div class="flex w-full items-center space-x-1">
@@ -195,13 +234,38 @@
             Add Translate Key
         </button>
     {:else if customType === "score"}
-        <p class="mt-2">Objective</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconScore class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>Scoreboard Value</span>
+                <span class="text-xs text-zinc-400"
+                    >Display a number from a scoreboard. This only works in certain contexts.</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Objective</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The name of the scoreboard objective to get the score from." />
+        </div>
         <input
             type="text"
             class="input-basic"
             placeholder="money"
             bind:value={customValues.score.objective} />
-        <p class="mt-2">Player, Fake Player, or Entity</p>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Player Name or Selector</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="Either the name of the score holder (a player or fake player), or an entity selector." />
+        </div>
         <input
             type="text"
             class="input-basic"
@@ -224,21 +288,51 @@
             Add Score Value
         </button>
     {:else if customType === "nbt"}
-        <p class="mt-2">NBT Source type</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconNBT class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>NBT Value</span>
+                <span class="text-xs text-zinc-400"
+                    >Display a value from an NBT store. This only works in certain contexts.</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>NBT Source Type</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The type of thing you are getting the NBT from." />
+        </div>
         <select bind:value={customValues.nbt.sourceType} class="input-basic">
             <option value="storage">Storage</option>
-            <option value="block">Block</option>
             <option value="entity">Entity</option>
+            <option value="block">Block</option>
         </select>
         {#if customValues.nbt.sourceType === "storage"}
-            <p class="mt-2">Storage ID</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Storage ID</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The namespaced ID of the NBT storage" />
+            </div>
             <input
                 type="text"
                 class="input-basic"
                 placeholder="example:storage"
                 bind:value={customValues.nbt.storage} />
 
-            <p class="mt-2">NBT path</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>NBT Path</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The path to the NBT value in the storage." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
@@ -247,7 +341,12 @@
 
             <div class="mt-2 flex items-center space-x-2">
                 <CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
-                <label for="interpret">Interpret (parse nbt value as a text component)</label>
+                <label for="interpret" class="flex flex-col">
+                    <span>Interpret</span>
+                    <span class="text-xs text-zinc-500"
+                        >If enabled, the NBT value will be treated and parsed as if it is a text
+                        component.</span>
+                </label>
             </div>
 
             <button
@@ -267,14 +366,26 @@
                 Add NBT Value
             </button>
         {:else if customValues.nbt.sourceType === "entity"}
-            <p class="mt-2">Entity</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Entity Selector</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The selector for the entity you want to get the NBT from. This could also be a player name." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
                 placeholder="@e[type=villager,limit=1,sort=nearest]"
                 bind:value={customValues.nbt.entity} />
 
-            <p class="mt-2">NBT path</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>NBT Path</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The path to the NBT value in the entity." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
@@ -283,7 +394,12 @@
 
             <div class="mt-2 flex items-center space-x-2">
                 <CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
-                <label for="interpret">Interpret (parse nbt value as a text component)</label>
+                <label for="interpret" class="flex flex-col">
+                    <span>Interpret</span>
+                    <span class="text-xs text-zinc-500"
+                        >If enabled, the NBT value will be treated and parsed as if it is a text
+                        component.</span>
+                </label>
             </div>
 
             <button
@@ -303,14 +419,26 @@
                 Add NBT Value
             </button>
         {:else if customValues.nbt.sourceType === "block"}
-            <p class="mt-2">Block</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Block</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The coordinates to the block entity that you want to get the NBT from. This can be absolute or relative." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
                 placeholder="~ ~ ~"
                 bind:value={customValues.nbt.block} />
 
-            <p class="mt-2">NBT path</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>NBT Path</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The path to the NBT value in the entity." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
@@ -319,7 +447,12 @@
 
             <div class="mt-2 flex items-center space-x-2">
                 <CheckBox bind:value={customValues.nbt.interpret} label="interpret" />
-                <label for="interpret">Interpret (parse nbt value as a text component)</label>
+                <label for="interpret" class="flex flex-col">
+                    <span>Interpret</span>
+                    <span class="text-xs text-zinc-500"
+                        >If enabled, the NBT value will be treated and parsed as if it is a text
+                        component.</span>
+                </label>
             </div>
 
             <button
@@ -340,7 +473,26 @@
             </button>
         {/if}
     {:else if customType === "keybind"}
-        <p class="mt-2">Keybind</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconKeybind class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>Keybind</span>
+                <span class="text-xs text-zinc-400"
+                    >Display the player's keybind for an action (e.g. "key.jump" would be "Space" by
+                    default).</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Keybind</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The ID of the keybind. A full list is on the Minecraft Wiki." />
+        </div>
         <input
             type="text"
             class="input-basic"
@@ -355,7 +507,26 @@
             Add Keybind
         </button>
     {:else if customType === "selector"}
-        <p class="mt-2">Selector</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconSelector class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>Selector</span>
+                <span class="text-xs text-zinc-400"
+                    >Display an entity name, or a list of entity names. This only works in certain
+                    contexts.</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Selector</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The entity selector." />
+        </div>
         <input
             type="text"
             class="input-basic"
@@ -374,27 +545,55 @@
             Add Selector
         </button>
     {:else if customType === "object"}
-        <p class="mt-2">Object Type</p>
+        <div class="flex w-full items-center space-x-2 rounded-md bg-zinc-900 p-2">
+            <IconObject class="flex w-10 shrink-0 justify-center text-2xl" />
+            <div class="flex grow flex-col">
+                <span>Object</span>
+                <span class="text-xs text-zinc-400"
+                    >Display either a game texture (e.g. a block) or the front of a player head.</span>
+            </div>
+            <button class="rounded-md p-2 hover:bg-black/15" onclick={() => (customType = null)}>
+                <IconBack />
+            </button>
+        </div>
+
+        <div class="mt-2 flex items-center space-x-1">
+            <span>Object Type</span>
+            <IconInfo
+                class="text-sm text-zinc-300"
+                {@attach tooltip_right}
+                aria-label="The type of object (sprite/texture or player head)." />
+        </div>
         <select bind:value={customValues.object.object} class="input-basic">
             <option value="atlas">Atlas (sprite)</option>
             <option value="player">Player Head</option>
         </select>
 
         {#if customValues.object.object == "atlas"}
-            <p class="mt-2">Atlas</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Atlas</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The resource pack atlas to which this sprite belongs." />
+            </div>
             <select
                 bind:value={customValues.object.atlas}
-                class="rounded-md bg-zinc-900 p-2 data-hidden:border-2">
-                <option hidden value="" data-hidden>Defaults to minecraft:blocks</option>
+                class="rounded-md bg-zinc-900 p-2 font-mono data-hidden:border-2">
+                <option hidden value="" data-hidden>(defaults to minecraft:blocks)</option>
                 {#each defaultAtlases as atlas}
                     <option value={atlas.value}>{atlas.label}</option>
                 {/each}
             </select>
-            <p class="mt-2">Sprite</p>
-            <input
-                type="text"
-                class="input-basic"
-                bind:value={customValues.object.sprite} />
+
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Sprite</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The path to the specific sprite." />
+            </div>
+            <input type="text" class="input-basic" bind:value={customValues.object.sprite} />
 
             <button
                 onclick={() => {
@@ -412,15 +611,26 @@
                 Add Object
             </button>
         {:else if customValues.object.object == "player"}
-            <p class="mt-2">Username</p>
+            <div class="mt-2 flex items-center space-x-1">
+                <span>Username</span>
+                <IconInfo
+                    class="text-sm text-zinc-300"
+                    {@attach tooltip_right}
+                    aria-label="The username of the player. If you want to dynamically choose a player, then you will need to use a macro function." />
+            </div>
             <input
                 type="text"
                 class="input-basic"
+                placeholder="Technoblade"
                 bind:value={customValues.object.player.name} />
 
             <div class="mt-2 flex items-center space-x-2">
-                <CheckBox bind:value={customValues.object.hat} label="interpret" />
-                <label for="interpret">Render Hat (2nd skin layer)</label>
+                <CheckBox bind:value={customValues.object.hat} label="renderHat" />
+                <label for="renderHat" class="flex flex-col">
+                    <span>Render Hat</span>
+                    <span class="text-xs text-zinc-500"
+                        >If enabled, the second layer of the skin will also be displayed.</span>
+                </label>
             </div>
 
             <button

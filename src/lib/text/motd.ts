@@ -13,9 +13,9 @@ function hexToRgb(hex: string): [number, number, number] {
     return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
 }
 
-function rgbToLab([r, g, b]: [number, number, number]): [number, number, number] {
+function rgbToLab([r, g, blue]: [number, number, number]): [number, number, number] {
     // Convert RGB to XYZ
-    let [rr, gg, bb] = [r, g, b].map((v) => {
+    let [rr, gg, bb] = [r, g, blue].map((v) => {
         v /= 255;
         return v > 0.04045 ? Math.pow((v + 0.055) / 1.055, 2.4) : v / 12.92;
     });
@@ -29,8 +29,8 @@ function rgbToLab([r, g, b]: [number, number, number]): [number, number, number]
 
     const l = 116 * xyz[1] - 16;
     const a = 500 * (xyz[0] - xyz[1]);
-    const b_ = 200 * (xyz[1] - xyz[2]);
-    return [l, a, b_];
+    const b = 200 * (xyz[1] - xyz[2]);
+    return [l, a, b];
 }
 
 export function deltaE(hex1: string, hex2: string): number {
@@ -49,9 +49,9 @@ const formattingCodes = [
     { key: "italic", value: "o" },
 ];
 
-export function translateMOTD(c: JSONContent) {
+export function translateMOTD(fullContent: JSONContent) {
     const char = "\\u00a7";
-    const paragraphs = c.content!;
+    const paragraphs = fullContent.content!;
 
     let data = "";
 

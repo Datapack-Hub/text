@@ -1,10 +1,10 @@
 <script lang="ts">
-    import WelcomeScreen from "../lib/components/WelcomeScreen.svelte";
-
     import { page } from "$app/state";
     import Modal from "$lib/components/Modal.svelte";
+    import BookMiniRenderer from "$lib/components/text/BookMiniRenderer.svelte";
     import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
     import TopUI from "$lib/components/TopUI.svelte";
+    import WelcomeScreen from "$lib/components/WelcomeScreen.svelte";
     import { openDataStore } from "$lib/db";
     import { appSettings } from "$lib/settings";
     import { outputVersion } from "$lib/settings";
@@ -37,32 +37,52 @@
     import { onDestroy, onMount } from "svelte";
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
+
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
+    import IconAdd from "~icons/tabler/plus";
+    import IconDelete from "~icons/tabler/trash";
+    import IconSettings from "~icons/tabler/settings";
+    import IconUp from "~icons/tabler/chevron-up";
+    import IconDown from "~icons/tabler/chevron-down";
 
-    let tiptapJSON: JSONContent = $state()!;
+    let currentTiptapJSON: JSONContent = $state()!;
+    let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
+    let currentPageIndex: number = $state(0);
 
     let element: HTMLElement = $state()!;
     let editor: Editor | undefined = $state()!;
 
-    let outputDialog: Modal = $state()!;
     let versionPopup: boolean = $state(false);
 
     let shouldOptimise = $state(true);
     let recentlyCopied = $state(false);
 
-    let finalOutput = $derived(editor ? convert(tiptapJSON, shouldOptimise) : "Loading...");
-
     let exportSelectionDialog: Modal = $state()!;
+    let bookDetailsDialog: Modal = $state()!;
+    let versionPopupConfirmationVisible = $state(false);
+    let temporaryVersionConfirmation: Version | undefined = $state();
 
-    let showWelcomeScreen: boolean = $state(false);
+    let welcomeScreenVisible = $state(false);
+
+    let title = $state("Custom Book");
+    let author = $state("Your Name Here");
+    let hideDetails = $state(false);
+    let generation = $state(0);
 
     async function loadData() {
-        if (localStorage.getItem("content")) {
-            tiptapJSON = JSON.parse(localStorage.getItem("content")!);
+        if (localStorage.getItem("book_content")) {
+            pageJSONs = JSON.parse(localStorage.getItem("book_content")!);
+            currentTiptapJSON = pageJSONs[0];
         } else {
-            tiptapJSON = [];
-            localStorage.setItem("content", "[]");
+            pageJSONs = [
+                {
+                    type: "doc",
+                    content: [],
+                },
+            ];
+            currentTiptapJSON = [];
+            localStorage.setItem("book_content", "[]");
         }
 
         const db = await openDataStore();
@@ -85,17 +105,12 @@
     onMount(async () => {
         await loadData();
 
-        // @ts-expect-error too lazy to define the global for this one function
-        window.dphDebugWriteJsonContent = (c: JSONContent) => {
-            editor?.commands.setContent(c);
-        };
-
         editor = new Editor({
             element: element,
-            content: tiptapJSON,
+            content: currentTiptapJSON,
             editorProps: {
                 attributes: {
-                    class: "tiptap-base",
+                    class: "tiptap-book",
                 },
             },
             extensions: [
@@ -141,29 +156,10 @@
                 editor = newEditor;
             },
             onUpdate: ({ editor: currEditor }) => {
-                tiptapJSON = currEditor.getJSON();
+                currentTiptapJSON = currEditor.getJSON();
+                pageJSONs[currentPageIndex] = currentTiptapJSON;
                 debounce(saveContent, 1000)();
             },
-        });
-
-        appSettings.subscribe(() => {
-            const el = document.querySelector(".tiptap") as HTMLElement;
-
-            if (!el) {
-                return;
-            }
-
-            if ($appSettings.realisticLineHeight == true) {
-                let lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
-                el.style.lineHeight = lineHeight.toString() + "rem";
-                // TODO fix the overlap from objects and event marks
-            } else {
-                let lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
-                el.style.lineHeight = lineHeight.toString() + "rem";
-            }
-
-            let fontSize = 1 + 0.25 * $appSettings.fontSize;
-            el.style.fontSize = fontSize.toString() + "rem";
         });
     });
 
@@ -184,7 +180,7 @@
     };
 
     function saveContent() {
-        localStorage.setItem("content", JSON.stringify(editor!.getJSON()));
+        localStorage.setItem("book_content", JSON.stringify(pageJSONs));
     }
 
     function modifierPressed(event: KeyboardEvent) {
@@ -211,11 +207,8 @@
         });
 
         editor?.commands.setContent(editorJson);
-        tiptapJSON = editorJson;
+        currentTiptapJSON = editorJson;
     }
-
-    let versionPopupConfirmationVisible = $state(false);
-    let temporaryVersionConfirmation: Version | undefined = $state();
 
     function updateOutputVersion(version: Version | undefined, confirm = false) {
         if (!version) {
@@ -239,29 +232,161 @@
             removeAllNodes("player_object");
         }
 
-        tiptapJSON = editor!.getJSON();
+        currentTiptapJSON = editor!.getJSON();
+    }
+
+    function pageKeyDownHandler(event: KeyboardEvent, index: number) {
+        if (event.key === "Enter" || event.key === " ") {
+            currentPageIndex = index;
+            editor?.commands.setContent(pageJSONs[index]);
+        }
     }
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
 
-<main class="flex h-screen max-h-screen flex-col">
-    <TopUI {editor} bind:welcomeScreenVisible={showWelcomeScreen} />
+<main class="flex h-screen max-h-screen flex-col items-center">
+    <TopUI
+        bind:pages={pageJSONs}
+        bind:pageIndex={currentPageIndex}
+        {editor}
+        {welcomeScreenVisible} />
 
     <ControlBar {editor} />
 
-    <!-- input box -->
-    <div
-        class="font-minecraft w-full grow overflow-auto bg-zinc-800 first:focus:outline-none"
-        spellcheck="false"
-        id="wysiwyg-box"
-        bind:this={element}>
+    <!-- input box(es) -->
+    <div class="flex h-0 w-full grow">
+        <div
+            id="page-box"
+            class="h-[calc(100vh-11rem )] flex w-80 flex-col items-center overflow-y-scroll p-2">
+            <div class="flex w-full items-center space-x-2 pl-2">
+                <span class="grow font-bold">Book Pages</span>
+                <button
+                    {@attach tooltip}
+                    aria-label="Book Details"
+                    onclick={() => bookDetailsDialog?.open()}
+                    class="btn"><IconSettings /></button>
+            </div>
+            {#key pageJSONs}
+                {#each pageJSONs as page, index}
+                    <div class="w-55 p-2">
+                        {#if $appSettings.bookPreviewMode === "normal"}
+                            <div
+                                role="button"
+                                tabindex="0"
+                                onkeydown={(event) => pageKeyDownHandler(event, index)}
+                                onclick={() => {
+                                    currentPageIndex = index;
+                                    editor?.commands.setContent(pageJSONs[index]);
+                                }}
+                                class="page-preview {currentPageIndex != index
+                                    ? 'opacity-60'
+                                    : ''}">
+                                <div
+                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
+                                    <BookMiniRenderer value={page} />
+                                </div>
+                            </div>
+                        {:else if $appSettings.bookPreviewMode === "compact"}
+                            <button
+                                onclick={() => {
+                                    currentPageIndex = index;
+                                    editor?.commands.setContent(pageJSONs[index]);
+                                }}
+                                class="w-full rounded-md bg-zinc-800 px-2 py-1 text-left hover:bg-zinc-700">
+                                <span class="font-minecraft text-book line-clamp-3">
+                                    <BookMiniRenderer value={page} />
+                                </span>
+                            </button>
+                        {/if}
+                        <div class="mt-1 flex w-full items-center gap-2 px-2">
+                            <p class="grow text-left">{index + 1} of {pageJSONs.length}</p>
+                            {#if index > 0}
+                                <button
+                                    onclick={() => {
+                                        if (index == currentPageIndex) currentPageIndex -= 1;
+                                        else if (index - 1 == currentPageIndex)
+                                            currentPageIndex += 1;
+                                        pageJSONs.splice(
+                                            index - 1,
+                                            0,
+                                            pageJSONs.splice(index, 1)[0],
+                                        );
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Move this page up"
+                                    class="py-0.5">
+                                    <IconUp />
+                                </button>
+                            {/if}
+                            {#if index + 1 < pageJSONs.length}
+                                <button
+                                    onclick={() => {
+                                        if (index == currentPageIndex) currentPageIndex += 1;
+                                        else if (index + 1 == currentPageIndex)
+                                            currentPageIndex -= 1;
+                                        pageJSONs.splice(
+                                            index + 1,
+                                            0,
+                                            pageJSONs.splice(index, 1)[0],
+                                        );
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Move this page down"
+                                    class="py-0.5">
+                                    <IconDown />
+                                </button>
+                            {/if}
+                            <button
+                                onclick={() => {
+                                    pageJSONs.splice(index + 1, 0, {
+                                        type: "doc",
+                                        content: [],
+                                    });
+                                    saveContent();
+                                }}
+                                {@attach tooltip}
+                                aria-label="Add new page below"
+                                class="py-0.5">
+                                <IconAdd />
+                            </button>
+                            {#if pageJSONs.length != 1}
+                                <button
+                                    onclick={() => {
+                                        pageJSONs.splice(index, 1);
+                                        currentPageIndex = Math.max(0, currentPageIndex - 1);
+                                        editor?.commands.setContent(pageJSONs[currentPageIndex]);
+                                        saveContent();
+                                    }}
+                                    {@attach tooltip}
+                                    aria-label="Delete this page"
+                                    class="py-0.5">
+                                    <IconDelete />
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
+                {/each}
+            {/key}
+        </div>
+        <div class="h-full w-full grow overflow-auto border-l border-zinc-700 bg-zinc-800">
+            <div class="book-img m-3">
+                <div
+                    class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
+                    spellcheck="false"
+                    id="wysiwyg-box"
+                    bind:this={element}>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- output box(es) -->
     {#if page.url.searchParams.has("dev")}
         <code class="inline-block overflow-x-scroll p-3 text-xs"
-            >DEV ONLY: {tiptapJSON ? JSON.stringify(tiptapJSON) : "Loading..."}</code>
+            >DEV ONLY: {currentTiptapJSON ? JSON.stringify(currentTiptapJSON) : "Loading..."}</code>
         <br />
     {/if}
     <div class="w-screen border-t border-zinc-700 bg-zinc-950 p-3">
@@ -270,7 +395,9 @@
                 {@attach tooltip}
                 class="rounded-md p-1 text-lg font-medium hover:bg-zinc-900 active:bg-white/10"
                 onclick={() => {
-                    navigator.clipboard.writeText(finalOutput);
+                    navigator.clipboard.writeText(
+                        `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}]`,
+                    );
                     recentlyCopied = true;
                     setTimeout(() => (recentlyCopied = false), 2000);
                 }}
@@ -281,15 +408,14 @@
                     <IconCopy />
                 {/if}</button>
             <code id="outputbox">
+                <!-- {editor ? translateMOTD(tiptapJSON) : "Loading..."} -->
                 {#if $appSettings.syntaxHighlight}
                     <Highlight
                         language={typescript}
-                        code={finalOutput.length === 0 ? "waiting for input..." : finalOutput} />
+                        code={`[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ""}]`} />
                 {:else}
                     <pre class="inline break-all whitespace-pre-wrap">{editor
-                            ? finalOutput.length === 0
-                                ? "waiting for input..."
-                                : finalOutput
+                            ? `[written_book_content={pages:[${pageJSONs.map((j) => [convert(j, shouldOptimise)])}],title:"${title}",author:"${author}",generation:${generation}}${hideDetails ? ',tooltip_display={hidden_components:["written_book_content"]}' : ""}]`
                             : "Loading..."}</pre>
                 {/if}
             </code>
@@ -362,63 +488,27 @@
                 onclick={() => (shouldOptimise = !shouldOptimise)}
                 >{shouldOptimise ? "optimised" : "expanded"}</button>
 
-            <p class="font-lexend nomob text-xs text-white/60">•</p>
-
-            <button
-                class="font-lexend text-xs text-white/60 underline"
-                onclick={outputDialog?.open}>
-                other output formats
-            </button>
-
             {#if $appSettings.showCharacterCount}
                 <p class="font-lexend nomob text-xs text-white/60">•</p>
 
                 <p class="font-lexend nomob text-xs text-white/60">
-                    {finalOutput.length} characters
+                    {pageJSONs.map((j) => [convert(j, shouldOptimise)]).join(",").length +
+                        title.length +
+                        author.length +
+                        1 +
+                        64} characters
                 </p>
             {/if}
         </div>
     </div>
 </main>
 
-<noscript>
-    <div class="absolute">
-        <div
-            class="fixed top-0 left-0 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"
-            style="font-family: Lexend">
-            <div class="z-50 m-auto w-[95%] py-4 md:w-[70%] 2xl:w-[50%]">
-                <div class="flex items-center space-x-2 rounded-t-lg bg-zinc-900 p-4">
-                    <img src="/dph.svg" class="h-5" alt="logo" />
-                    <span class="grow text-lg font-bold">Datapack Hub Text Editor</span>
-                </div>
-                <div class="flex flex-col space-y-2 rounded-b-lg bg-zinc-800 p-4">
-                    <p>
-                        This is a /tellraw editor and editor for Minecraft text components, for all
-                        versions. Create /tellraw commands and text components (JSON text) for
-                        Minecraft Java Edition with our easy-to-use, modern online tool!
-                    </p>
-                    <div class="flex flex-col rounded-md bg-red-500/50 p-3">
-                        <b class="text-lg">⚠️ This website requires JavaScript to work.</b>
-                        <span class="text-sm"
-                            >Please enable JavaScript in your site settings. If JavaScript is
-                            enabled, please refresh. If that doesn't work, then try a different
-                            browser. If that still doesn't work, then ask for help in <a
-                                href="https://discord.datapackhub.net/"
-                                class="link">our Discord</a
-                            ></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</noscript>
-
-<WelcomeScreen bind:visible={showWelcomeScreen} />
-
-{#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
-    <modal.default bind:outputDialog {editor} {recentlyCopied} />
-{/await}
+<WelcomeScreen bind:visible={welcomeScreenVisible} />
 
 {#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
+{/await}
+
+{#await import("$lib/components/modals/BookDetailsModal.svelte") then modal}
+    <modal.default bind:bookDetailsDialog bind:title bind:author bind:hideDetails bind:generation />
 {/await}

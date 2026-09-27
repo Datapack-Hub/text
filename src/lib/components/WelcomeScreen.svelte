@@ -29,7 +29,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-{#if true}
+{#if visible}
     <div class="absolute">
         <div
             class="fixed top-0 left-0 z-40 flex h-screen w-screen flex-col items-center overflow-auto bg-black/65 text-zinc-100"

@@ -1,5 +1,11 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import { Editor, type JSONContent } from "@tiptap/core";
+    import Placeholder from "@tiptap/extension-placeholder";
+    import { onDestroy, onMount } from "svelte";
+    import { Highlight } from "svelte-highlight";
+    import typescript from "svelte-highlight/languages/typescript";
+    
     import Modal from "$lib/components/Modal.svelte";
     import BookMiniRenderer from "$lib/components/text/BookMiniRenderer.svelte";
     import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
@@ -9,34 +15,9 @@
     import { appSettings } from "$lib/settings";
     import { outputVersion } from "$lib/settings";
     import { convert } from "$lib/text/nbt/export";
-    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
-    import {
-        AtlasObjectNode,
-        BlockNBTNode,
-        ClickEventMark,
-        EntityNBTNode,
-        FixedTextStyle,
-        FontsExtension,
-        HoverEventMark,
-        KeybindNode,
-        Obfuscation,
-        PlayerObjectNode,
-        ScoreNode,
-        SelectorNode,
-        ShadowColorMark,
-        StorageNBTNode,
-        TranslateNode,
-    } from "$lib/tiptap/extensions/index";
     import { tooltip } from "$lib/tooltip";
     import { versions, type Version } from "$lib/types";
-    import { Editor, type JSONContent } from "@tiptap/core";
-    import Color from "@tiptap/extension-color";
-    import Placeholder from "@tiptap/extension-placeholder";
-    import StarterKit from "@tiptap/starter-kit";
-    import { onDestroy, onMount } from "svelte";
-    import { Highlight } from "svelte-highlight";
-    import typescript from "svelte-highlight/languages/typescript";
 
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
@@ -45,6 +26,7 @@
     import IconSettings from "~icons/tabler/settings";
     import IconUp from "~icons/tabler/chevron-up";
     import IconDown from "~icons/tabler/chevron-down";
+    import { defaultExtensions } from "$lib/text/utils";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -69,6 +51,8 @@
     let author = $state("Your Name Here");
     let hideDetails = $state(false);
     let generation = $state(0);
+
+    let bookPagesThumbnails: HTMLDivElement[] = []
 
     async function loadData() {
         if (localStorage.getItem("book_content")) {
@@ -114,42 +98,11 @@
                 },
             },
             extensions: [
-                StarterKit.configure({
-                    blockquote: false,
-                    bulletList: false,
-                    codeBlock: false,
-                    hardBreak: false,
-                    heading: false,
-                    horizontalRule: false,
-                    listItem: false,
-                    orderedList: false,
-                    link: false,
-                }),
-                Color,
-                FixedTextStyle,
-                Obfuscation,
-                ClickEventMark,
-                HoverEventMark,
-                ShadowColorMark,
-                ScoreNode,
-                TranslateNode,
-                BlockNBTNode,
-                StorageNBTNode,
-                EntityNBTNode,
-                KeybindNode,
-                SelectorNode,
-                AtlasObjectNode,
-                PlayerObjectNode,
-                FontsExtension,
+                ...defaultExtensions,
                 Placeholder.configure({
                     placeholder:
                         "Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",
-                }),
-                ExportButtonExtension.configure({
-                    onClick: () => {
-                        exportSelectionDialog.open();
-                    },
-                }),
+                })
             ],
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
@@ -260,7 +213,8 @@
             id="page-box"
             class="h-[calc(100vh-11rem )] flex w-80 flex-col items-center overflow-y-scroll p-2">
             <div class="flex w-full items-center space-x-2 pl-2">
-                <span class="grow font-bold">Book Pages</span>
+                <span class="grow font-bold">Pages</span>
+                <input class="w-16 px-1 bg-zinc-950 rounded-sm font-mono placeholder:text-zinc-700 placeholder:text-xs text-sm" placeholder="go to #"/>
                 <button
                     {@attach tooltip}
                     aria-label="Book Details"
@@ -269,7 +223,7 @@
             </div>
             {#key pageJSONs}
                 {#each pageJSONs as page, index}
-                    <div class="w-55 p-2">
+                    <div class="w-55 p-2" bind:this={bookPagesThumbnails[index]}>
                         {#if $appSettings.bookPreviewMode === "normal"}
                             <div
                                 role="button"

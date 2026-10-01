@@ -1,65 +1,23 @@
 <script lang="ts">
+    import { generateHTML, type JSONContent } from "@tiptap/core";
+    import { onMount } from "svelte";
+    
     import { browser } from "$app/environment";
     import { appSettings } from "$lib/settings";
-    import {
-        AtlasObjectNode,
-        BlockNBTNode,
-        ClickEventMark,
-        EntityNBTNode,
-        FixedTextStyle,
-        FontsExtension,
-        HoverEventMark,
-        KeybindNode,
-        Obfuscation,
-        PlayerObjectNode,
-        ScoreNode,
-        SelectorNode,
-        ShadowColorMark,
-        StorageNBTNode,
-        TranslateNode,
-    } from "$lib/tiptap/extensions/index";
-    import { generateHTML, type JSONContent } from "@tiptap/core";
-    import Color from "@tiptap/extension-color";
-    import StarterKit from "@tiptap/starter-kit";
-    import { onMount } from "svelte";
+    import { defaultExtensions } from "$lib/text/utils";
 
     let { value }: { value: JSONContent } = $props();
 
-    let html: string = $derived(
-        browser
-            ? generateHTML(value, [
-                  StarterKit.configure({
-                      blockquote: false,
-                      bulletList: false,
-                      codeBlock: false,
-                      hardBreak: false,
-                      heading: false,
-                      horizontalRule: false,
-                      listItem: false,
-                      orderedList: false,
-                      link: false,
-                  }),
-                  Color,
-                  FixedTextStyle,
-                  Obfuscation,
-                  ClickEventMark,
-                  HoverEventMark,
-                  ShadowColorMark,
-                  ScoreNode,
-                  TranslateNode,
-                  BlockNBTNode,
-                  StorageNBTNode,
-                  EntityNBTNode,
-                  KeybindNode,
-                  SelectorNode,
-                  AtlasObjectNode,
-                  PlayerObjectNode,
-                  FontsExtension,
-              ])
-            : "",
-    );
+    let html: string = $state(")");
 
     onMount(() => {
+        html = browser
+            ? generateHTML(value, [
+                  ...defaultExtensions
+              ])
+            : ""
+        console.log(value)
+        // console.log(html)
         appSettings.subscribe(() => {
             const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
 
@@ -83,4 +41,6 @@
     });
 </script>
 
+{#if html}
 <div class="tiptap tiptap-minirenderer">{@html html}</div>
+{/if}

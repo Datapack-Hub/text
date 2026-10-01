@@ -214,7 +214,6 @@
             class="h-[calc(100vh-11rem )] flex w-80 flex-col items-center overflow-y-scroll p-2">
             <div class="flex w-full items-center space-x-2 pl-2">
                 <span class="grow font-bold">Pages</span>
-                <input class="w-16 px-1 bg-zinc-950 rounded-sm font-mono placeholder:text-zinc-700 placeholder:text-xs text-sm" placeholder="go to #"/>
                 <button
                     {@attach tooltip}
                     aria-label="Book Details"

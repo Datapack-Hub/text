@@ -52,9 +52,6 @@
             type: "doc",
             content: content,
         };
-
-        console.log(content)
-        // console.log(generateHTML(value, defaultExtensions))
         
         value = content
     }

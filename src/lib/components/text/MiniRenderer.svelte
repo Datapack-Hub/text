@@ -1,7 +1,7 @@
 <script lang="ts">
     import { generateHTML, type JSONContent } from "@tiptap/core";
     import { onMount } from "svelte";
-    
+
     import { browser } from "$app/environment";
     import { appSettings } from "$lib/settings";
     import { defaultExtensions } from "$lib/text/utils";
@@ -16,8 +16,7 @@
                   ...defaultExtensions
               ])
             : ""
-        console.log(value)
-        // console.log(html)
+        
         appSettings.subscribe(() => {
             const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
 

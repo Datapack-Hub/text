@@ -162,7 +162,6 @@
             onTransaction: ({ editor: newEditor }) => {
                 editor = undefined;
                 editor = newEditor;
-                
             },
             onSelectionUpdate: ({editor: currEditor, transaction}) => {
                 if (!transaction.docChanged) {
@@ -175,8 +174,9 @@
                 if (countDocLines(json) > 14) {
                     if (currEditor.getText().length - 1 === lastTextSelection.from) {
                         addPageBelow(currentPageIndex)
+                        currentPageIndex++;
+                        editor?.commands.setContent(pageJSONs[currentPageIndex]);
                     }
-                    // console.log("pos", lastTextSelection.from, lastTextSelection.to, "len", currEditor.getText().length);
                     currEditor.commands.setContent(currentTiptapJSON, { emitUpdate: false });
                     currEditor.commands.setTextSelection(lastTextSelection);
                     return;
@@ -307,6 +307,28 @@
         editor?.commands.setContent(pageJSONs[currentPageIndex]);
         saveContent();
     }
+
+    function editorKeyDownHandler(event: KeyboardEvent) {
+        const textLen = (editor?.getText().length ?? 0);
+        const cursorPos = editor?.state.selection.from ?? 0;
+
+        if (event.key === "ArrowUp" && cursorPos === 1) {
+            const nextIndex = Math.max(0, currentPageIndex - 1);
+            if (nextIndex !== currentPageIndex) {
+                currentPageIndex = nextIndex;
+                editor?.commands.setContent(pageJSONs[nextIndex]);
+                editor?.commands.focus("end");
+            }
+        }
+        else if (event.key === "ArrowDown" && cursorPos - 1 === textLen){
+            const nextIndex = Math.min(pageJSONs.length - 1, currentPageIndex + 1);
+            if (nextIndex !== currentPageIndex) {
+                currentPageIndex = nextIndex;
+                editor?.commands.setContent(pageJSONs[nextIndex]);
+                editor?.commands.focus("start");
+            }
+        }
+    }
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
@@ -408,10 +430,13 @@
         </div>
         <div class="h-full w-full grow overflow-auto border-l border-zinc-700 bg-zinc-800">
             <div class="book-img m-3">
+                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
                     spellcheck="false"
                     id="wysiwyg-box"
+                    role="document"
+                    onkeydown={(e: KeyboardEvent) => editorKeyDownHandler(e)}
                     bind:this={element}>
                 </div>
             </div>

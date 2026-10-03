@@ -4,7 +4,7 @@
 
     import { browser } from "$app/environment";
     import { appSettings } from "$lib/settings";
-    import { defaultExtensions } from "$lib/text/utils";
+    import { defaultExtensions } from "$lib/text/defaultExtensions";
 
     let { value }: { value: JSONContent } = $props();
 

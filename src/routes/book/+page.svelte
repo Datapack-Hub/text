@@ -371,7 +371,7 @@
                                     ? 'opacity-60'
                                     : ''}">
                                 <div
-                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
+                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word [&_p]:min-h-lh zoom-90">
                                     <BookMiniRenderer value={page} />
                                 </div>
                             </div>

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { generateHTML, type JSONContent } from "@tiptap/core";
     import { onMount } from "svelte";
-
     import { browser } from "$app/environment";
     import { appSettings } from "$lib/settings";
     import { defaultExtensions } from "$lib/text/defaultExtensions";
@@ -12,9 +11,7 @@
 
     onMount(() => {
         html = browser
-            ? generateHTML(value, [
-                  ...defaultExtensions
-              ])
+            ? generateHTML(value, defaultExtensions)
             : ""
         
         appSettings.subscribe(() => {

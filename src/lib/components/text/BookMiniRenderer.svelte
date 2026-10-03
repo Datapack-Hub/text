@@ -1,86 +1,75 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { browser } from "$app/environment";
     import { appSettings } from "$lib/settings";
-    import {
-        AtlasObjectNode,
-        BlockNBTNode,
-        ClickEventMark,
-        EntityNBTNode,
-        FixedTextStyle,
-        FontsExtension,
-        HoverEventMark,
-        KeybindNode,
-        Obfuscation,
-        PlayerObjectNode,
-        ScoreNode,
-        SelectorNode,
-        ShadowColorMark,
-        StorageNBTNode,
-        TranslateNode,
-    } from "$lib/tiptap/extensions/index";
+    import { defaultExtensions } from "$lib/text/defaultExtensions";
     import { generateHTML, type JSONContent } from "@tiptap/core";
-    import Color from "@tiptap/extension-color";
-    import StarterKit from "@tiptap/starter-kit";
     import { onMount } from "svelte";
 
     let { value }: { value: JSONContent } = $props();
 
-    let html: string = $derived(
-        browser
-            ? generateHTML(value, [
-                  StarterKit.configure({
-                      blockquote: false,
-                      bulletList: false,
-                      codeBlock: false,
-                      hardBreak: false,
-                      heading: false,
-                      horizontalRule: false,
-                      listItem: false,
-                      orderedList: false,
-                      link: false,
-                  }),
-                  Color,
-                  FixedTextStyle,
-                  Obfuscation,
-                  ClickEventMark,
-                  HoverEventMark,
-                  ShadowColorMark,
-                  ScoreNode,
-                  TranslateNode,
-                  BlockNBTNode,
-                  StorageNBTNode,
-                  EntityNBTNode,
-                  KeybindNode,
-                  SelectorNode,
-                  AtlasObjectNode,
-                  PlayerObjectNode,
-                  FontsExtension,
-              ])
-            : "",
+    let html: string = $derived.by(() => {
+        if (!browser) return "";
+
+        const doc: JSONContent = {
+            ...value,
+            content: value.content?.map((paragraph) =>
+                paragraph.content === undefined
+                    ? { ...paragraph, content: [{ type: "text", text: " " }] }
+                    : paragraph,
+            ),
+        }
+
+        const a =  generateHTML(doc, defaultExtensions);
+        console.log(a);
+        return a;
+    });
+
+    let lineHeight = $derived(
+        $appSettings.realisticLineHeight
+            ? 0.8 + 0.2 * $appSettings.fontSize
+            : 1.25 + 0.25 * $appSettings.fontSize,
     );
 
-    onMount(() => {
-        appSettings.subscribe(() => {
-            const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
+    // onMount(() => {
+    //     appSettings.subscribe(() => {
+    //         const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
 
-            if ($appSettings.realisticLineHeight == true) {
-                const lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
-                el.forEach((e) => {
-                    e.style.lineHeight = lineHeight.toString() + "rem";
-                });
-            } else {
-                const lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
-                el.forEach((e) => {
-                    e.style.lineHeight = lineHeight.toString() + "rem";
-                });
-            }
+    //         if ($appSettings.realisticLineHeight == true) {
+    //             const lineHeight = 0.8 + 0.2 * $appSettings.fontSize;
+    //             el.forEach((e) => {
+    //                 e.style.lineHeight = lineHeight.toString() + "rem";
+    //             });
+    //         } else {
+    //             const lineHeight = 1.25 + 0.25 * $appSettings.fontSize;
+    //             el.forEach((e) => {
+    //                 e.style.lineHeight = lineHeight.toString() + "rem";
+    //             });
+    //         }
 
-            const fontSize = 1 + 0.25 * $appSettings.fontSize;
-            el.forEach((e) => {
-                e.style.fontSize = fontSize.toString() + "rem";
-            });
-        });
-    });
+    //         const fontSize = 1 + 0.25 * $appSettings.fontSize;
+    //         el.forEach((e) => {
+    //             e.style.fontSize = fontSize.toString() + "rem";
+    //         });
+    //     });
+    // });
+</script>
+
+<!-- <style>
+    .text-book :global(p) {
+        min-height: 1lh;
+    }
+</style> -->
+
+<!-- {@html html} -->
+
+<script lang="ts">
+    import { browser } from "$app/environment";
+    import { defaultExtensions } from "$lib/text/defaultExtensions";
+    import { generateHTML, type JSONContent } from "@tiptap/core";
+
+    let { value }: { value: JSONContent } = $props();
+
+    let html = $derived(browser ? generateHTML(value, defaultExtensions) : "");
 </script>
 
 {@html html}

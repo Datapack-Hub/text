@@ -108,7 +108,7 @@
         if (fontName === undefined) return null;
         
         return {
-            text: node.text,
+            text: node.text.replaceAll(" ", "t"),
             font: `${fontSize}px ${fontName}`,
         };
     }

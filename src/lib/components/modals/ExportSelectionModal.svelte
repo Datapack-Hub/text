@@ -1,16 +1,17 @@
 <script lang="ts">
     import Modal from "$lib/components/Modal.svelte";
-    import { Editor } from "@tiptap/core";
+    import { Editor, generateHTML } from "@tiptap/core";
     import Key from "../Key.svelte";
     import MiniRenderer from "../text/MiniRenderer.svelte";
     import { appSettings } from "$lib/settings";
     import { convert } from "$lib/text/nbt/export";
-    import { json, typescript } from "svelte-highlight/languages";
+    import { json, typescript, v } from "svelte-highlight/languages";
     import Highlight from "svelte-highlight";
 
     import IconCopy from "~icons/tabler/copy";
     import IconCheck from "~icons/tabler/check";
     import CheckBox from "../CheckBox.svelte";
+    import { defaultExtensions } from "$lib/text/utils";
 
     let recentlyCopied: boolean = $state(false);
     let jsonOutput: boolean = $state(false);
@@ -47,11 +48,12 @@
             content.pop();
         }
 
-        // Format in document
-        value = {
+        content = {
             type: "doc",
             content: content,
         };
+        
+        value = content
     }
 </script>
 

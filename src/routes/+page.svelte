@@ -1,8 +1,13 @@
 <script lang="ts">
-    import WelcomeScreen from "../lib/components/WelcomeScreen.svelte";
-
     import { page } from "$app/state";
+    import { Editor, type JSONContent } from "@tiptap/core";
+    import Placeholder from "@tiptap/extension-placeholder";
+    import { onDestroy, onMount } from "svelte";
+    import { Highlight } from "svelte-highlight";
+    import typescript from "svelte-highlight/languages/typescript";
+
     import Modal from "$lib/components/Modal.svelte";
+    import WelcomeScreen from "../lib/components/WelcomeScreen.svelte";
     import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
     import TopUI from "$lib/components/TopUI.svelte";
     import { openDataStore } from "$lib/db";
@@ -11,32 +16,10 @@
     import { convert } from "$lib/text/nbt/export";
     import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
-    import {
-        AtlasObjectNode,
-        BlockNBTNode,
-        ClickEventMark,
-        EntityNBTNode,
-        FixedTextStyle,
-        FontsExtension,
-        HoverEventMark,
-        KeybindNode,
-        Obfuscation,
-        PlayerObjectNode,
-        ScoreNode,
-        SelectorNode,
-        ShadowColorMark,
-        StorageNBTNode,
-        TranslateNode,
-    } from "$lib/tiptap/extensions/index";
     import { tooltip } from "$lib/tooltip";
     import { versions, type Version } from "$lib/types";
-    import { Editor, type JSONContent } from "@tiptap/core";
-    import Color from "@tiptap/extension-color";
-    import Placeholder from "@tiptap/extension-placeholder";
-    import StarterKit from "@tiptap/starter-kit";
-    import { onDestroy, onMount } from "svelte";
-    import { Highlight } from "svelte-highlight";
-    import typescript from "svelte-highlight/languages/typescript";
+    import { defaultExtensions } from "$lib/text/utils";
+
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
 
@@ -99,33 +82,7 @@
                 },
             },
             extensions: [
-                StarterKit.configure({
-                    blockquote: false,
-                    bulletList: false,
-                    codeBlock: false,
-                    hardBreak: false,
-                    heading: false,
-                    horizontalRule: false,
-                    listItem: false,
-                    orderedList: false,
-                    link: false,
-                }),
-                Color,
-                FixedTextStyle,
-                Obfuscation,
-                ClickEventMark,
-                HoverEventMark,
-                ShadowColorMark,
-                ScoreNode,
-                TranslateNode,
-                BlockNBTNode,
-                StorageNBTNode,
-                EntityNBTNode,
-                KeybindNode,
-                SelectorNode,
-                AtlasObjectNode,
-                PlayerObjectNode,
-                FontsExtension,
+                ...defaultExtensions,
                 Placeholder.configure({
                     placeholder:
                         "Write text here, style it with the options above, and the output text components will appear at the bottom. You can also import text components with the Import button above!",

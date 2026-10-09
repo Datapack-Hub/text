@@ -18,7 +18,7 @@
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
     import { tooltip } from "$lib/tooltip";
     import { versions, type Version } from "$lib/types";
-    import { prepareRichInline, walkRichInlineLineRanges, type RichInlineItem } from "@chenglou/pretext/rich-inline";
+    import { materializeRichInlineLineRange, measureRichInlineStats, prepareRichInline, walkRichInlineLineRanges, type RichInlineItem } from "@chenglou/pretext/rich-inline";
     import { convertFont } from "$lib/fonts";
 
     import IconTick from "~icons/tabler/check";
@@ -29,6 +29,7 @@
     import IconUp from "~icons/tabler/chevron-up";
     import IconDown from "~icons/tabler/chevron-down";
     import { defaultExtensions } from "$lib/text/defaultExtensions";
+    import { layoutNextLineRange } from "@chenglou/pretext";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -108,7 +109,7 @@
         if (fontName === undefined) return null;
         
         return {
-            text: node.text.replaceAll(" ", "t"),
+            text: node.text.replaceAll(" ", "\u00A0\u200B"),
             font: `${fontSize}px ${fontName}`,
         };
     }
@@ -117,7 +118,6 @@
         if (doc.type !== "doc") return -1;
         
         let lineCount = 0;
-
         doc.content?.forEach(paragraph => {
             if (paragraph.content === undefined) {
                 lineCount++;
@@ -132,10 +132,9 @@
             });
 
             const prepared = prepareRichInline(prepareList);
-
-            walkRichInlineLineRanges(prepared, maxWidth, () => {
-                lineCount++;
-            });
+            const measured = measureRichInlineStats(prepared, maxWidth);
+            
+            lineCount += measured.lineCount;
         })
 
         return lineCount;
@@ -171,6 +170,7 @@
             onUpdate: ({ editor: currEditor }) => {
                 const json = currEditor.getJSON();
 
+                // console.log(countDocLines(json));
                 if (countDocLines(json) > 14) {
                     if (currEditor.getText().length - 1 === lastTextSelection.from) {
                         addPageBelow(currentPageIndex)

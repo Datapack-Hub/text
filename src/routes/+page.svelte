@@ -18,7 +18,7 @@
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
     import { tooltip } from "$lib/tooltip";
     import { versions, type Version } from "$lib/types";
-    import { defaultExtensions } from "$lib/text/utils";
+    import { defaultExtensions } from "$lib/text/defaultExtensions";
 
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
@@ -130,8 +130,8 @@
         }
     });
 
+    let timeoutId: number;
     const debounce = (callback: (...args: any[]) => void, wait: number) => {
-        let timeoutId: number;
         return (...args: any[]) => {
             window.clearTimeout(timeoutId);
             timeoutId = window.setTimeout(() => {

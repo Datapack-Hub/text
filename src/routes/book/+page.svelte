@@ -18,6 +18,8 @@
     import { fontLUT } from "$lib/tiptap/extensions/fonts";
     import { tooltip } from "$lib/tooltip";
     import { versions, type Version } from "$lib/types";
+    import { materializeRichInlineLineRange, measureRichInlineStats, prepareRichInline, walkRichInlineLineRanges, type RichInlineItem } from "@chenglou/pretext/rich-inline";
+    import { convertFont } from "$lib/fonts";
 
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
@@ -26,7 +28,8 @@
     import IconSettings from "~icons/tabler/settings";
     import IconUp from "~icons/tabler/chevron-up";
     import IconDown from "~icons/tabler/chevron-down";
-    import { defaultExtensions } from "$lib/text/utils";
+    import { defaultExtensions } from "$lib/text/defaultExtensions";
+    import { layoutNextLineRange } from "@chenglou/pretext";
 
     let currentTiptapJSON: JSONContent = $state()!;
     let pageJSONs: JSONContent[] = $state([{ type: "doc", content: [] }]);
@@ -34,6 +37,12 @@
 
     let element: HTMLElement = $state()!;
     let editor: Editor | undefined = $state()!;
+    let lastTextSelection: { from: number, to: number } = { from: 0, to: 0 };
+
+    // TODO Make this dynamic when book zooming gets implemented.
+    let fontSize: number = 30.88;
+    // TODO Make this dynamic when book zooming gets implemented.
+    let maxWidth: number = 296;;
 
     let versionPopup: boolean = $state(false);
 
@@ -52,7 +61,7 @@
     let hideDetails = $state(false);
     let generation = $state(0);
 
-    let bookPagesThumbnails: HTMLDivElement[] = []
+    let bookPagesThumbnails: HTMLDivElement[] = $state([]);
 
     async function loadData() {
         if (localStorage.getItem("book_content")) {
@@ -86,6 +95,51 @@
         );
     }
 
+    function extractPreparableItem(node: JSONContent): RichInlineItem | null {
+        if (node.type !== "text" || typeof node.text !== "string") return null;
+
+        const style = node.marks?.find((m) => m.type === "textStyle");                
+        const isBold: boolean = node.marks?.find((m) => m.type === "bold") !== undefined;
+
+        const fontName = convertFont(
+            style?.attrs?.font ?? "minecraft:default",
+            isBold,
+        );
+
+        if (fontName === undefined) return null;
+        
+        return {
+            text: node.text.replaceAll(" ", "\u00A0\u200B"),
+            font: `${fontSize}px ${fontName}`,
+        };
+    }
+
+    function countDocLines(doc: JSONContent): number {
+        if (doc.type !== "doc") return -1;
+        
+        let lineCount = 0;
+        doc.content?.forEach(paragraph => {
+            if (paragraph.content === undefined) {
+                lineCount++;
+                return;
+            }
+
+            let prepareList: RichInlineItem[] = [];
+
+            paragraph.content?.forEach(textNode => {
+                const item = extractPreparableItem(textNode)
+                if (item !== null) prepareList.push(item);
+            });
+
+            const prepared = prepareRichInline(prepareList);
+            const measured = measureRichInlineStats(prepared, maxWidth);
+            
+            lineCount += measured.lineCount;
+        })
+
+        return lineCount;
+    }
+
     onMount(async () => {
         await loadData();
 
@@ -108,9 +162,29 @@
                 editor = undefined;
                 editor = newEditor;
             },
+            onSelectionUpdate: ({editor: currEditor, transaction}) => {
+                if (!transaction.docChanged) {
+                    lastTextSelection = currEditor.state.selection;
+                }
+            },
             onUpdate: ({ editor: currEditor }) => {
-                currentTiptapJSON = currEditor.getJSON();
+                const json = currEditor.getJSON();
+
+                // console.log(countDocLines(json));
+                if (countDocLines(json) > 14) {
+                    if (currEditor.getText().length - 1 === lastTextSelection.from) {
+                        addPageBelow(currentPageIndex)
+                        currentPageIndex++;
+                        editor?.commands.setContent(pageJSONs[currentPageIndex]);
+                    }
+                    currEditor.commands.setContent(currentTiptapJSON, { emitUpdate: false });
+                    currEditor.commands.setTextSelection(lastTextSelection);
+                    return;
+                }
+                
+                currentTiptapJSON = json;
                 pageJSONs[currentPageIndex] = currentTiptapJSON;
+                lastTextSelection = currEditor.state.selection;
                 debounce(saveContent, 1000)();
             },
         });
@@ -122,8 +196,8 @@
         }
     });
 
+    let timeoutId: number;
     const debounce = (callback: (...args: any[]) => void, wait: number) => {
-        let timeoutId: number;
         return (...args: any[]) => {
             window.clearTimeout(timeoutId);
             timeoutId = window.setTimeout(() => {
@@ -194,6 +268,67 @@
             editor?.commands.setContent(pageJSONs[index]);
         }
     }
+
+    function movePageUp(index: number) {
+        if (index == currentPageIndex) currentPageIndex -= 1;
+        else if (index - 1 == currentPageIndex) currentPageIndex += 1;
+        
+        pageJSONs.splice(
+            index,
+            0,
+            pageJSONs.splice(index, 1)[0],
+        );
+        saveContent();
+    }
+
+    function movePageDown(index: number) {
+        if (index == currentPageIndex) currentPageIndex += 1;
+        else if (index + 1 == currentPageIndex) currentPageIndex -= 1;
+        
+        pageJSONs.splice(
+            index + 1,
+            0,
+            pageJSONs.splice(index, 1)[0],
+        );
+        saveContent();
+    }
+
+    function addPageBelow(index: number) {
+        pageJSONs.splice(index + 1, 0, {
+            type: "doc",
+            content: [],
+        });
+        saveContent();
+    }
+
+    function deletePage(index: number) {
+        pageJSONs.splice(index, 1);
+        currentPageIndex = Math.max(0, currentPageIndex - 1);
+        editor?.commands.setContent(pageJSONs[currentPageIndex]);
+        saveContent();
+    }
+
+    function editorKeyDownHandler(event: KeyboardEvent) {
+        const textLen = (editor?.getText().length ?? 0);
+        const cursorPos = editor?.state.selection.from ?? 0;
+
+        if (event.key === "ArrowUp" && cursorPos === 1) {
+            const nextIndex = Math.max(0, currentPageIndex - 1);
+            if (nextIndex !== currentPageIndex) {
+                currentPageIndex = nextIndex;
+                editor?.commands.setContent(pageJSONs[nextIndex]);
+                editor?.commands.focus("end");
+            }
+        }
+        else if (event.key === "ArrowDown" && cursorPos - 1 === textLen){
+            const nextIndex = Math.min(pageJSONs.length - 1, currentPageIndex + 1);
+            if (nextIndex !== currentPageIndex) {
+                currentPageIndex = nextIndex;
+                editor?.commands.setContent(pageJSONs[nextIndex]);
+                editor?.commands.focus("start");
+            }
+        }
+    }
 </script>
 
 <svelte:window onkeydown={clearMarksHandler} />
@@ -236,7 +371,7 @@
                                     ? 'opacity-60'
                                     : ''}">
                                 <div
-                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word">
+                                    class="font-minecraft text-book h-61 overflow-clip px-6 pt-11 leading-3.5 wrap-break-word [&_p]:min-h-lh zoom-90">
                                     <BookMiniRenderer value={page} />
                                 </div>
                             </div>
@@ -256,17 +391,7 @@
                             <p class="grow text-left">{index + 1} of {pageJSONs.length}</p>
                             {#if index > 0}
                                 <button
-                                    onclick={() => {
-                                        if (index == currentPageIndex) currentPageIndex -= 1;
-                                        else if (index - 1 == currentPageIndex)
-                                            currentPageIndex += 1;
-                                        pageJSONs.splice(
-                                            index - 1,
-                                            0,
-                                            pageJSONs.splice(index, 1)[0],
-                                        );
-                                        saveContent();
-                                    }}
+                                    onclick={() => movePageUp(index)}
                                     {@attach tooltip}
                                     aria-label="Move this page up"
                                     class="py-0.5">
@@ -275,17 +400,7 @@
                             {/if}
                             {#if index + 1 < pageJSONs.length}
                                 <button
-                                    onclick={() => {
-                                        if (index == currentPageIndex) currentPageIndex += 1;
-                                        else if (index + 1 == currentPageIndex)
-                                            currentPageIndex -= 1;
-                                        pageJSONs.splice(
-                                            index + 1,
-                                            0,
-                                            pageJSONs.splice(index, 1)[0],
-                                        );
-                                        saveContent();
-                                    }}
+                                    onclick={() => movePageDown(index)}
                                     {@attach tooltip}
                                     aria-label="Move this page down"
                                     class="py-0.5">
@@ -293,13 +408,7 @@
                                 </button>
                             {/if}
                             <button
-                                onclick={() => {
-                                    pageJSONs.splice(index + 1, 0, {
-                                        type: "doc",
-                                        content: [],
-                                    });
-                                    saveContent();
-                                }}
+                                onclick={() => addPageBelow(index)}
                                 {@attach tooltip}
                                 aria-label="Add new page below"
                                 class="py-0.5">
@@ -307,12 +416,7 @@
                             </button>
                             {#if pageJSONs.length != 1}
                                 <button
-                                    onclick={() => {
-                                        pageJSONs.splice(index, 1);
-                                        currentPageIndex = Math.max(0, currentPageIndex - 1);
-                                        editor?.commands.setContent(pageJSONs[currentPageIndex]);
-                                        saveContent();
-                                    }}
+                                    onclick={() => deletePage(index)}
                                     {@attach tooltip}
                                     aria-label="Delete this page"
                                     class="py-0.5">
@@ -326,10 +430,13 @@
         </div>
         <div class="h-full w-full grow overflow-auto border-l border-zinc-700 bg-zinc-800">
             <div class="book-img m-3">
+                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                 <div
                     class="font-minecraft w-full grow overflow-clip first:focus:outline-none"
                     spellcheck="false"
                     id="wysiwyg-box"
+                    role="document"
+                    onkeydown={(e: KeyboardEvent) => editorKeyDownHandler(e)}
                     bind:this={element}>
                 </div>
             </div>

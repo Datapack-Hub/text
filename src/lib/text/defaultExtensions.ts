@@ -1,0 +1,50 @@
+import {
+    AtlasObjectNode,
+    BlockNBTNode,
+    ClickEventMark,
+    EntityNBTNode,
+    FixedTextStyle,
+    FontsExtension,
+    HoverEventMark,
+    KeybindNode,
+    Obfuscation,
+    PlayerObjectNode,
+    ScoreNode,
+    SelectorNode,
+    ShadowColorMark,
+    StorageNBTNode,
+    TranslateNode,
+} from "$lib/tiptap/extensions/index";
+import { StarterKit } from "@tiptap/starter-kit";
+import { Color } from "@tiptap/extension-text-style";
+import type { Extensions } from "@tiptap/core";
+
+export const defaultExtensions : Extensions = [
+    StarterKit.configure({
+        blockquote: false,
+        bulletList: false,
+        codeBlock: false,
+        hardBreak: false,
+        heading: false,
+        horizontalRule: false,
+        listItem: false,
+        orderedList: false,
+        link: false,
+    }),
+    Color,
+    FixedTextStyle,
+    Obfuscation,
+    ClickEventMark,
+    HoverEventMark,
+    ShadowColorMark,
+    ScoreNode,
+    TranslateNode,
+    BlockNBTNode,
+    StorageNBTNode,
+    EntityNBTNode,
+    KeybindNode,
+    SelectorNode,
+    AtlasObjectNode,
+    PlayerObjectNode,
+    FontsExtension,
+]

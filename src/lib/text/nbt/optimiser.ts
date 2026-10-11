@@ -1,4 +1,4 @@
-import type { MinecraftText, StringyMCText } from "$lib/types";
+import type { MinecraftText, StringyMCText } from "#lib/types.js";
 import { isAnInteractiveProp, isDefinedTextObject as isATextComponent } from "../utils";
 
 const styleProps = [

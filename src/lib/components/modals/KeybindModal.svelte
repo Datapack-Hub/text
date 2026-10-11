@@ -1,5 +1,5 @@
 <script>
-    import Modal from "$lib/components/Modal.svelte";
+    import Modal from "#lib/components/Modal.svelte";
     import Key from "../Key.svelte";
 
     let { keybindDialog = $bindable() } = $props();

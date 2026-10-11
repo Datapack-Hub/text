@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { colourMap, getNodeAtSelection, sourceKeys } from "$lib/text/utils";
-    import { tooltip } from "$lib/tooltip";
+    import { colourMap, getNodeAtSelection, sourceKeys } from "#lib/text/utils.js";
+    import { tooltip } from "#lib/tooltip.js";
     import type { Editor } from "@tiptap/core";
     import ColorPicker from "svelte-awesome-color-picker";
     import IconUndo from "~icons/tabler/arrow-back-up";
@@ -139,6 +139,7 @@
 
         <ToolbarButton
             Icon={IconFont}
+            testid="font-button"
             onClick={() =>
                 editor!.getAttributes("textStyle").font
                     ? editor!.chain().focus().unsetFont().run()
@@ -280,7 +281,7 @@
     {/if}
 </div>
 
-{#await import("$lib/components/modals/ClickEventModal.svelte") then modal}
+{#await import("#lib/components/modals/ClickEventModal.svelte") then modal}
     <modal.default bind:clickEventDialog bind:clickEventType bind:clickEventValue {editor} />
 {/await}
 
@@ -301,11 +302,11 @@
     </button>
 </Modal>
 
-{#await import("$lib/components/modals/CustomSourceModal.svelte") then modal}
+{#await import("#lib/components/modals/CustomSourceModal.svelte") then modal}
     <modal.default bind:customDialog bind:customType {editor} />
 {/await}
 
-{#await import("$lib/components/modals/InsertImageModal.svelte") then modal}
+{#await import("#lib/components/modals/InsertImageModal.svelte") then modal}
     <modal.default bind:insertImageDialog {editor} />
 {/await}
 
@@ -325,20 +326,20 @@
     </div>
 </Modal>
 
-{#await import("$lib/components/modals/FontPickerModal.svelte") then modal}
+{#await import("#lib/components/modals/FontPickerModal.svelte") then modal}
     <modal.default bind:fontDialog {fontUploadModal} editor={editor!} bind:fontName />
 {/await}
 
-{#await import("$lib/components/modals/KeybindModal.svelte") then modal}
+{#await import("#lib/components/modals/KeybindModal.svelte") then modal}
     <modal.default bind:keybindDialog />
 {/await}
-{#await import("$lib/components/modals/FontUploadModal.svelte") then modal}
+{#await import("#lib/components/modals/FontUploadModal.svelte") then modal}
     <modal.default bind:fontUploadModal />
 {/await}
 
-{#await import("$lib/components/modals/ColorGradientModal.svelte") then modal}
+{#await import("#lib/components/modals/ColorGradientModal.svelte") then modal}
     <modal.default {editor} bind:gradientDialog />
 {/await}
-{#await import("$lib/components/modals/UnicodeSelectorModal.svelte") then modal}
+{#await import("#lib/components/modals/UnicodeSelectorModal.svelte") then modal}
     <modal.default editor={editor!} bind:unicodeSelectorDialog />
 {/await}

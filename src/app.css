@@ -65,7 +65,7 @@ strong {
 
 .book-img {
     @apply h-115 w-94 px-10 py-18 text-black;
-    background-image: url("$lib/assets/book.png");
+    background-image: url("lib/assets/book.png");
     background-repeat: no-repeat;
     background-size: cover;
     image-rendering: pixelated;
@@ -87,7 +87,7 @@ strong {
 }
 
 .page-preview {
-    background-image: url("$lib/assets/book.png");
+    background-image: url("lib/assets/book.png");
     background-repeat: no-repeat;
     background-size: cover;
     image-rendering: pixelated;

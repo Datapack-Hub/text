@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
-    import MiniRenderer from "$lib/components/text/MiniRenderer.svelte";
-    import { tooltip } from "$lib/tooltip";
+    import Modal from "#lib/components/Modal.svelte";
+    import MiniRenderer from "#lib/components/text/MiniRenderer.svelte";
+    import { tooltip } from "#lib/tooltip.js";
     import type { Editor } from "@tiptap/core";
 
     interface Props {

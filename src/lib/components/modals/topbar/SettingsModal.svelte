@@ -1,7 +1,7 @@
 <script lang="ts">
-    import CheckBox from "$lib/components/CheckBox.svelte";
-    import Modal from "$lib/components/Modal.svelte";
-    import { appSettings } from "$lib/settings";
+    import CheckBox from "#lib/components/CheckBox.svelte";
+    import Modal from "#lib/components/Modal.svelte";
+    import { appSettings } from "#lib/settings.js";
 
     interface Props {
         settingsDialog?: Modal;

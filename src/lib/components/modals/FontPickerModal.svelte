@@ -1,12 +1,12 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
+    import Modal from "#lib/components/Modal.svelte";
     import IconFont from "~icons/tabler/function";
     import IconUploadFont from "~icons/tabler/function-filled";
     import IconCustom from "~icons/tabler/file-plus";
     import IconClose from "~icons/tabler/x";
     import type { Editor } from "@tiptap/core";
-    import { fontLUT } from "$lib/tiptap/extensions/fonts";
-    import { openDataStore } from "$lib/db";
+    import { fontLUT } from "#lib/tiptap/extensions/fonts.js";
+    import { openDataStore } from "#lib/db.js";
 
     let {
         editor,

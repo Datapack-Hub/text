@@ -1,6 +1,6 @@
-import { outputVersion } from "$lib/settings";
-import { convert, translateJSON } from "$lib/text/nbt/export";
-import { versions, type TranslateOptions } from "$lib/types";
+import { outputVersion } from "#lib/settings.js";
+import { convert, translateJSON } from "#lib/text/nbt/export.js";
+import { versions, type TranslateOptions } from "#lib/types.js";
 import type { JSONContent } from "@tiptap/core";
 import { expect, it } from "vitest";
 import { readTestDataFile, readTestJSONFile } from "../test_utils";

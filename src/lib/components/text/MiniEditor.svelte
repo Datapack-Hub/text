@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type MinecraftText, type StringyMCText } from "$lib/types";
+    import { type MinecraftText, type StringyMCText } from "#lib/types.js";
     import { Editor, type JSONContent } from "@tiptap/core";
     import Color from "@tiptap/extension-color";
     import Placeholder from "@tiptap/extension-placeholder";
@@ -12,9 +12,9 @@
     import IconHollow from "~icons/tabler/square-x";
     import { convertToTextOrEmpty, snbtToDocument } from "../../text/nbt/import";
 
-    import { colourMap, defaultColorLUT, trueMarkOrUndefined } from "$lib/text/utils";
-    import { addTypeSpecificValues } from "$lib/text/nbt/export";
-    import { FontsExtension, Obfuscation, ShadowColorMark } from "$lib/tiptap/extensions/index";
+    import { colourMap, defaultColorLUT, trueMarkOrUndefined } from "#lib/text/utils.js";
+    import { addTypeSpecificValues } from "#lib/text/nbt/export.js";
+    import { FontsExtension, Obfuscation, ShadowColorMark } from "#lib/tiptap/extensions/index.js";
     import TextStyleButtons from "../toolbar/TextStyleButtons.svelte";
 
     let {

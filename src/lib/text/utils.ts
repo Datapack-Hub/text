@@ -1,4 +1,4 @@
-import type { MinecraftText } from "$lib/types";
+import type { MinecraftText } from "#lib/types.js";
 import type { Editor, JSONContent } from "@tiptap/core";
 
 export const colourMap = [

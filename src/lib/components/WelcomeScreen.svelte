@@ -1,12 +1,12 @@
 <script lang="ts">
-    import IconImport from "~icons/tabler/upload";
+    import { welcomeScreenFormat } from "#lib/globals.js";
+    import { onMount } from "svelte";
+    import IconBook from "~icons/tabler/book";
+    import IconCode from "~icons/tabler/code";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconLore from "~icons/tabler/swords";
-    import IconCode from "~icons/tabler/code";
+    import IconImport from "~icons/tabler/upload";
     import IconClose from "~icons/tabler/X";
-    import IconBook from "~icons/tabler/book";
-    import { onMount } from "svelte";
-    import { welcomeScreenFormat } from "$lib/globals";
 
     let { visible = $bindable(false) }: { visible: boolean } = $props();
 
@@ -38,7 +38,8 @@
                 aria-hidden="true"
                 onclick={() => (visible = false)}
                 class="fixed top-0 left-0 z-40 h-screen w-screen bg-transparent"
-                tabindex="-1">
+                tabindex="-1"
+                hidden={!visible}>
             </div>
             <div class="z-50 m-auto w-[95%] py-4 md:w-[50%] 2xl:w-[40%]">
                 <div class="flex items-center rounded-t-lg bg-zinc-900 p-2 text-xl">
@@ -61,9 +62,9 @@
 
                     <div class="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                         <div
-                            class="col-span-2 mb-1 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50">
-                            <IconBook class="w-[3.75%] lg:w-1/20" />
-                            <div class="my-1 flex w-[96.25%] flex-col space-y-1 lg:w-19/20">
+                            class="mb-1 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50 lg:col-span-2">
+                            <IconBook class="w-8" />
+                            <div class="my-1 flex w-full flex-col space-y-1">
                                 <span class="text-xs font-bold text-yellow-500 uppercase"
                                     >New - Book Mode</span>
                                 <span class="text-sm text-white"
@@ -75,8 +76,8 @@
 
                         <div
                             class="flex items-center space-x-2 rounded-md border-2 border-green-500 bg-green-500/20 p-2 text-zinc-200 shadow-xl drop-shadow-lg">
-                            <IconImport class="w-[7.5%] lg:w-1/10" />
-                            <div class="my-1 flex w-[92.5%] flex-col space-y-1 lg:w-9/10">
+                            <IconImport class="w-8" />
+                            <div class="my-1 flex grow flex-col space-y-1 lg:w-9/10">
                                 <span class="text-xs font-bold text-green-500 uppercase"
                                     >Import</span>
                                 <span class="text-sm text-green-100"
@@ -86,8 +87,8 @@
 
                         <div
                             class="flex items-center space-x-2 rounded-md border-2 border-rose-500 bg-rose-500/20 p-2 text-zinc-200 shadow-xl drop-shadow-lg">
-                            <IconGradient class="w-[7.5%] lg:w-1/10" />
-                            <div class="my-1 flex w-[92.5%] flex-col space-y-1 lg:w-9/10">
+                            <IconGradient class="w-8" />
+                            <div class="my-1 flex grow flex-col space-y-1 lg:w-9/10">
                                 <span class="text-xs font-bold text-rose-500 uppercase"
                                     >Gradient</span>
                                 <span class="text-sm text-rose-100"
@@ -97,8 +98,8 @@
 
                         <div
                             class="flex items-center space-x-2 rounded-md border-2 border-blue-500 bg-blue-500/20 p-2 text-zinc-200 shadow-xl drop-shadow-lg">
-                            <IconLore class="w-[7.5%] lg:w-1/10" />
-                            <div class="my-1 flex w-[92.5%] flex-col space-y-1 lg:w-9/10">
+                            <IconLore class="w-8" />
+                            <div class="my-1 flex grow flex-col space-y-1 lg:w-9/10">
                                 <span class="text-xs font-bold text-blue-500 uppercase"
                                     >Lore output</span>
                                 <span class="text-sm text-blue-100"
@@ -108,8 +109,8 @@
 
                         <div
                             class="flex items-center space-x-2 rounded-md border-2 border-zinc-500 bg-zinc-800 p-2 text-zinc-200 shadow-xl drop-shadow-lg">
-                            <IconCode class="w-[7.5%] lg:w-1/10" />
-                            <div class="my-1 flex w-[92.5%] flex-col space-y-1 lg:w-9/10">
+                            <IconCode class="w-8" />
+                            <div class="my-1 flex grow flex-col space-y-1 lg:w-9/10">
                                 <span class="text-xs font-bold text-zinc-500 uppercase"
                                     >Open source</span>
                                 <span class="text-sm"

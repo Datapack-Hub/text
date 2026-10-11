@@ -1,4 +1,4 @@
-import { rgbToHex } from "$lib/text/utils";
+import { rgbToHex } from "#lib/text/utils.js";
 import { TextStyle } from "@tiptap/extension-text-style";
 
 export const FixedTextStyle = TextStyle.extend({

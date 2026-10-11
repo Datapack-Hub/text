@@ -1,4 +1,9 @@
-import type { MinecraftText, OldMinecraftText, StringyMCText, TranslateOptions } from "$lib/types";
+import type {
+    MinecraftText,
+    OldMinecraftText,
+    StringyMCText,
+    TranslateOptions,
+} from "#lib/types.js";
 import { type JSONContent } from "@tiptap/core";
 import {
     defaultColorLUT,
@@ -7,7 +12,7 @@ import {
     trueMarkOrUndefined,
     unescapeUnicode,
 } from "../utils";
-import { outputVersion } from "$lib/settings";
+import { outputVersion } from "#lib/settings.js";
 import { get } from "svelte/store";
 import { optimise } from "./optimiser";
 

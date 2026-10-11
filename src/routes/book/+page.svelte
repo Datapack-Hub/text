@@ -133,7 +133,7 @@
 
             const prepared = prepareRichInline(prepareList);
             const measured = measureRichInlineStats(prepared, maxWidth);
-            
+
             lineCount += measured.lineCount;
         })
 
@@ -169,8 +169,7 @@
             },
             onUpdate: ({ editor: currEditor }) => {
                 const json = currEditor.getJSON();
-
-                // console.log(countDocLines(json));
+                
                 if (countDocLines(json) > 14) {
                     if (currEditor.getText().length - 1 === lastTextSelection.from) {
                         addPageBelow(currentPageIndex)
@@ -274,7 +273,7 @@
         else if (index - 1 == currentPageIndex) currentPageIndex += 1;
         
         pageJSONs.splice(
-            index,
+            index - 1,
             0,
             pageJSONs.splice(index, 1)[0],
         );

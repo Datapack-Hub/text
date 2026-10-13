@@ -1,4 +1,4 @@
-import { welcomeScreenFormat } from "$lib/globals";
+import { welcomeScreenFormat } from "../../lib/globals.ts";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
     await page.waitForLoadState();
 
     await page.evaluate((format) => {
-        localStorage.setItem("hasSeenWelcome", format);
+        localStorage.setItem("seen_welcome", format);
     }, welcomeScreenFormat);
 
     await page.reload();
@@ -30,7 +30,7 @@ test("the bold button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("bold-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await expect(button).toHaveClass(/bg-zinc-800/);
     await expect(textbox.locator("p>strong")).toHaveCount(1);
     await expect(textbox.locator("p>strong").first()).toHaveCSS("font-family", "MinecraftBold");
@@ -41,7 +41,7 @@ test("the italic button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("italic-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await expect(button).toHaveClass(/bg-zinc-800/);
     await expect(textbox.locator("p>em")).toHaveCount(1);
     await expect(textbox.locator("p>em").first()).toHaveCSS("font-style", "italic");
@@ -52,7 +52,7 @@ test("the strikethrough button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("strikethrough-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await expect(button).toHaveClass(/bg-zinc-800/);
     await expect(textbox.locator("p>s")).toHaveCount(1);
     await expect(textbox.locator("p>s").first()).toHaveCSS("text-decoration-line", "line-through");
@@ -63,7 +63,7 @@ test("the underline button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("underline-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await expect(button).toHaveClass(/bg-zinc-800/);
     await expect(textbox.locator("p>u")).toHaveCount(1);
     await expect(textbox.locator("p>u").first()).toHaveCSS("text-decoration-line", "underline");
@@ -74,7 +74,7 @@ test("the obfuscation button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("obfuscation-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await expect(button).toHaveClass(/bg-zinc-800/);
     await expect(textbox.locator("p>span.obfuscated")).toHaveCount(1);
 });
@@ -84,7 +84,7 @@ test("the shadow color button should work", async ({ page }) => {
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
     const button = page.getByTestId("shadow-color-button");
-    await button.click();
+    await button.click({ timeout: 3000 });
     await page.locator('input[aria-label="hex color"]').waitFor({ timeout: 1000 });
     const colorInput = page.locator('input[aria-label="hex color"]');
     await colorInput.fill("#ff0000");
@@ -110,7 +110,7 @@ test("the color buttons should work", async ({ page }) => {
 
     // check colors
     for (const button of colorButtons) {
-        await button.click();
+        await button.click({ timeout: 3000 });
         const color = await button.getAttribute("style");
         const colorName = (await button.getAttribute("aria-label"))
             ?.toLowerCase()
@@ -130,7 +130,7 @@ test("the color buttons should work", async ({ page }) => {
     await textbox.selectText();
 
     // should be visible, being that it should still have color applied from the last button click
-    await page.getByTestId("unset-color-button").click();
+    await page.getByTestId("unset-color-button").click({ timeout: 3000 });
 
     await expect(textbox.locator("p>span[style*='color']")).toHaveCount(0);
     await expect(output).not.toContainText("color");

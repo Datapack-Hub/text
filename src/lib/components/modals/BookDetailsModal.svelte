@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
-    import { tooltip_right } from "$lib/tooltip";
+    import Modal from "#lib/components/Modal.svelte";
+    import { tooltip_right } from "#lib/tooltip.js";
     import IconInfo from "~icons/tabler/info-circle";
     import CheckBox from "../CheckBox.svelte";
 

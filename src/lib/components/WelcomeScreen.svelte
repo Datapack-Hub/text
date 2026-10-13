@@ -1,12 +1,12 @@
 <script lang="ts">
-    import IconImport from "~icons/tabler/upload";
+    import { welcomeScreenFormat } from "#lib/globals.js";
+    import { onMount } from "svelte";
+    import IconBook from "~icons/tabler/book";
+    import IconCode from "~icons/tabler/code";
     import IconGradient from "~icons/tabler/contrast-2";
     import IconLore from "~icons/tabler/swords";
-    import IconCode from "~icons/tabler/code";
+    import IconImport from "~icons/tabler/upload";
     import IconClose from "~icons/tabler/X";
-    import IconBook from "~icons/tabler/book";
-    import { onMount } from "svelte";
-    import { welcomeScreenFormat } from "$lib/globals";
 
     let { visible = $bindable(false) }: { visible: boolean } = $props();
 
@@ -38,7 +38,8 @@
                 aria-hidden="true"
                 onclick={() => (visible = false)}
                 class="fixed top-0 left-0 z-40 h-screen w-screen bg-transparent"
-                tabindex="-1">
+                tabindex="-1"
+                hidden={!visible}>
             </div>
             <div class="z-50 m-auto w-[95%] py-4 md:w-[50%] 2xl:w-[40%]">
                 <div class="flex items-center rounded-t-lg bg-zinc-900 p-2 text-xl">
@@ -61,7 +62,7 @@
 
                     <div class="mt-2 grid grid-cols-1 gap-2 lg:grid-cols-2">
                         <div
-                            class="lg:col-span-2 mb-1 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50">
+                            class="mb-1 flex items-center space-x-2 rounded-md border-2 border-yellow-500 bg-green-500/20 p-2 text-zinc-200 shadow-[0_0_10px_rgba(0,0,0,0)] shadow-yellow-500/50 lg:col-span-2">
                             <IconBook class="w-8" />
                             <div class="my-1 flex w-full flex-col space-y-1">
                                 <span class="text-xs font-bold text-yellow-500 uppercase"
@@ -72,7 +73,7 @@
                                     book details!</span>
                             </div>
                         </div>
-                        
+
                         <div
                             class="flex items-center space-x-2 rounded-md border-2 border-green-500 bg-green-500/20 p-2 text-zinc-200 shadow-xl drop-shadow-lg">
                             <IconImport class="w-8" />

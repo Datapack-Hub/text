@@ -10,7 +10,7 @@ import {
     rgbaToArgbHex,
     argbToRgbaHex,
     rgbToHex,
-} from "$lib/text/utils";
+} from "#lib/text/utils.js";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 

@@ -1,6 +1,6 @@
-import { outputVersion } from "$lib/settings";
-import { addTypeSpecificValues } from "$lib/text/nbt/export";
-import { versions, type MinecraftText, type VersionAgnosticText } from "$lib/types";
+import { outputVersion } from "#lib/settings.js";
+import { addTypeSpecificValues } from "#lib/text/nbt/export.js";
+import { versions, type MinecraftText, type VersionAgnosticText } from "#lib/types.js";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it } from "vitest";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
+    import Modal from "#lib/components/Modal.svelte";
     import type { Editor } from "@tiptap/core";
     import Sortable from "sortablejs";
     import ColorPicker from "svelte-awesome-color-picker";

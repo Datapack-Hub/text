@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { colourMap } from "$lib/text/utils";
-    import { tooltip } from "$lib/tooltip";
+    import { colourMap } from "#lib/text/utils.js";
+    import { tooltip } from "#lib/tooltip.js";
     import type { Editor } from "@tiptap/core";
     import ColorPicker from "svelte-awesome-color-picker";
     import IconBold from "~icons/tabler/bold";

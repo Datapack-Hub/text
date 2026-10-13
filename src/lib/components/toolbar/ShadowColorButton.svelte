@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { tooltip } from "$lib/tooltip";
+    import { tooltip } from "#lib/tooltip.js";
     import IconShadow from "~icons/tabler/shadow";
 
     interface Props {

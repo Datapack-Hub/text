@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
-    import type { ExternalSources } from "$lib/types";
+    import Modal from "#lib/components/Modal.svelte";
+    import type { ExternalSources } from "#lib/types.js";
 
     import IconScore from "~icons/tabler/123";
     import IconBack from "~icons/tabler/arrow-back-up";
@@ -11,8 +11,8 @@
     import IconKeybind from "~icons/tabler/keyboard";
     import IconTranslate from "~icons/tabler/language";
 
-    import { outputVersion } from "$lib/settings";
-    import { tooltip_right } from "$lib/tooltip";
+    import { outputVersion } from "#lib/settings.js";
+    import { tooltip_right } from "#lib/tooltip.js";
     import CheckBox from "../CheckBox.svelte";
     import MiniEditor from "../text/MiniEditor.svelte";
 

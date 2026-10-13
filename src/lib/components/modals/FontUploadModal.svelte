@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
-    import { openDataStore } from "$lib/db";
-    import { fontLUT } from "$lib/tiptap/extensions/fonts";
+    import Modal from "#lib/components/Modal.svelte";
+    import { openDataStore } from "#lib/db.js";
+    import { fontLUT } from "#lib/tiptap/extensions/fonts.js";
     import { fileTypeFromBlob } from "file-type";
     import IconUpload from "~icons/tabler/file-upload";
 

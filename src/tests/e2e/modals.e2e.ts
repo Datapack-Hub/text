@@ -1,4 +1,4 @@
-import { welcomeScreenFormat } from "$lib/globals";
+import { welcomeScreenFormat } from "../../lib/globals.ts";
 import { test, expect } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -16,7 +16,7 @@ test("the font button should work", async ({ page }) => {
     const textbox = page.locator("#wysiwyg-box>[role=textbox]").first();
     await textbox.fill("lorem ipsum");
     await textbox.selectText();
-    const button = page.getByLabel("Font", { exact: true });
+    const button = page.getByTestId("font-button");
     await button.click();
     await page.getByTestId("modal-title-set font").waitFor({ timeout: 1000 });
     await expect(page.getByTestId("modal-title-set font")).toBeVisible();

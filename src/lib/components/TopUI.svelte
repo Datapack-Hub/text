@@ -67,14 +67,14 @@
     </button>
     {#if page.url.pathname == "/book"}
         <a
-            class="hidden md:flex items-center space-x-[0.45rem] px-[0.6rem] py-2 text-orange-300 hover:bg-white/5"
+            class="hidden items-center space-x-[0.45rem] px-[0.6rem] py-2 text-orange-300 hover:bg-white/5 md:flex"
             href="/">
             <IconBookMode class="text-xs" />
             <span>Book Mode</span>
         </a>
     {:else}
         <a
-            class="hidden md:flex items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5"
+            class="hidden items-center space-x-[0.45rem] px-[0.6rem] py-2 hover:bg-white/5 md:flex"
             href="/book">
             <IconNormalMode class="text-xs" />
             <span>Normal Mode</span>
@@ -91,14 +91,14 @@
         >Datapack Wiki</a>
 </div>
 
-{#await import("$lib/components/modals/topbar/SavedTextsModal.svelte") then modal}
+{#await import("#lib/components/modals/topbar/SavedTextsModal.svelte") then modal}
     <modal.default bind:loadDialog {editor} {snapshots} />
 {/await}
 
-{#await import("$lib/components/modals/topbar/ImportModal.svelte") then modal}
+{#await import("#lib/components/modals/topbar/ImportModal.svelte") then modal}
     <modal.default bind:importDialog bind:pages bind:pageIndex {editor} />
 {/await}
 
-{#await import("$lib/components/modals/topbar/SettingsModal.svelte") then modal}
+{#await import("#lib/components/modals/topbar/SettingsModal.svelte") then modal}
     <modal.default bind:settingsDialog />
 {/await}

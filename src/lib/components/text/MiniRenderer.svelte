@@ -1,22 +1,17 @@
 <script lang="ts">
     import { generateHTML, type JSONContent } from "@tiptap/core";
     import { onMount } from "svelte";
-
-    import { browser } from "$app/environment";
-    import { appSettings } from "$lib/settings";
-    import { defaultExtensions } from "$lib/text/utils";
+    import { browser } from "$app/env";
+    import { appSettings } from "#lib/settings.js";
+    import { defaultExtensions } from "#lib/text/defaultExtensions.js";
 
     let { value }: { value: JSONContent } = $props();
 
-    let html: string = $state(")");
+    let html: string = $state("");
 
     onMount(() => {
-        html = browser
-            ? generateHTML(value, [
-                  ...defaultExtensions
-              ])
-            : ""
-        
+        html = browser ? generateHTML(value, defaultExtensions) : "";
+
         appSettings.subscribe(() => {
             const el = document.querySelectorAll(".tiptap") as NodeListOf<HTMLElement>;
 
@@ -41,5 +36,5 @@
 </script>
 
 {#if html}
-<div class="tiptap tiptap-minirenderer">{@html html}</div>
+    <div class="tiptap tiptap-minirenderer">{@html html}</div>
 {/if}

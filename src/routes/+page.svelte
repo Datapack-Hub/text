@@ -6,19 +6,19 @@
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
 
-    import Modal from "$lib/components/Modal.svelte";
+    import Modal from "#lib/components/Modal.svelte";
     import WelcomeScreen from "../lib/components/WelcomeScreen.svelte";
-    import ControlBar from "$lib/components/toolbar/Toolbar.svelte";
-    import TopUI from "$lib/components/TopUI.svelte";
-    import { openDataStore } from "$lib/db";
-    import { appSettings } from "$lib/settings";
-    import { outputVersion } from "$lib/settings";
-    import { convert } from "$lib/text/nbt/export";
-    import { ExportButtonExtension } from "$lib/tiptap/extensions/ExportButton";
-    import { fontLUT } from "$lib/tiptap/extensions/fonts";
-    import { tooltip } from "$lib/tooltip";
-    import { versions, type Version } from "$lib/types";
-    import { defaultExtensions } from "$lib/text/utils";
+    import ControlBar from "#lib/components/toolbar/Toolbar.svelte";
+    import TopUI from "#lib/components/TopUI.svelte";
+    import { openDataStore } from "#lib/db.js";
+    import { appSettings } from "#lib/settings.js";
+    import { outputVersion } from "#lib/settings.js";
+    import { convert } from "#lib/text/nbt/export.js";
+    import { ExportButtonExtension } from "#lib/tiptap/extensions/ExportButton.js";
+    import { fontLUT } from "#lib/tiptap/extensions/fonts.js";
+    import { tooltip } from "#lib/tooltip.js";
+    import { versions, type Version } from "#lib/types.js";
+    import { defaultExtensions } from "#lib/text/defaultExtensions.js";
 
     import IconTick from "~icons/tabler/check";
     import IconCopy from "~icons/tabler/copy";
@@ -130,8 +130,8 @@
         }
     });
 
+    let timeoutId: number;
     const debounce = (callback: (...args: any[]) => void, wait: number) => {
-        let timeoutId: number;
         return (...args: any[]) => {
             window.clearTimeout(timeoutId);
             timeoutId = window.setTimeout(() => {
@@ -372,10 +372,10 @@
 
 <WelcomeScreen bind:visible={showWelcomeScreen} />
 
-{#await import("$lib/components/modals/topbar/ExportModal.svelte") then modal}
+{#await import("#lib/components/modals/topbar/ExportModal.svelte") then modal}
     <modal.default bind:outputDialog {editor} {recentlyCopied} />
 {/await}
 
-{#await import("$lib/components/modals/ExportSelectionModal.svelte") then modal}
+{#await import("#lib/components/modals/ExportSelectionModal.svelte") then modal}
     <modal.default bind:exportSelectionDialog editor={editor!} {shouldOptimise} />
 {/await}

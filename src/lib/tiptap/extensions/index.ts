@@ -5,7 +5,7 @@ import {
     HoverEventMark,
     Obfuscation,
     ShadowColorMark,
-} from "$lib/tiptap/extensions/index";
+} from "#lib/tiptap/extensions/index.js";
 import { getSchema } from "@tiptap/core";
 import Color from "@tiptap/extension-color";
 import StarterKit from "@tiptap/starter-kit";

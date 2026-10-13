@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
+    import Modal from "#lib/components/Modal.svelte";
     import { Editor } from "@tiptap/core";
-    import IconRight from "~icons/tabler/chevron-right"
-    import IconDown from "~icons/tabler/chevron-down"
+    import IconRight from "~icons/tabler/chevron-right";
+    import IconDown from "~icons/tabler/chevron-down";
     import CheckBox from "../CheckBox.svelte";
 
     let sections = $state([
@@ -64,7 +64,7 @@
         {
             name: "Cultural",
             open: false,
-            chars: ["☯","☲","☵","☰","☱","☳","☴","☶","☷"],
+            chars: ["☯", "☲", "☵", "☰", "☱", "☳", "☴", "☶", "☷"],
         },
         {
             name: "Gothic Alphabet",
@@ -78,7 +78,7 @@
         }
     ])
 
-    let show_bold = $state(false)
+    let show_bold = $state(false);
 
     let {
         unicodeSelectorDialog = $bindable(),
@@ -91,36 +91,53 @@
 
 <Modal title="Insert Special Character" bind:this={unicodeSelectorDialog} key="U" flexible>
     <div class="flex flex-col">
-        <p class="text-sm mb-2 text-zinc-400 max-w-239">In Minecraft, these special Unicode characters display in the pixely Minecraft font, and can be used to spice up text without needing a custom font. Source: <a class="link" href="https://gist.github.com/tarkodev/ec3604b007e543d2f9e596f4e1d63d9c" target="_blank">tarkodev on GitHub</a>.</p>
+        <p class="mb-2 max-w-239 text-sm text-zinc-400">
+            In Minecraft, these special Unicode characters display in the pixely Minecraft font, and
+            can be used to spice up text without needing a custom font. Source: <a
+                class="link"
+                href="https://gist.github.com/tarkodev/ec3604b007e543d2f9e596f4e1d63d9c"
+                target="_blank">tarkodev on GitHub</a
+            >.
+        </p>
         <!-- big screens -->
-        <div class="w-239 h-0"></div>
+        <div class="h-0 w-239"></div>
         <div class="space-y-2">
             <div class="flex items-center space-x-2">
-                <div class="mr-3 flex items-center text-sm space-x-2">
+                <div class="mr-3 flex items-center space-x-2 text-sm">
                     <CheckBox bind:value={show_bold} label="bold" />
                     <label for="bold">Show bold symbols</label>
                 </div>
-                <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = true)}>Expand All</button>
-                <button class="w-fit rounded-md bg-zinc-900 p-1.5 hover:bg-black/50 text-sm" onclick={() => sections.forEach(s => s.open = false)}>Collapse All</button>
+                <button
+                    class="w-fit rounded-md bg-zinc-900 p-1.5 text-sm hover:bg-black/50"
+                    onclick={() => sections.forEach((s) => (s.open = true))}>Expand All</button>
+                <button
+                    class="w-fit rounded-md bg-zinc-900 p-1.5 text-sm hover:bg-black/50"
+                    onclick={() => sections.forEach((s) => (s.open = false))}>Collapse All</button>
             </div>
             {#each sections as sect}
-            <div class="flex flex-col space-y-1">
-                <button class="flex items-center space-x-2 w-fit" onclick={() => sect.open = !sect.open}>
-                    {#if sect.open}<IconDown />{:else}<IconRight />{/if}
-                    <span class="font-bold">{sect.name}</span>
-                </button>
-                {#if sect.open}
-                <div class="grid grid-flow-dense grid-cols-8 sm:grid-cols-12 md:grid-cols-17 lg:grid-cols-20 xl:grid-cols-24 gap-1 w-fit">
-                    {#each sect.chars as char}
-                        <button
-                            class="grid place-items-center m-auto {show_bold ? "font-minecraft-bold" : "font-minecraft"} aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl hover:text-white text-zinc-300"
-                            onclick={() => editor.chain().focus().insertContent(char!).run()}>
-                            <span class="translate-x-px">{char}</span>
-                        </button>
-                    {/each}
+                <div class="flex flex-col space-y-1">
+                    <button
+                        class="flex w-fit items-center space-x-2"
+                        onclick={() => (sect.open = !sect.open)}>
+                        {#if sect.open}<IconDown />{:else}<IconRight />{/if}
+                        <span class="font-bold">{sect.name}</span>
+                    </button>
+                    {#if sect.open}
+                        <div
+                            class="grid w-fit grid-flow-dense grid-cols-8 gap-1 sm:grid-cols-12 md:grid-cols-17 lg:grid-cols-20 xl:grid-cols-24">
+                            {#each sect.chars as char}
+                                <button
+                                    class="m-auto grid place-items-center {show_bold
+                                        ? 'font-minecraft-bold'
+                                        : 'font-minecraft'} aspect-square h-9 w-9 rounded-md bg-zinc-900 text-xl text-zinc-300 hover:text-white"
+                                    onclick={() =>
+                                        editor.chain().focus().insertContent(char!).run()}>
+                                    <span class="translate-x-px">{char}</span>
+                                </button>
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
-                {/if}
-            </div>
             {/each}
         </div>
     </div>

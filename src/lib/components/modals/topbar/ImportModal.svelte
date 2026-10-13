@@ -1,8 +1,8 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import CheckBox from "$lib/components/CheckBox.svelte";
-    import Modal from "$lib/components/Modal.svelte";
-    import { convertToTextOrEmpty, importBook, snbtToDocument } from "$lib/text/nbt/import";
+    import CheckBox from "#lib/components/CheckBox.svelte";
+    import Modal from "#lib/components/Modal.svelte";
+    import { convertToTextOrEmpty, importBook, snbtToDocument } from "#lib/text/nbt/import.js";
     import type { Editor, JSONContent } from "@tiptap/core";
 
     interface Props {

@@ -1,4 +1,4 @@
-import { optimise } from "$lib/text/nbt/optimiser";
+import { optimise } from "#lib/text/nbt/optimiser.js";
 import { describe, expect, it } from "vitest";
 
 // Minimal mock types for test compatibility

@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
-import { appSettings } from "$lib/settings";
+import { appSettings } from "#lib/settings.js";
 import { get } from "svelte/store";
 
 // Define the shape of configuration options for type safety

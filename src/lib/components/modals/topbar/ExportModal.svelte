@@ -1,12 +1,12 @@
 <script lang="ts">
-    import Modal from "$lib/components/Modal.svelte";
-    import { translateMOTD } from "$lib/text/motd";
-    import { convert } from "$lib/text/nbt/export";
+    import Modal from "#lib/components/Modal.svelte";
+    import { translateMOTD } from "#lib/text/motd.js";
+    import { convert } from "#lib/text/nbt/export.js";
     import CheckBox from "../../CheckBox.svelte";
     import { domToPng, type Options } from "modern-screenshot";
     import { Highlight } from "svelte-highlight";
     import typescript from "svelte-highlight/languages/typescript";
-    import { appSettings } from "$lib/settings";
+    import { appSettings } from "#lib/settings.js";
     import { json } from "svelte-highlight/languages";
 
     // Icons

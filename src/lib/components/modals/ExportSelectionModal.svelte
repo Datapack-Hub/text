@@ -60,7 +60,9 @@
         {#key value}
             <p class="w-full">Selected text:</p>
             <div class="rounded-md bg-zinc-900 px-1">
+                {#if value.content}
                 <MiniRenderer {value} />
+                {/if}
             </div>
 
             <p class="mt-2 w-full">Output:</p>

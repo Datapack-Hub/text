@@ -9,11 +9,11 @@ import {
 import { type MinecraftText, type OldMinecraftText } from "../../types";
 import { type StringyMCText } from "../../types";
 
-export function importBook(raw: StringyMCText[]): JSONContent[] {
+export function importBook(raw: StringyMCText[][]): JSONContent[] {
     const pages: JSONContent[] = [];
 
     raw.forEach((page) => {
-        const pageDocument = snbtToDocument([page]);
+        const pageDocument = snbtToDocument(page);
         pages.push(pageDocument);
     });
 
@@ -72,7 +72,12 @@ export function convertToTextOrEmpty(raw: string): StringyMCText[] {
     let parsed: MinecraftText[] | MinecraftText | string;
 
     try {
-        parsed = JSON.parse(raw);
+        const temp = JSON.parse(raw);
+        if (temp.pages) { // handle book format with pages property
+            parsed = temp.pages;
+        } else {
+            parsed = temp;
+        }
     } catch (err) {
         return [
             "",

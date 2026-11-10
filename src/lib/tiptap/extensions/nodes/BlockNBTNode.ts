@@ -48,7 +48,7 @@ export const BlockNBTNode = Node.create<NodeOptions>({
 					text-decoration: inherit;
 				`,
             }),
-            ["span", {}, `NBT: ${nbt}, ${block}`],
+            ["span", {}, `NBT: ${nbt} of ${block}`],
         ];
     },
 

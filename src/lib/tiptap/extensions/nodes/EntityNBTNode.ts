@@ -48,7 +48,7 @@ export const EntityNBTNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
             `,
             }),
-            ["p", {}, `NBT: ${nbt}, ${entity}`],
+            ["p", {}, `NBT: ${nbt} of ${entity}`],
         ];
     },
 

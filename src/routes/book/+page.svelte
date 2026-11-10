@@ -417,6 +417,7 @@
                     </div>
                 {/each}
             {/key}
+            <div class="py-48"></div>
         </div>
         <div class="h-full w-full grow overflow-auto border-l border-zinc-700 bg-zinc-800">
             <div class="book-img m-3">
@@ -439,7 +440,7 @@
             >DEV ONLY: {currentTiptapJSON ? JSON.stringify(currentTiptapJSON) : "Loading..."}</code>
         <br />
     {/if}
-    <div class="w-screen border-t border-zinc-700 bg-zinc-950 p-3">
+    <div class="w-screen border-t border-zinc-700 bg-zinc-950 p-3 z-20">
         <div class="flex max-h-32 items-start space-x-2 overflow-auto">
             <button
                 {@attach tooltip}

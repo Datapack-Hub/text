@@ -59,7 +59,7 @@ export const AtlasObjectNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
         `,
             }),
-            ["span", {}, `OBJECT: [${sprite}@${atlas}]`],
+            ["span", {}, `OBJ: [${sprite} in ${atlas}]`],
         ];
     },
 

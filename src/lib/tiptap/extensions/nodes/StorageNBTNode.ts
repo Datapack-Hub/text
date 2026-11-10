@@ -48,7 +48,7 @@ export const StorageNBTNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
             `,
             }),
-            ["span", {}, `NBT: ${nbt}, ${storage}`],
+            ["span", {}, `NBT: ${nbt} of ${storage}`],
         ];
     },
 

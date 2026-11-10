@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { page } from "$app/state";
     import CheckBox from "#lib/components/CheckBox.svelte";
     import Modal from "#lib/components/Modal.svelte";
     import { convertToTextOrEmpty, importBook, snbtToDocument } from "#lib/text/nbt/import.js";
+    import { page } from "$app/state";
     import type { Editor, JSONContent } from "@tiptap/core";
 
     interface Props {
@@ -37,9 +37,12 @@
     }
 
     function importBookToEditor() {
-        const convertedContent = convertToTextOrEmpty(importText!);
+        let convertedContent = convertToTextOrEmpty(importText!);
 
         if (bookImportMode === "overwrite") {
+            // @ts-expect-error *technically* in this one case, convertedContent is a StringyMCText[][], 
+            // but fixing it would require another function which is overkill, and this is the only place 
+            // where it is used, so it's fine to ignore the error here.            
             const jsonContent = importBook(convertedContent);
             pages = jsonContent;
             pageIndex = 0;

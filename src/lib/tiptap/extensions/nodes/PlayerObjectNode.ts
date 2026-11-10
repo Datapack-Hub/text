@@ -57,7 +57,7 @@ export const PlayerObjectNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
         `,
             }),
-            ["span", {}, `OBJECT: [player ${player.name}]`],
+            ["span", {}, `OBJ: [head of ${player.name}]`],
         ];
     },
 

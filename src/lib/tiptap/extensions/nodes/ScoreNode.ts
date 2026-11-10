@@ -47,7 +47,7 @@ export const ScoreNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
         `,
             }),
-            ["span", {}, `SCORE: ${name} - ${objective}`],
+            ["span", {}, `SCORE: ${name} in ${objective}`],
         ];
     },
 

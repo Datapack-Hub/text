@@ -46,7 +46,7 @@ export const KeybindNode = Node.create<NodeOptions>({
 			text-decoration: inherit;
             `,
             }),
-            ["span", {}, `KEYBIND: ${key}`],
+            ["span", {}, `KEY: ${key}`],
         ];
     },
 
